@@ -1,0 +1,2088 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CIC EXPERT PRO — Agence Comptable EPLE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+/* ====================================================
+   VARIABLES & RESET
+   ==================================================== */
+:root {
+  --navy:       #0b1437;
+  --navy-mid:   #152051;
+  --navy-light: #1e3a8a;
+  --blue:       #2563eb;
+  --blue-light: #3b82f6;
+  --sky:        #0ea5e9;
+  --gold:       #f59e0b;
+  --success:    #10b981;
+  --danger:     #ef4444;
+  --warn:       #f59e0b;
+  --info:       #0ea5e9;
+  --purple:     #7c3aed;
+  --bg:         #f0f4ff;
+  --surface:    #ffffff;
+  --border:     #e2e8f0;
+  --text:       #1e293b;
+  --muted:      #64748b;
+  --sidebar-w:  290px;
+  --header-h:   62px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;}
+
+/* ====================================================
+   SIDEBAR
+   ==================================================== */
+nav.sidebar{
+  width:var(--sidebar-w);flex-shrink:0;
+  background:linear-gradient(165deg,var(--navy) 0%,var(--navy-mid) 60%,#1e3a8a 100%);
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:4px 0 24px rgba(0,0,0,0.25);
+  position:relative;z-index:10;
+}
+nav.sidebar::before{
+  content:'';position:absolute;top:-80px;right:-60px;
+  width:240px;height:240px;border-radius:50%;
+  background:radial-gradient(circle,rgba(37,99,235,0.18) 0%,transparent 70%);
+  pointer-events:none;
+}
+.sidebar-logo{
+  padding:22px 20px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  position:relative;
+}
+.sidebar-logo h1{
+  font-family:'Playfair Display',serif;
+  font-size:1.15rem;color:#fff;line-height:1.2;
+}
+.sidebar-logo .sub{font-size:0.7rem;color:#93c5fd;margin-top:3px;letter-spacing:.5px;}
+.sidebar-logo .badge-version{
+  position:absolute;top:22px;right:16px;
+  background:var(--gold);color:var(--navy);
+  font-size:0.6rem;font-weight:700;padding:3px 7px;border-radius:20px;
+  font-family:'DM Mono',monospace;letter-spacing:.5px;
+}
+.nav-scroll{flex:1;overflow-y:auto;padding-bottom:12px;}
+.nav-scroll::-webkit-scrollbar{width:4px;}
+.nav-scroll::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.12);border-radius:4px;}
+.nav-group{padding:14px 16px 4px;font-size:0.62rem;color:#93c5fd;text-transform:uppercase;letter-spacing:1.5px;font-weight:700;}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 18px;cursor:pointer;
+  border:none;background:none;color:rgba(255,255,255,0.75);
+  width:100%;text-align:left;font-size:0.83rem;
+  font-family:'DM Sans',sans-serif;
+  border-left:3px solid transparent;
+  transition:all 0.18s;
+}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff;border-left-color:rgba(147,197,253,0.4);}
+.nav-item.active{background:rgba(37,99,235,0.28);color:#fff;border-left-color:#60a5fa;font-weight:600;}
+.nav-item .icon{font-size:1rem;flex-shrink:0;width:20px;text-align:center;}
+.nav-item .nav-badge{
+  margin-left:auto;background:var(--danger);color:#fff;
+  font-size:0.62rem;padding:1px 6px;border-radius:20px;font-weight:700;
+}
+.nav-item .nav-badge.green{background:var(--success);}
+.nav-item .nav-badge.gold{background:var(--gold);color:var(--navy);}
+
+.sidebar-footer{
+  padding:12px 16px;border-top:1px solid rgba(255,255,255,0.08);
+  font-size:0.7rem;color:rgba(255,255,255,0.35);text-align:center;
+}
+
+/* ====================================================
+   MAIN CONTENT
+   ==================================================== */
+.main-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+.topbar{
+  height:var(--header-h);background:var(--surface);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;padding:0 24px;gap:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.04);
+  flex-shrink:0;
+}
+.topbar-eple{display:flex;align-items:center;gap:10px;flex:1;}
+.topbar-eple label{font-size:0.78rem;font-weight:600;color:var(--muted);white-space:nowrap;}
+.topbar-eple select{
+  padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:0.85rem;font-family:'DM Sans',sans-serif;
+  background:#fff;min-width:260px;
+}
+.topbar-eple select:focus{outline:none;border-color:var(--blue);}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.status-pill{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;
+}
+.status-pill.ok{background:#d1fae5;color:#065f46;}
+.status-pill.warn{background:#fef3c7;color:#78350f;}
+.status-pill.danger{background:#fee2e2;color:#7f1d1d;}
+.status-pill .dot{width:7px;height:7px;border-radius:50%;}
+.status-pill.ok .dot{background:var(--success);}
+.status-pill.warn .dot{background:var(--warn);}
+.status-pill.danger .dot{background:var(--danger);}
+.topbar-date{font-size:0.75rem;color:var(--muted);font-family:'DM Mono',monospace;}
+
+main.content{flex:1;overflow-y:auto;padding:24px;}
+main.content::-webkit-scrollbar{width:6px;}
+main.content::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px;}
+
+section.page{display:none;}
+section.page.active{display:block;}
+
+/* ====================================================
+   CARDS
+   ==================================================== */
+.page-header{margin-bottom:20px;}
+.page-header h2{font-size:1.25rem;font-weight:700;color:var(--navy);}
+.page-header p{font-size:0.83rem;color:var(--muted);margin-top:4px;}
+
+.card{
+  background:var(--surface);border-radius:12px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.055);
+  margin-bottom:18px;overflow:hidden;
+}
+.card-header{
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-header h3{font-size:0.95rem;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:8px;}
+.card-body{padding:20px;}
+
+.card-accent-blue{border-top:3px solid var(--blue);}
+.card-accent-green{border-top:3px solid var(--success);}
+.card-accent-gold{border-top:3px solid var(--gold);}
+.card-accent-red{border-top:3px solid var(--danger);}
+.card-accent-purple{border-top:3px solid var(--purple);}
+.card-accent-sky{border-top:3px solid var(--sky);}
+
+/* INFO BOXES */
+.info-box{
+  padding:12px 16px;border-radius:8px;margin-bottom:14px;
+  font-size:0.82rem;line-height:1.55;
+}
+.info-box.blue{background:#eff6ff;border-left:4px solid var(--blue);color:#1e40af;}
+.info-box.green{background:#f0fdf4;border-left:4px solid var(--success);color:#14532d;}
+.info-box.gold{background:#fffbeb;border-left:4px solid var(--gold);color:#78350f;}
+.info-box.red{background:#fff1f2;border-left:4px solid var(--danger);color:#7f1d1d;}
+.info-box.purple{background:#faf5ff;border-left:4px solid var(--purple);color:#4c1d95;}
+.info-box.sky{background:#f0f9ff;border-left:4px solid var(--sky);color:#0c4a6e;}
+.info-box .ref{font-family:'DM Mono',monospace;font-size:0.75rem;opacity:.75;}
+
+/* GRID */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+@media(max-width:900px){.g3,.g4{grid-template-columns:1fr 1fr;}.g2{grid-template-columns:1fr;}}
+
+/* FORMS */
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;}
+.form-group{margin-bottom:12px;}
+.form-group label{display:block;font-size:0.78rem;font-weight:600;color:var(--muted);margin-bottom:5px;}
+input[type=text],input[type=number],input[type=email],input[type=tel],input[type=month],input[type=date],select,textarea{
+  width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:0.86rem;font-family:'DM Sans',sans-serif;background:#fff;
+  transition:border-color .18s,box-shadow .18s;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px rgba(37,99,235,0.12);}
+textarea{resize:vertical;min-height:65px;}
+
+/* BUTTONS */
+.btn{
+  padding:9px 18px;border-radius:8px;border:none;cursor:pointer;
+  font-weight:600;font-size:0.83rem;font-family:'DM Sans',sans-serif;
+  transition:all .18s;display:inline-flex;align-items:center;gap:6px;
+}
+.btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.12);}
+.btn-primary{background:var(--blue);color:#fff;}
+.btn-success{background:var(--success);color:#fff;}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn-gold{background:var(--gold);color:var(--navy);}
+.btn-purple{background:var(--purple);color:#fff;}
+.btn-ghost{background:#f1f5f9;color:var(--text);}
+.btn-sm{padding:6px 12px;font-size:0.76rem;border-radius:6px;}
+.btn-xs{padding:4px 9px;font-size:0.71rem;border-radius:5px;}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:0.71rem;font-weight:700;}
+.badge-ok{background:#d1fae5;color:#065f46;}
+.badge-nok{background:#fee2e2;color:#7f1d1d;}
+.badge-warn{background:#fef3c7;color:#78350f;}
+.badge-info{background:#e0f2fe;color:#0c4a6e;}
+.badge-purple{background:#ede9fe;color:#4c1d95;}
+.badge-navy{background:#e0e7ff;color:#312e81;}
+
+/* CHECKLISTS */
+.checklist-block{margin-bottom:18px;}
+.checklist-title{
+  font-size:0.8rem;font-weight:700;color:var(--navy-light);
+  padding:8px 12px;background:#f8faff;border-radius:6px 6px 0 0;
+  border-bottom:2px solid var(--blue-light);margin-bottom:0;
+  text-transform:uppercase;letter-spacing:.5px;
+}
+.check-item{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:9px 12px;border-bottom:1px solid #f1f5f9;
+  transition:background .15s;
+}
+.check-item:last-child{border-bottom:none;}
+.check-item:hover{background:#fafbff;}
+.check-item input[type=checkbox]{
+  width:16px;height:16px;flex-shrink:0;margin-top:2px;
+  accent-color:var(--success);cursor:pointer;
+}
+.check-item label{cursor:pointer;font-size:0.86rem;line-height:1.45;flex:1;}
+.check-item label strong{color:var(--navy);}
+.check-item .check-ref{font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--muted);display:block;margin-top:2px;}
+.check-item .check-jurisprudence{font-size:0.71rem;color:var(--purple);font-style:italic;display:block;margin-top:2px;}
+.check-item .risk-high{color:var(--danger);}
+.check-item .risk-med{color:var(--warn);}
+
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;font-size:0.84rem;}
+.tbl th{background:#0f172a;color:#e2e8f0;padding:10px 14px;text-align:left;font-size:0.72rem;text-transform:uppercase;letter-spacing:.5px;font-weight:600;}
+.tbl td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.tbl tr:hover td{background:#f8faff;}
+.tbl td input[type=number]{width:130px;text-align:right;}
+.tbl .td-center{text-align:center;}
+.tbl .td-right{text-align:right;font-family:'DM Mono',monospace;}
+
+/* STAT CARDS */
+.stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+@media(max-width:1100px){.stat-cards{grid-template-columns:1fr 1fr;}}
+.stat-card{
+  background:var(--surface);border-radius:12px;padding:18px 20px;
+  box-shadow:0 2px 10px rgba(0,0,0,0.055);
+  border-left:4px solid var(--blue);
+  position:relative;overflow:hidden;
+}
+.stat-card::after{
+  content:attr(data-icon);position:absolute;right:16px;top:14px;
+  font-size:1.6rem;opacity:.12;
+}
+.stat-card .s-label{font-size:0.73rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.stat-card .s-val{font-size:1.9rem;font-weight:800;color:var(--navy);font-family:'DM Mono',monospace;margin:4px 0;}
+.stat-card .s-sub{font-size:0.72rem;color:var(--muted);}
+.stat-card.green{border-left-color:var(--success);}
+.stat-card.gold{border-left-color:var(--gold);}
+.stat-card.red{border-left-color:var(--danger);}
+.stat-card.purple{border-left-color:var(--purple);}
+
+/* RISK METER */
+.risk-meter{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.risk-bar{flex:1;height:6px;border-radius:3px;background:#e2e8f0;overflow:hidden;}
+.risk-fill{height:100%;border-radius:3px;transition:width .5s;}
+.risk-fill.low{background:var(--success);}
+.risk-fill.med{background:var(--gold);}
+.risk-fill.high{background:var(--danger);}
+.risk-label{font-size:0.7rem;font-weight:700;width:36px;text-align:right;}
+
+/* VOYAGES */
+.voyage-card{
+  background:#f8faff;border:1.5px solid var(--border);
+  border-radius:10px;padding:16px;margin-bottom:12px;
+  position:relative;
+}
+.voyage-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.v-balance{
+  padding:7px 14px;border-radius:8px;font-size:0.82rem;font-weight:700;
+  text-align:center;margin-top:8px;
+}
+.v-balance.ok{background:#d1fae5;color:#065f46;}
+.v-balance.nok{background:#fee2e2;color:#7f1d1d;}
+
+/* CLASSE 5 */
+.c5-diag-ok{color:var(--success);font-weight:700;font-size:0.82rem;}
+.c5-diag-nok{color:var(--danger);font-weight:700;font-size:0.82rem;}
+.c5-diag-na{color:var(--muted);font-size:0.82rem;}
+
+/* RECOUVREMENT */
+.creance-row{
+  display:grid;grid-template-columns:1fr 1fr 1fr 1fr auto;
+  gap:8px;align-items:center;
+  padding:10px 12px;background:#f8faff;border-radius:8px;margin-bottom:8px;
+  border-left:3px solid var(--border);
+}
+.creance-row.urgent{border-left-color:var(--danger);}
+.creance-row.warning{border-left-color:var(--gold);}
+.creance-row.ok{border-left-color:var(--success);}
+
+/* QUOTIDIEN CALENDAR */
+.jour-tab{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;}
+.jour-btn{
+  padding:7px 16px;border-radius:8px;border:1.5px solid var(--border);
+  background:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;
+  font-family:'DM Sans',sans-serif;color:var(--muted);transition:.15s;
+}
+.jour-btn.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.jour-content{display:none;}
+.jour-content.active{display:block;}
+
+/* PV */
+#pv-overlay{
+  display:none;position:fixed;inset:0;background:#fff;z-index:9999;
+  overflow-y:auto;
+}
+.pv-topbar{
+  position:sticky;top:0;background:#fff;
+  border-bottom:2px solid var(--border);padding:14px 30px;
+  display:flex;justify-content:space-between;align-items:center;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);z-index:1;
+}
+.pv-body{max-width:820px;margin:0 auto;padding:40px 30px 60px;}
+.pv-entete{text-align:center;padding-bottom:24px;margin-bottom:24px;border-bottom:3px double #333;}
+.pv-title{font-family:'Playfair Display',serif;font-size:1.5rem;text-transform:uppercase;text-decoration:underline;}
+.pv-sub{font-size:1rem;margin-top:8px;}
+.pv-meta{margin-top:14px;font-size:0.9rem;line-height:1.8;}
+.pv-section{margin-bottom:22px;}
+.pv-section-h{font-weight:700;font-size:1rem;text-transform:uppercase;border-bottom:1.5px solid #999;padding-bottom:5px;margin-bottom:12px;}
+.pv-ok{background:#f0fdf4;border-left:3px solid #059669;padding:9px 14px;margin-bottom:7px;font-size:0.88rem;border-radius:0 6px 6px 0;}
+.pv-nok{background:#fff1f2;border-left:3px solid #dc2626;padding:9px 14px;margin-bottom:7px;font-size:0.88rem;border-radius:0 6px 6px 0;}
+.pv-action{font-size:0.82rem;color:#6d28d9;font-style:italic;margin-top:5px;}
+.pv-ref{font-family:'DM Mono',monospace;font-size:0.72rem;color:var(--muted);}
+.pv-sigs{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:50px;}
+.pv-sig{border:1px solid #ccc;padding:20px;min-height:170px;border-radius:4px;text-align:center;}
+.pv-sig strong{display:block;margin-bottom:5px;}
+.pv-sig small{color:#666;font-size:0.8rem;}
+.pv-sig .sig-assigned{
+  margin-top:8px;font-size:0.75rem;
+  background:#eff6ff;color:#1e40af;padding:3px 8px;border-radius:4px;
+  font-weight:600;
+}
+
+/* TOAST */
+#toast{
+  visibility:hidden;position:fixed;bottom:22px;right:22px;
+  background:var(--navy);color:#fff;padding:12px 22px;
+  border-radius:10px;z-index:10000;
+  box-shadow:0 6px 20px rgba(0,0,0,0.28);font-size:0.88rem;
+  display:flex;align-items:center;gap:10px;
+}
+#toast.show{visibility:visible;animation:fadeUp .3s;}
+@keyframes fadeUp{from{transform:translateY(20px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+
+/* DAILY RISK INDICATOR */
+.daily-indicator{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy-mid) 100%);
+  border-radius:12px;padding:20px 24px;color:#fff;margin-bottom:18px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 4px 16px rgba(11,20,55,0.25);
+}
+.daily-indicator .di-left h3{font-size:1rem;font-weight:700;margin-bottom:4px;}
+.daily-indicator .di-left p{font-size:0.8rem;opacity:.7;}
+.daily-indicator .di-right{text-align:right;}
+.di-score{font-size:2.4rem;font-weight:800;font-family:'DM Mono',monospace;}
+.di-score.green{color:#6ee7b7;}
+.di-score.orange{color:#fde68a;}
+.di-score.red{color:#fca5a5;}
+
+/* ORDONNATEUR badge */
+.ordo-card{
+  background:linear-gradient(135deg,#1e3a8a 0%,#1e40af 100%);
+  color:#fff;border-radius:10px;padding:16px 20px;
+  display:flex;align-items:center;gap:14px;margin-bottom:12px;
+}
+.ordo-card .ordo-icon{font-size:2rem;opacity:.8;}
+.ordo-card h4{font-size:0.92rem;font-weight:700;margin-bottom:2px;}
+.ordo-card p{font-size:0.75rem;opacity:.7;}
+
+/* TEAM CARDS */
+.team-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px;}
+.team-card{
+  background:var(--surface);border-radius:10px;padding:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+  border-top:4px solid var(--blue);
+}
+.team-card.fp{border-top-color:var(--purple);}
+.team-card.ag{border-top-color:var(--success);}
+.team-card h4{font-size:0.9rem;font-weight:700;margin-bottom:2px;}
+.team-card .role{font-size:0.7rem;text-transform:uppercase;letter-spacing:.5px;font-weight:700;margin-bottom:8px;}
+.team-card .role.ac{color:var(--blue);}
+.team-card .role.fp{color:var(--purple);}
+.team-card .role.ag{color:var(--success);}
+.team-card .eple-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.eple-chip{
+  font-size:0.66rem;padding:2px 8px;border-radius:12px;
+  background:#e0e7ff;color:#312e81;font-weight:600;
+}
+
+/* MARCHÉS */
+.marche-level{
+  display:flex;align-items:stretch;gap:0;border-radius:8px;overflow:hidden;
+  margin-bottom:10px;border:1.5px solid var(--border);
+}
+.ml-seuil{
+  background:var(--navy);color:#fff;padding:12px 16px;
+  font-size:0.82rem;font-weight:700;min-width:140px;
+  display:flex;align-items:center;
+}
+.ml-desc{
+  padding:12px 16px;background:#f8faff;flex:1;font-size:0.82rem;
+}
+.ml-desc strong{color:var(--navy);}
+
+/* IMMO */
+.immo-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 80px;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--border);}
+.immo-row:last-child{border-bottom:none;}
+.immo-row input{margin-bottom:0;}
+
+/* PRINT */
+@media print{
+  nav.sidebar{display:none!important;}
+  .main-wrap{display:none!important;}
+  #pv-overlay{display:block!important;}
+  .pv-topbar{display:none!important;}
+  .no-print{display:none!important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     SIDEBAR
+     ============================================================ -->
+<nav class="sidebar no-print">
+  <div class="sidebar-logo">
+    <h1>CIC EXPERT PRO</h1>
+    <div class="sub">Agence Comptable EPLE · M9-6</div>
+    <span class="badge-version">v57 PRO</span>
+  </div>
+  <div class="nav-scroll">
+    <div class="nav-group">Structure</div>
+    <button class="nav-item active" onclick="showPage('dashboard')"><span class="icon">📊</span>Tableau de Bord</button>
+    <button class="nav-item" onclick="showPage('parametres')"><span class="icon">⚙️</span>Paramètres & Équipe</button>
+
+    <div class="nav-group">Contrôles Quotidiens</div>
+    <button class="nav-item" onclick="showPage('quotidien')"><span class="icon">📅</span>Vérification Quotidienne</button>
+    <button class="nav-item" onclick="showPage('ordonnateur')"><span class="icon">👤</span>Contrôle Ordonnateur</button>
+
+    <div class="nav-group">Contrôles Opérationnels</div>
+    <button class="nav-item" onclick="showPage('droits_constates')"><span class="icon">📋</span>Droits Constatés</button>
+    <button class="nav-item" onclick="showPage('exec_depenses')"><span class="icon">💸</span>Dépenses (Demandes de paiement)</button>
+    <button class="nav-item" onclick="showPage('exec_recettes')"><span class="icon">💰</span>Recettes (Titres)</button>
+    <button class="nav-item" onclick="showPage('voyages')"><span class="icon">🚌</span>Voyages Scolaires</button>
+    <button class="nav-item" onclick="showPage('marches')"><span class="icon">📑</span>Marchés Publics</button>
+    <button class="nav-item" onclick="showPage('regie')"><span class="icon">💼</span>Régies (Vérification)</button>
+
+    <div class="nav-group">Suivi Financier</div>
+    <button class="nav-item" onclick="showPage('classe5')"><span class="icon">🏦</span>Audit Classe 5</button>
+    <button class="nav-item" onclick="showPage('recouvrement')"><span class="icon">🎯</span>Recouvrement Créances</button>
+    <button class="nav-item" onclick="showPage('immo')"><span class="icon">🏗️</span>Immobilisations</button>
+
+    <div class="nav-group">Synthèse</div>
+    <button class="nav-item" onclick="generatePV()"><span class="icon">📜</span>Procès-Verbal</button>
+    <button class="nav-item" onclick="window.print()"><span class="icon">🖨️</span>Imprimer le PV</button>
+  </div>
+  <div class="sidebar-footer">CIC EXPERT PRO · EPLE Guadeloupe<br>M9-6 · Décret GBCP 2012-1246</div>
+</nav>
+
+<!-- ============================================================
+     MAIN
+     ============================================================ -->
+<div class="main-wrap">
+  <!-- Topbar -->
+  <div class="topbar no-print">
+    <div class="topbar-eple">
+      <label>Établissement :</label>
+      <select id="uai-selector" onchange="changeEple(this.value)"></select>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-date" id="topbar-date"></div>
+      <div class="status-pill ok" id="status-pill"><span class="dot"></span><span id="status-text">Prêt</span></div>
+    </div>
+  </div>
+
+  <main class="content">
+
+    <!-- ==================== DASHBOARD ==================== -->
+    <section class="page active" id="dashboard">
+      <div class="page-header">
+        <h2>Tableau de Bord de l'Agence Comptable</h2>
+        <p>Vue d'ensemble — Contrôle Interne Comptable quotidien · Référentiel M9-6 & GBCP</p>
+      </div>
+      <div class="daily-indicator" id="dash-indicator" data-icon="📊">
+        <div class="di-left">
+          <h3 id="dash-eple-name">Aucun établissement sélectionné</h3>
+          <p id="dash-eple-info">Sélectionnez un EPLE dans la barre du haut pour commencer</p>
+        </div>
+        <div class="di-right">
+          <div class="di-score green" id="dash-score">—</div>
+          <div style="font-size:.75rem;opacity:.6;margin-top:2px;">Score de conformité</div>
+        </div>
+      </div>
+      <div class="stat-cards">
+        <div class="stat-card" data-icon="🏛️"><div class="s-label">EPLE rattachés</div><div class="s-val" id="st-eples">0</div><div class="s-sub">Groupement comptable</div></div>
+        <div class="stat-card green" data-icon="✅"><div class="s-label">Points validés</div><div class="s-val" id="st-ok">—</div><div class="s-sub">EPLE courant</div></div>
+        <div class="stat-card red" data-icon="⚠️"><div class="s-label">Anomalies</div><div class="s-val" id="st-nok">—</div><div class="s-sub">À régulariser</div></div>
+        <div class="stat-card gold" data-icon="🎯"><div class="s-label">Taux conformité</div><div class="s-val" id="st-rate">—</div><div class="s-sub">Tous modules</div></div>
+      </div>
+      <div class="card card-accent-blue">
+        <div class="card-header"><h3>📈 Récapitulatif par module</h3></div>
+        <div class="card-body" style="padding:0;">
+          <table class="tbl"><thead><tr><th>Module</th><th>Points</th><th>Validés</th><th>Anomalies</th><th>Statut</th><th>Risque</th></tr></thead>
+          <tbody id="dash-tbody"><tr><td colspan="6" style="text-align:center;padding:20px;color:var(--muted);">Sélectionnez un EPLE pour voir le récapitulatif</td></tr></tbody></table>
+        </div>
+      </div>
+      <div class="card card-accent-sky">
+        <div class="card-header"><h3>💡 Note pédagogique — Rôle du CIC</h3></div>
+        <div class="card-body">
+          <div class="info-box blue">
+            <strong>Ce qu'est le CIC EXPERT PRO :</strong> Cet outil n'est pas un audit annuel mais un contrôle interne comptable <strong>quotidien</strong>. Il accompagne chaque collaboratrice dans la vérification des dossiers présentés à l'agence comptable avant toute prise en charge ou mise en paiement. Il s'appuie sur le <strong>décret GBCP n°2012-1246</strong>, l'instruction M9-6, la nomenclature des pièces justificatives du <strong>décret n°2022-505 du 23 mars 2022</strong>, et les jurisprudences récentes du Conseil d'État.
+            <br><br>
+            <strong>Ce qu'il n'est pas :</strong> Un substitut au contrôle juridictionnel de la Chambre régionale des comptes, ni un remplacement du jugement professionnel de l'agent comptable.
+          </div>
+          <div class="info-box gold"><span class="ref">Réf : Art. 19 décret 2012-1246 — Responsabilité des gestionnaires publics (RGP) du comptable public. La RGP est engagée dès lors qu'une dépense irrégulière est payée ou qu'une recette n'est pas recouvrée.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== PARAMÈTRES ==================== -->
+    <section class="page" id="parametres">
+      <div class="page-header"><h2>Paramètres de l'Agence Comptable</h2><p>Configuration des établissements rattachés et de l'équipe comptable</p></div>
+
+      <!-- ÉQUIPE -->
+      <div class="card card-accent-purple">
+        <div class="card-header"><h3>👥 Équipe de l'Agence Comptable</h3><button class="btn btn-primary btn-sm" onclick="saveTeam()">💾 Enregistrer l'équipe</button></div>
+        <div class="card-body">
+          <div class="info-box purple">Les membres de l'équipe sont automatiquement désignés comme cosignataires du PV pour les établissements qui leur sont attribués. L'agent comptable signe toujours le PV. Chaque EPLE peut être attribué à l'AC (suivi direct), à la fondée de pouvoir ou à l'assistante de gestion selon l'organisation de l'agence.</div>
+          <div class="team-grid" id="team-cards-display"><!-- Généré --></div>
+          <div class="g3">
+            <div>
+              <div style="font-size:.78rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Agent Comptable</div>
+              <div class="form-group"><label>Nom et Prénom *</label><input type="text" id="t-ac-nom" placeholder="Ex: M. DUPONT Pierre"></div>
+              <div class="form-group"><label>Téléphone</label><input type="tel" id="t-ac-tel" placeholder="0590 XX XX XX"></div>
+              <div class="form-group"><label>Email</label><input type="email" id="t-ac-email" placeholder="p.dupont@ac-guadeloupe.fr"></div>
+            </div>
+            <div>
+              <div style="font-size:.78rem;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Fondée de Pouvoir</div>
+              <div class="form-group"><label>Nom et Prénom *</label><input type="text" id="t-fp-nom" placeholder="Ex: Mme MARTIN Sophie"></div>
+              <div class="form-group"><label>Téléphone</label><input type="tel" id="t-fp-tel" placeholder="0590 XX XX XX"></div>
+              <div class="form-group"><label>Email</label><input type="email" id="t-fp-email" placeholder="s.martin@ac-guadeloupe.fr"></div>
+            </div>
+            <div>
+              <div style="font-size:.78rem;font-weight:700;color:var(--success);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px;">Assistante de Gestion</div>
+              <div class="form-group"><label>Nom et Prénom *</label><input type="text" id="t-ag-nom" placeholder="Ex: Mme JOSEPH Marie"></div>
+              <div class="form-group"><label>Téléphone</label><input type="tel" id="t-ag-tel" placeholder="0590 XX XX XX"></div>
+              <div class="form-group"><label>Email</label><input type="email" id="t-ag-email" placeholder="m.joseph@ac-guadeloupe.fr"></div>
+            </div>
+          </div>
+          <div class="info-box sky" style="margin-top:10px;">
+            <strong>Attribution des établissements :</strong> Après avoir enregistré l'équipe, rendez-vous dans la fiche de chaque EPLE ci-dessous pour lui attribuer un membre de l'équipe (AC, FP ou AG). Cette attribution déterminera automatiquement le cosignataire du PV. L'AC peut également être attitré à des EPLE en suivi direct.
+          </div>
+        </div>
+      </div>
+
+      <!-- FICHE EPLE -->
+      <div class="card card-accent-blue">
+        <div class="card-header"><h3>🏫 Fiche de l'Établissement</h3><button class="btn btn-danger btn-sm" onclick="deleteEple()">🗑️ Supprimer</button></div>
+        <div class="card-body">
+          <div class="form-row">
+            <div class="form-group"><label>Code UAI *</label><input type="text" id="p-uai" placeholder="0971234X"></div>
+            <div class="form-group"><label>Nom de l'EPLE *</label><input type="text" id="p-nom" placeholder="Lycée / Collège..."></div>
+            <div class="form-group"><label>Ordonnateur (Chef d'établissement)</label><input type="text" id="p-ordo" placeholder="Nom complet"></div>
+            <div class="form-group"><label>Secrétaire Général(e)</label><input type="text" id="p-sg" placeholder="Nom complet"></div>
+            <div class="form-group"><label>Régisseur</label><input type="text" id="p-regisseur" placeholder="Nom complet"></div>
+            <div class="form-group"><label>Type de restauration</label>
+              <select id="p-restauration">
+                <option>Autonome</option>
+                <option>Satellite</option>
+                <option>Cuisine centrale</option>
+                <option>Sans restauration</option>
+              </select></div>
+            <div class="form-group"><label>Nombre d'élèves</label><input type="number" id="p-eleves" placeholder="850"></div>
+            <div class="form-group"><label>Exercice budgétaire</label><input type="text" id="p-exercice" placeholder="2025"></div>
+          </div>
+          <div class="form-group"><label>👤 Membre de l'équipe attitré pour cet EPLE (cosignataire PV)</label>
+            <select id="p-cosign">
+              <option value="ac">L'Agent Comptable (suivi direct)</option>
+              <option value="fp">La Fondée de Pouvoir</option>
+              <option value="ag">L'Assistante de Gestion</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="saveEple()">💾 Enregistrer l'établissement</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VÉRIFICATION QUOTIDIENNE ==================== -->
+    <section class="page" id="quotidien">
+      <div class="page-header"><h2>Vérification Quotidienne</h2><p>Contrôles à effectuer chaque jour selon le calendrier de l'agence — Inspiré des fiches de l'académie de Toulouse &amp; guide Aix-Marseille</p></div>
+      <div class="info-box blue">
+        <strong>💡 Principe :</strong> La vérification quotidienne n'est pas facultative. L'agent comptable engage sa <strong>responsabilité des gestionnaires publics</strong> (RGP) sur chaque opération. La régularité s'apprécie au moment de la prise en charge (demandes de paiement) ou du recouvrement (titres), pas a posteriori.
+        <br><span class="ref">Réf : Ordonnance n°2022-408 du 23/03/2022 (RGP — régime de responsabilité des gestionnaires publics) · Décret n°2022-1605 du 22/12/2022</span>
+      </div>
+      <div class="jour-tab">
+        <button class="jour-btn active" onclick="showJour('lundi',this)">Lundi</button>
+        <button class="jour-btn" onclick="showJour('mardi',this)">Mardi</button>
+        <button class="jour-btn" onclick="showJour('mercredi',this)">Mercredi</button>
+        <button class="jour-btn" onclick="showJour('jeudi',this)">Jeudi</button>
+        <button class="jour-btn" onclick="showJour('vendredi',this)">Vendredi</button>
+        <button class="jour-btn" onclick="showJour('mensuel',this)">📆 Mensuel</button>
+        <button class="jour-btn" onclick="showJour('annuel',this)">📅 Annuel</button>
+      </div>
+
+      <div class="jour-content active" id="jour-lundi">
+        <div class="card card-accent-blue"><div class="card-header"><h3>🌅 Lundi — Contrôles de début de semaine</h3></div><div class="card-body">
+          <div class="checklist-block">
+            <div class="checklist-title">Trésorerie &amp; Comptes</div>
+            <div class="check-item"><input type="checkbox" id="qlu-1" class="save-data"><label for="qlu-1"><strong>Vérification du solde DFT (c/515100) :</strong> Consulter le relevé bancaire du jour et le rapprocher avec le solde comptable Op@le. Toute discordance doit être levée avant fin de journée.<span class="check-ref">Art. 20 décret GBCP 2012-1246 · Instruction M9-6 §2.2</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qlu-2" class="save-data"><label for="qlu-2"><strong>Contrôle des virements de la semaine précédente :</strong> S'assurer que tous les paiements effectués vendredi ont été correctement imputés et que les rejets éventuels (SEPA reject) ont été identifiés.<span class="check-ref">Art. 34 décret GBCP 2012-1246</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qlu-3" class="save-data"><label for="qlu-3"><strong>Chèques à l'encaissement (c/511200) :</strong> Vérifier qu'aucun chèque reçu en fin de semaine n'est resté sans traitement. Remettre en banque si nécessaire.<span class="check-ref">Règle d'or : aucun chèque ne doit rester non traité plus de 48h</span></label></div>
+          </div>
+          <div class="checklist-block">
+            <div class="checklist-title">Dossiers en attente</div>
+            <div class="check-item"><input type="checkbox" id="qlu-4" class="save-data"><label for="qlu-4"><strong>Revue des demandes de paiement en suspens :</strong> Lister les demandes de paiement reçues mais non encore vérifiées. Prioriser celles approchant le délai de 30 jours (délai global de paiement — DGP).<span class="check-ref">Décret 2013-269 du 29/03/2013 relatif au délai de paiement des dépenses des collectivités territoriales</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qlu-5" class="save-data"><label for="qlu-5"><strong>Revue des titres de recettes en souffrance :</strong> Identifier les titres non recouvrés depuis plus de 30 jours. Initier une relance amiable.<span class="check-ref">Art. 80 décret GBCP · R421-68 Code de l'éducation</span></label></div>
+          </div>
+          <textarea id="obs-qlu" class="save-data" style="margin-top:10px;" placeholder="Observations du lundi..."></textarea>
+          <button class="btn btn-success" style="margin-top:8px;" onclick="saveCurrentData()">💾 Sauvegarder</button>
+        </div></div>
+      </div>
+
+      <div class="jour-content" id="jour-mardi">
+        <div class="card card-accent-green"><div class="card-header"><h3>📋 Mardi — Contrôle des dossiers de dépenses</h3></div><div class="card-body">
+          <div class="checklist-block">
+            <div class="checklist-title">Contrôle des mandats (prise en charge)</div>
+            <div class="check-item"><input type="checkbox" id="qma-1" class="save-data"><label for="qma-1"><strong>Qualité de l'ordonnateur :</strong> Vérifier que le bordereau de demandes de paiement est signé par l'ordonnateur accrédité ou son délégataire. À la première demande de paiement de l'année, l'acte de nomination ou de délégation doit être fourni.<span class="check-ref">Art. 10 décret 2012-1246 · Arrêté 25/07/2013 — accréditation ordonnateur</span><span class="check-jurisprudence">⚖️ Note : si le signataire n'est pas l'ordonnateur légitime, la demande de paiement doit être rejetée même si la dépense est régulière par ailleurs</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qma-2" class="save-data"><label for="qma-2"><strong>Disponibilité des crédits :</strong> Vérifier dans Op@le que les crédits sont suffisants sur le compte budgétaire concerné. Un dépassement de crédits est un motif obligatoire de rejet.<span class="check-ref">Art. 19 décret 2012-1246 · 5 cas de refus de réquisition</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qma-3" class="save-data"><label for="qma-3"><strong>Pièces justificatives — Seuil 230€ :</strong> Pour les dépenses ≤ 230€, les indications portées sur la demande de paiement ou un certificat simple suffisent. Pas d'obligation de facture formelle (arrêté 27/02/1989 modifié).<span class="check-ref">Arrêté du 27/02/1989 modifié 03/09/2001 — seuil 230€</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qma-4" class="save-data"><label for="qma-4"><strong>Contrôle allégé en partenariat (CAP) :</strong> Pour les mandats ≤ 2 000€ (rubriques 2 &amp; 3) ou ≤ 1 000€ (autres), si une convention CAP est signée, l'ordonnateur est dispensé de fournir les PJ au comptable. Vérifier l'existence de la convention CAP.<span class="check-ref">Arrêté 25/07/2013 modifié 06/01/2014 — Seuil CAP</span></label></div>
+          </div>
+          <div class="checklist-block">
+            <div class="checklist-title">Points de vigilance jurisprudentiels</div>
+            <div class="check-item"><input type="checkbox" id="qma-5" class="save-data"><label for="qma-5"><strong>Imputation correcte (Bulgnéville) :</strong> L'imputation comptable retenue par l'ordonnateur n'est pas opposable au comptable. Si un doute existe sur la nature de la dépense, notamment pour c/6257 Réceptions vs c/6532 Frais de mission vs c/6536 Représentation, suspendre le paiement.<span class="check-jurisprudence">⚖️ CE n°68700 — Commune de Bulgnéville (23/12/2015) : mise en débet pour imputation insuffisamment justifiée. Le comptable doit vérifier la nature de la dépense.</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qma-6" class="save-data"><label for="qma-6"><strong>RIB &amp; affacturage :</strong> Vérifier que le créancier désigné sur la facture est bien celui enregistré dans Op@le. En cas de cession de créance ou contrat d'affacturage, payer le cessionnaire, non le cédant.<span class="check-jurisprudence">⚖️ Comptable de lycée mis en débet pour avoir payé le fournisseur initial alors qu'un contrat d'affacturage existait (Vade-mécum PJ 2022)</span></label></div>
+          </div>
+          <textarea id="obs-qma" class="save-data" style="margin-top:10px;" placeholder="Observations du mardi..."></textarea>
+          <button class="btn btn-success" style="margin-top:8px;" onclick="saveCurrentData()">💾 Sauvegarder</button>
+        </div></div>
+      </div>
+
+      <div class="jour-content" id="jour-mercredi">
+        <div class="card card-accent-gold"><div class="card-header"><h3>💰 Mercredi — Contrôle des recettes &amp; droits constatés</h3></div><div class="card-body">
+          <div class="checklist-block">
+            <div class="checklist-title">Titres de recettes</div>
+            <div class="check-item"><input type="checkbox" id="qme-1" class="save-data"><label for="qme-1"><strong>Contrôle de l'autorisation de percevoir :</strong> Chaque titre doit reposer sur une base légale ou conventionnelle (convention, arrêté de subvention, délibération du CA fixant les tarifs). Vérifier cette pièce fondamentale.<span class="check-ref">Art. 13 décret 2012-1246 · §13411 instruction M9-6</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qme-2" class="save-data"><label for="qme-2"><strong>Contrôle de la mise en recouvrement :</strong> Le titre est-il émis au bon moment ? Une recette dont le droit est certain, liquide et exigible doit être titrée sans délai. Un retard entraîne une perte pour l'EPLE.<span class="check-ref">Art. 11 décret 2012-1246 — droit constaté = droit certain, liquide, exigible</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qme-3" class="save-data"><label for="qme-3"><strong>Annulations &amp; réductions de titre :</strong> Toute réduction d'un titre exige une justification formelle. Un simple accord verbal avec une famille ne suffit pas. Un titre annulé sans justification engage la RGP du comptable.<span class="check-ref">§134113 instruction M9-6 — contrôle de la régularité des réductions</span></label></div>
+          </div>
+          <div class="checklist-block">
+            <div class="checklist-title">Frais scolaires</div>
+            <div class="check-item"><input type="checkbox" id="qme-4" class="save-data"><label for="qme-4"><strong>Vérification des tarifs votés en CA :</strong> Les tarifs appliqués doivent correspondre exactement aux délibérations du Conseil d'Administration. Toute discordance est une erreur de liquidation.<span class="check-ref">Art. R421-2 Code de l'éducation — compétences du CA</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qme-5" class="save-data"><label for="qme-5"><strong>Déduction des bourses avant facturation :</strong> Les bourses nationales (ASBC) doivent être déduites AVANT l'émission des avis de paiement aux familles. Une facturation sans déduction des bourses constitue une sur-facturation illégale.<span class="check-ref">Circulaire académique sur les droits constatés · Instruction M9-6 §1.3.2</span></label></div>
+          </div>
+          <textarea id="obs-qme" class="save-data" style="margin-top:10px;" placeholder="Observations du mercredi..."></textarea>
+          <button class="btn btn-success" style="margin-top:8px;" onclick="saveCurrentData()">💾 Sauvegarder</button>
+        </div></div>
+      </div>
+
+      <div class="jour-content" id="jour-jeudi">
+        <div class="card card-accent-purple"><div class="card-header"><h3>🎯 Jeudi — Recouvrement &amp; Régies</h3></div><div class="card-body">
+          <div class="checklist-block">
+            <div class="checklist-title">Diligences de recouvrement</div>
+            <div class="check-item"><input type="checkbox" id="qje-1" class="save-data"><label for="qje-1"><strong>Relances amiables des débiteurs :</strong> Envoyer les lettres de relance aux familles et organismes dont les titres dépassent 30 jours sans paiement. Conserver la preuve de l'envoi (AR ou email).<span class="check-ref">Art. R421-68 Code de l'éducation — engagement des poursuites</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qje-2" class="save-data"><label for="qje-2"><strong>Titres &gt; 60 jours :</strong> Identifier les créances en souffrance depuis plus de 60 jours. Évaluer l'opportunité d'engager des poursuites (état exécutoire, huissier) ou de proposer une remise gracieuse à l'ordonnateur.<span class="check-ref">§134 instruction M9-6 — procédure de recouvrement forcé</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qje-3" class="save-data"><label for="qje-3"><strong>Effets impayés (c/511700) :</strong> Vérifier que les chèques sans provision ou prélèvements rejetés ont été identifiés et que la procédure de recouvrement est engagée. Ce compte doit toujours être débiteur.<span class="check-ref">Règle : c/511700 toujours débiteur · Jamais créditeur</span></label></div>
+          </div>
+          <div class="checklist-block">
+            <div class="checklist-title">Contrôle des régies</div>
+            <div class="check-item"><input type="checkbox" id="qje-4" class="save-data"><label for="qje-4"><strong>Arrêté de régie valide :</strong> L'arrêté de création de la régie est-il en vigueur ? Le régisseur est-il en poste et son cautionnement est-il à jour ?<span class="check-ref">Art. R421-57 Code de l'éducation · Décret 92-681 du 20/07/1992</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qje-5" class="save-data"><label for="qje-5"><strong>Versement périodique :</strong> Le régisseur a-t-il bien versé les encaissements en espèces dans les délais prévus par l'arrêté ? (généralement hebdomadaire ou dès dépassement du plafond).<span class="check-ref">Art. R421-61 à R421-66 Code de l'éducation — obligations du régisseur</span></label></div>
+          </div>
+          <textarea id="obs-qje" class="save-data" style="margin-top:10px;" placeholder="Observations du jeudi..."></textarea>
+          <button class="btn btn-success" style="margin-top:8px;" onclick="saveCurrentData()">💾 Sauvegarder</button>
+        </div></div>
+      </div>
+
+      <div class="jour-content" id="jour-vendredi">
+        <div class="card card-accent-sky"><div class="card-header"><h3>📊 Vendredi — Clôture de semaine &amp; synthèse</h3></div><div class="card-body">
+          <div class="checklist-block">
+            <div class="checklist-title">Clôture des opérations de la semaine</div>
+            <div class="check-item"><input type="checkbox" id="qve-1" class="save-data"><label for="qve-1"><strong>Rapprochement bancaire de fin de semaine :</strong> Vérifier la concordance entre les écritures comptables Op@le et le relevé bancaire DFT. Tout écart doit être documenté.<span class="check-ref">Instruction M9-6 · Obligation de rapprochement mensuel a minima</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qve-2" class="save-data"><label for="qve-2"><strong>Demandes de paiement transmises :</strong> S'assurer que toutes les demandes de paiement visées en cours de semaine ont bien été transmises. Pas de demande en souffrance non justifié.<span class="check-ref">DGP : 30 jours maximum à compter de la réception</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qve-3" class="save-data"><label for="qve-3"><strong>Caisse espèces (c/531000) :</strong> Procéder au décompte physique de la caisse et le comparer au solde comptable. Un écart même minime doit être justifié et tracé.<span class="check-ref">Règle : c/531 toujours débiteur ou nul — JAMAIS créditeur</span></label></div>
+            <div class="check-item"><input type="checkbox" id="qve-4" class="save-data"><label for="qve-4"><strong>Vérification des pièces archivées :</strong> Contrôler que toutes les pièces justificatives de la semaine sont bien classées et archivées conformément aux règles de conservation (10 ans).<span class="check-ref">Art. 11 décret 2012-1246 — conservation des pièces justificatives</span></label></div>
+          </div>
+          <textarea id="obs-qve" class="save-data" style="margin-top:10px;" placeholder="Observations du vendredi..."></textarea>
+          <button class="btn btn-success" style="margin-top:8px;" onclick="saveCurrentData()">💾 Sauvegarder</button>
+        </div></div>
+      </div>
+
+      <div class="jour-content" id="jour-mensuel">
+        <div class="card card-accent-blue"><div class="card-header"><h3>📆 Contrôles Mensuels Obligatoires</h3></div><div class="card-body">
+          <div class="checklist-block">
+            <div class="checklist-title">Audit complets classe 5 (trésorerie)</div>
+            <div class="check-item"><input type="checkbox" id="qmens-1" class="save-data"><label for="qmens-1"><strong>Rapprochement DFT complet :</strong> Faire le rapprochement intégral du compte 515100 entre relevé bancaire et comptabilité Op@le. Justifier chaque opération non rapprochée.</label></div>
+            <div class="check-item"><input type="checkbox" id="qmens-2" class="save-data"><label for="qmens-2"><strong>Balance âgée des créances :</strong> Éditer dans Op@le la balance âgée des titres de recettes par ancienneté (0-30j / 30-60j / 60-90j / +90j). Décider des actions à mener.</label></div>
+            <div class="check-item"><input type="checkbox" id="qmens-3" class="save-data"><label for="qmens-3"><strong>Contrôle des régies attachées :</strong> Vérifier les journaux de caisse des régisseurs et les rapprocher des reversements effectués. Toute discordance doit être signalée.</label></div>
+            <div class="check-item"><input type="checkbox" id="qmens-4" class="save-data"><label for="qmens-4"><strong>Revue des comptes de la classe 4 :</strong> Contrôler que les comptes de tiers (fournisseurs c/401, familles c/4191, débiteurs divers c/416) ne présentent pas de soldes anormaux.</label></div>
+            <div class="check-item"><input type="checkbox" id="qmens-5" class="save-data"><label for="qmens-5"><strong>Envoi du tableau de bord à l'autorité académique :</strong> Transmettre le tableau de bord mensuel au DASEN / rectorat si exigé par le calendrier académique local.</label></div>
+          </div>
+          <button class="btn btn-success" style="margin-top:8px;" onclick="saveCurrentData()">💾 Sauvegarder</button>
+        </div></div>
+      </div>
+
+      <div class="jour-content" id="jour-annuel">
+        <div class="card card-accent-gold"><div class="card-header"><h3>📅 Calendrier Annuel du Comptable</h3></div><div class="card-body">
+          <div class="info-box gold"><strong>Calendrier synthétique</strong> — Guide Aix-Marseille (BA n°432 du 09/11/2020) &amp; Instruction M9-6</div>
+          <table class="tbl"><thead><tr><th>Période</th><th>Action obligatoire</th><th>Référence</th></tr></thead><tbody>
+            <tr><td><strong>Janvier</strong></td><td>Budget exécutoire reçu ou application des 12es provisoires · Accréditation des nouveaux ordonnateurs</td><td class="td-right"><span style="font-family:monospace;font-size:.76rem;">R421-61 CÉdu · Art.10 GBCP</span></td></tr>
+            <tr><td><strong>Fév-Mar</strong></td><td>Préparation et envoi du Compte Financier · Délibération du CA sur le CF (avant fin avril)</td><td class="td-right"><span style="font-family:monospace;font-size:.76rem;">R421-78 CÉdu · DEMACT</span></td></tr>
+            <tr><td><strong>Avril</strong></td><td>Transmission du CF à la DRFiP · Prise en charge des soldes reportés</td><td class="td-right"><span style="font-family:monospace;font-size:.76rem;">Art. R421-78 II CÉdu</span></td></tr>
+            <tr><td><strong>Mai-Juin</strong></td><td>Préparation du budget prévisionnel · 1er trimestre de frais scolaires contrôlé</td><td class="td-right"><span style="font-family:monospace;font-size:.76rem;">Instruction M9-6 T2</span></td></tr>
+            <tr><td><strong>Juillet</strong></td><td>Contrôle des arrêtés de régie · Vérification des cautionnements régisseurs</td><td class="td-right"><span style="font-family:monospace;font-size:.76rem;">Décret 92-681</span></td></tr>
+            <tr><td><strong>Août-Sept</strong></td><td>Réception du nouveau budget exécutoire · Vérification des accréditations ordonnateurs rentrée</td><td class="td-right"><span style="font-family:monospace;font-size:.76rem;">Art.10 décret GBCP</span></td></tr>
+            <tr><td><strong>Octobre</strong></td><td>Contrôle du 1er trimestre de frais scolaires · Vérification des listes ASBC/bourses</td><td class="td-right"><span style="font-family:monospace;font-size:.76rem;">Instruction M9-6 §1.3</span></td></tr>
+            <tr><td><strong>Nov-Déc</strong></td><td>Clôture de l'exercice · Écritures de fin d'exercice (stocks, amortissements, provisions) · Inventaire physique de caisse</td><td class="td-right"><span style="font-family:monospace;font-size:.76rem;">Instruction M9-6 T3</span></td></tr>
+          </tbody></table>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- ==================== ORDONNATEUR ==================== -->
+    <section class="page" id="ordonnateur">
+      <div class="page-header"><h2>Contrôle de l'Ordonnateur</h2><p>Vérification de la légitimité des signatures — Principe de séparation ordonnateur / comptable</p></div>
+      <div class="info-box red">
+        <strong>⚠️ Principe fondamental (art. 9 décret 2012-1246) :</strong> L'ordonnateur et le comptable sont des fonctions strictement séparées et incompatibles. Un agent comptable ne peut recevoir de délégation de signature pour les actes relevant de l'ordonnateur. Toute confusion constitue une violation grave du GBCP.
+        <br><span class="ref">CE Sect. 6/11/2009 n°297877 — Prest'action : exclusivité du comptable public · Art.9 décret GBCP</span>
+      </div>
+      <div class="card card-accent-blue">
+        <div class="card-header"><h3>👤 Informations de l'Ordonnateur en poste</h3></div>
+        <div class="card-body">
+          <div class="ordo-card"><div class="ordo-icon">👤</div><div><h4 id="ordo-nom-display">—</h4><p id="ordo-etab-display">Aucun établissement sélectionné</p></div></div>
+          <div class="checklist-block">
+            <div class="checklist-title">Accréditation de l'Ordonnateur (Art. 10 décret GBCP)</div>
+            <div class="check-item"><input type="checkbox" id="ord-1" class="save-data"><label for="ord-1"><strong>Formulaire d'accréditation modèle I :</strong> Le formulaire conforme à l'arrêté 25/07/2013 a été remis à la première demande de paiement de l'année ou lors du changement d'ordonnateur. Il comporte un exemplaire de la signature manuscrite.<span class="check-ref">Arrêté du 25/07/2013 modifié · Art. I du modèle d'accréditation</span></label></div>
+            <div class="check-item"><input type="checkbox" id="ord-2" class="save-data"><label for="ord-2"><strong>Acte de nomination :</strong> La copie de l'arrêté de nomination du chef d'établissement comme ordonnateur est jointe à la première demande de paiement de l'exercice et conservée au poste comptable.<span class="check-ref">R421-13 Code de l'éducation</span></label></div>
+            <div class="check-item"><input type="checkbox" id="ord-3" class="save-data"><label for="ord-3"><strong>Cohérence des signatures :</strong> La signature figurant sur les bordereaux de demandes de paiement correspond bien à la signature enregistrée dans le formulaire d'accréditation. Contrôle par comparaison visuelle.<span class="check-ref">Vade-mécum PJ 2022 §II.1 · Op@le : vérification sur le bordereau numérique</span></label></div>
+          </div>
+          <div class="checklist-block">
+            <div class="checklist-title">Délégations de signature</div>
+            <div class="check-item"><input type="checkbox" id="ord-4" class="save-data"><label for="ord-4"><strong>Acte de délégation (modèle II) :</strong> Si un délégataire signe (adjoint gestionnaire, principal adjoint), l'acte de délégation conforme au modèle II a été transmis et son étendue est précisée.<span class="check-ref">R421-13 Code de l'éducation · Arrêté 25/07/2013 modèle II</span></label></div>
+            <div class="check-item"><input type="checkbox" id="ord-5" class="save-data"><label for="ord-5"><strong>Délégation valide et non expirée :</strong> La délégation est toujours en vigueur (pas de changement d'affectation du délégataire) et n'a pas été retirée par le chef d'établissement.<span class="check-ref">Une délégation prend fin avec la mutation du délégataire ou la révocation</span></label></div>
+            <div class="check-item"><input type="checkbox" id="ord-6" class="save-data"><label for="ord-6"><strong>Absence ou empêchement :</strong> En cas d'empêchement du CE sans délégation préalable, l'autorité académique a-t-elle nommé un ordonnateur suppléant ? La mention d'empêchement figure-t-elle sur le bordereau ?<span class="check-ref">R421-13 CÉdu · Note : l'AG ne peut être délégataire si elle est aussi AC de l'EPLE</span></label></div>
+          </div>
+          <div class="form-group" style="margin-top:10px;"><label>Observations relatives à l'ordonnateur :</label>
+          <textarea id="obs-ordonnateur" class="save-data" placeholder="Ex: Changement d'ordonnateur le XX/XX — nouveau formulaire à recevoir..."></textarea></div>
+          <button class="btn btn-success" onclick="saveCurrentData()">💾 Sauvegarder</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== DROITS CONSTATÉS ==================== -->
+    <section class="page" id="droits_constates">
+      <div class="page-header"><h2>Module Droits Constatés</h2><p>Vérification complète — Frais scolaires · Bourses · Remises d'ordre · Fonds Social Cantines</p></div>
+      <div class="info-box blue">
+        <strong>Principe M9-6 :</strong> Un droit est constaté dès qu'il est certain, liquide et exigible. Tout défaut de constatation ou toute constatation tardive engage la responsabilité du comptable si une recette n'est pas recouvrée. La régularité et la sincérité des droits constatés conditionne la qualité du compte financier.
+        <br><span class="ref">Art. 11 décret GBCP 2012-1246 · §134111 instruction M9-6 · Art. R421-78 Code de l'éducation</span>
+      </div>
+
+      <!-- FRAIS SCOLAIRES -->
+      <div class="card card-accent-blue"><div class="card-header"><h3>🎓 1 — Frais Scolaires (Demi-pension &amp; Internat)</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Vérifications préalables à l'émission des titres</div>
+          <div class="check-item"><input type="checkbox" id="dc-fs-1" class="save-data"><label for="dc-fs-1"><strong>Effectif facturé = Effectif réel (SIECLE) :</strong> Comparer les listes GFC/TurboSelf avec les listes d'émargement ou SIECLE. Toute discordance (élève désinscrit facturé, nouveau non facturé) constitue une erreur de liquidation.<span class="check-ref">Instruction M9-6 §1.3.1 · Code de l'éducation R421-2</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-fs-2" class="save-data"><label for="dc-fs-2"><strong>Tarifs CA en vigueur :</strong> Les tarifs appliqués (demi-pension, internat, externat) correspondent exactement à ceux votés en Conseil d'Administration pour l'année scolaire en cours. Un tarif erroné entraîne une sur/sous-facturation.<span class="check-ref">Art. R421-2 Code de l'éducation — compétences du CA en matière de tarifs</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-fs-3" class="save-data"><label for="dc-fs-3"><strong>Périodicité conforme au calendrier académique :</strong> La facturation couvre exactement la bonne période. Les vacances officielles de l'académie de Guadeloupe sont exclues du calcul des repas facturés.<span class="check-ref">Calendrier académique Guadeloupe · Tarif journalier = tarif trimestriel / nombre de jours ouvrables hors vacances</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-fs-4" class="save-data"><label for="dc-fs-4"><strong>Pièce justificative du titre : état nominatif :</strong> Le titre de recettes est accompagné d'un état nominatif des débiteurs signé par l'ordonnateur, précisant pour chaque élève le montant dû.<span class="check-ref">Décret n°2022-505 du 23/03/2022 — nomenclature PJ · Rubrique "droits constatés"</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-fs-5" class="save-data"><label for="dc-fs-5"><strong>Concordance titre ↔ logiciel (GFC / TurboSelf) :</strong> Le montant global du titre de recettes correspond exactement au total du logiciel de facturation. Tout écart, même de quelques centimes, doit être expliqué.<span class="check-ref">Instruction M9-6 §2.3.1 — contrôle de la liquidation</span></label></div>
+        </div>
+      </div></div>
+
+      <!-- BOURSES -->
+      <div class="card card-accent-sky"><div class="card-header"><h3>🎒 2 — Bourses Nationales &amp; Primes (ASBC)</h3></div><div class="card-body">
+        <div class="info-box sky">Les bourses nationales sont des recettes de l'EPLE (c/744). Elles doivent être déduites des frais scolaires AVANT émission des appels de fonds. Une sur-facturation des familles boursières est une irrégularité grave pouvant entraîner un litige juridique.</div>
+        <div class="checklist-block"><div class="checklist-title">Intégration et application</div>
+          <div class="check-item"><input type="checkbox" id="dc-b-1" class="save-data"><label for="dc-b-1"><strong>Liste ASBC importée avant facturation :</strong> La liste officielle des boursiers fournie par la Région ou l'État (ASBC = Aide Sociale aux Boursiers des Collèges/Lycées) a été importée dans le logiciel avant l'édition des factures.<span class="check-ref">Circulaire académique ASBC · Code de l'éducation L531-1 à L531-5</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-b-2" class="save-data"><label for="dc-b-2"><strong>Déduction appliquée — contrôle par sondage :</strong> Sur un échantillon de 5 dossiers boursiers, vérifier que le montant de la bourse a bien été déduit de la facture envoyée à la famille.<span class="check-ref">Instruction M9-6 §1.3.2 — contrôle de la déduction des bourses</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-b-3" class="save-data"><label for="dc-b-3"><strong>Prime d'internat (boursiers internes) :</strong> Les élèves internes boursiers bénéficient d'une prime d'internat qui réduit leurs frais. Cette prime apparaît sur leurs appels de fonds.<span class="check-ref">Circulaire MEN sur les primes d'internat</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-b-4" class="save-data"><label for="dc-b-4"><strong>Prime de transport :</strong> Les élèves éligibles à la prime de transport régional (Région Guadeloupe) ont bien vu leurs frais réduits en conséquence.<span class="check-ref">Délibération du Conseil Régional sur la prime transport</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-b-5" class="save-data"><label for="dc-b-5"><strong>Imputation correcte au c/744 :</strong> Les bourses sont comptabilisées au compte 744 (subventions de fonctionnement), et non au compte 706 (prestations de services). Vérifier l'imputation lors de la prise en charge.<span class="check-ref">Plan de comptes M9-6 · c/744 = subventions État / c/745 = subventions collectivités</span></label></div>
+        </div>
+      </div></div>
+
+      <!-- REMISES D'ORDRE -->
+      <div class="card card-accent-gold"><div class="card-header"><h3>🔄 3 — Remises d'Ordre</h3></div><div class="card-body">
+        <div class="info-box gold"><strong>Définition réglementaire :</strong> Une remise d'ordre est une réduction ou annulation de frais scolaires accordée pour des motifs réglementaires limitatifs : absence médicale &gt;15 jours, stage en entreprise, exclusion définitive, déménagement, etc. Elle n'est jamais accordée de façon discrétionnaire. Elle est imputée en diminution du titre au c/706 ou c/709.</div>
+        <div class="checklist-block"><div class="checklist-title">Justificatifs obligatoires</div>
+          <div class="check-item"><input type="checkbox" id="dc-ro-1" class="save-data"><label for="dc-ro-1"><strong>Absence médicale &gt;15 jours :</strong> Certificat médical original ou certificat d'hospitalisation joint au dossier. La durée exacte d'absence est précisée et correspond aux jours de restauration non consommés.<span class="check-jurisprudence">⚖️ Sans certificat médical = remise d'ordre injustifiée = titre irrégulièrement réduit = engagement RGP</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-ro-2" class="save-data"><label for="dc-ro-2"><strong>Stage en entreprise :</strong> La convention de stage tripartite signée (EPLE/Entreprise/Famille) est jointe avec les dates précises d'absence du service de restauration.<span class="check-ref">Code de l'éducation L124-1 à L124-20 — stages en entreprise</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-ro-3" class="save-data"><label for="dc-ro-3"><strong>Exclusion temporaire ou définitive :</strong> La décision du chef d'établissement (ou du CA pour l'exclusion définitive) est présente et datée. La durée exacte de l'exclusion est précisée.<span class="check-ref">Art. R511-13 à R511-15 Code de l'éducation — sanctions disciplinaires</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-ro-4" class="save-data"><label for="dc-ro-4"><strong>Calcul exact de la remise :</strong> La remise = nombre de jours d'absence × (tarif journalier hors frais fixes). Le tarif journalier est calculé sur la base du tarif trimestriel moins les frais fixes (abonnement, entretien).<span class="check-ref">Instruction M9-6 · Méthode de calcul des remises d'ordre</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-ro-5" class="save-data"><label for="dc-ro-5"><strong>Signature de l'ordonnateur sur l'état des remises :</strong> L'état récapitulatif des remises d'ordre est signé par le chef d'établissement avant émission du titre rectificatif. C'est la pièce justificative obligatoire.<span class="check-ref">Décret 2022-505 — nomenclature PJ · Rubrique réductions de titres</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-ro-6" class="save-data"><label for="dc-ro-6"><strong>Comptabilisation correcte :</strong> Les remises sont comptabilisées en réduction du titre initial (c/709 Rabais et remises) ou en annulation partielle, et non en charge (c/6). La méthode retenue est documentée.<span class="check-ref">Plan de comptes M9-6 — c/709 vs c/706 vs annulation OR</span></label></div>
+        </div>
+      </div></div>
+
+      <!-- FSC -->
+      <div class="card card-accent-red"><div class="card-header"><h3>🍽️ 4 — Fonds Social des Cantines (FSC)</h3></div><div class="card-body">
+        <div class="info-box red"><strong>Encadrement strict :</strong> Le FSC est financé par l'État (DSDEN) et la CAF. Son usage est strictement réservé aux aides à la restauration scolaire des élèves en situation de précarité. Toute utilisation détournée (aide à l'achat de fournitures, aide au transport) est irrégulière et constitue une faute de gestion.</div>
+        <div class="checklist-block"><div class="checklist-title">Gouvernance et traçabilité</div>
+          <div class="check-item"><input type="checkbox" id="dc-fsc-1" class="save-data"><label for="dc-fsc-1"><strong>Commission FSC réglementairement constituée :</strong> La commission d'attribution est composée conformément à la circulaire (représentants des parents, professeurs, direction). Ses PV de réunion sont archivés.<span class="check-ref">Circulaire MEN sur le Fonds Social des Cantines</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-fsc-2" class="save-data"><label for="dc-fsc-2"><strong>Dossiers individuels complets :</strong> Chaque bénéficiaire dispose d'un dossier avec : justificatifs de ressources (attestation CAF, avis d'imposition N-1), décision d'attribution signée et datée, montant accordé.<span class="check-ref">Instruction DSDEN — constitution des dossiers FSC</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-fsc-3" class="save-data"><label for="dc-fsc-3"><strong>Imputation exclusive au c/6571 :</strong> TOUTES les aides FSC sont imputées au compte 6571 (Aides exceptionnelles). Aucune imputation au c/706 ou c/6257 n'est admise.<span class="check-ref">Plan de comptes M9-6 · c/6571 exclusivement</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-fsc-4" class="save-data"><label for="dc-fsc-4"><strong>Convention de financement valide :</strong> La convention avec la DSDEN et/ou la CAF est valide pour l'année scolaire en cours. Le montant de l'enveloppe est connu et respecté.<span class="check-ref">Convention pluriannuelle FSC · Dotation annuelle DSDEN</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-fsc-5" class="save-data"><label for="dc-fsc-5"><strong>Enveloppe non dépassée :</strong> Le cumul des aides accordées ne dépasse pas le crédit FSC disponible. Un suivi en temps réel est maintenu.<span class="check-ref">⚠️ Dépasser l'enveloppe = dépense sans crédit = irrégularité budgétaire</span></label></div>
+          <div class="check-item"><input type="checkbox" id="dc-fsc-6" class="save-data"><label for="dc-fsc-6"><strong>Traitement des demandes refusées :</strong> Les familles dont la demande a été refusée ont reçu une notification écrite motivée dans les délais. Les recours éventuels sont traités.<span class="check-ref">Principe du contradictoire · Code de l'éducation L551-1</span></label></div>
+        </div>
+      </div></div>
+
+      <!-- CALCULATEUR FSC -->
+      <div class="card card-accent-gold"><div class="card-header"><h3>&#129518; Calculateur &mdash; Coh&eacute;rence des aides FSC (Circulaire MEN 2017)</h3></div><div class="card-body">
+        <div class="info-box red"><strong>&#128680; R&egrave;gle circulaire MEN 2017 sur les aides sociales :</strong> Il est irr&eacute;gulier d'attribuer une aide FSC &agrave; un &eacute;l&egrave;ve dont le reste &agrave; charge apr&egrave;s d&eacute;duction de la bourse est d&eacute;j&agrave; n&eacute;gatif ou nul. Exemple : frais de 100 &euro;, bourse de 80 &euro; &rarr; reste &agrave; charge = 20 &euro; &rarr; une aide FSC de 30 &euro; serait excessive de 10 &euro;. Ce point doit figurer dans le PV avec un d&eacute;lai de r&eacute;gularisation accord&eacute; &agrave; l'&eacute;tablissement.<span class="ref">Circulaire MEN 2017 sur les fonds sociaux &middot; Instruction DSDEN Guadeloupe</span></div>
+        <div class="g3" style="margin-bottom:10px;">
+          <div class="form-group" style="margin:0;"><label>&#128100; Nom de l'&eacute;l&egrave;ve</label><input type="text" id="fsc-nom" placeholder="DUPONT"></div>
+          <div class="form-group" style="margin:0;"><label>&#128100; Pr&eacute;nom</label><input type="text" id="fsc-prenom" placeholder="Jean"></div>
+          <div class="form-group" style="margin:0;"><label>&#127979; Classe</label><input type="text" id="fsc-classe" placeholder="2nde 3 / BTS1..."></div>
+        </div>
+        <div class="g3" style="margin-bottom:14px;">
+          <div class="form-group" style="margin:0;"><label>&#128179; Frais scolaires dus (&euro;)</label><input type="number" id="fsc-frais" placeholder="100.00" step="0.01" oninput="calcFSC()"></div>
+          <div class="form-group" style="margin:0;"><label>&#127891; Bourse nationale attribu&eacute;e (&euro;)</label><input type="number" id="fsc-bourse" placeholder="80.00" step="0.01" oninput="calcFSC()"></div>
+          <div class="form-group" style="margin:0;"><label>&#129309; Aide FSC attribu&eacute;e (&euro;)</label><input type="number" id="fsc-aide" placeholder="30.00" step="0.01" oninput="calcFSC()"></div>
+        </div>
+        <div id="fsc-resultat" style="margin-bottom:10px;"></div>
+        <div style="margin-top:12px;">
+          <div style="font-size:.82rem;font-weight:700;margin-bottom:6px;">&#128203; Contr&ocirc;le nominatif des b&eacute;n&eacute;ficiaires FSC :</div>
+          <div id="fsc-rows"></div>
+          <div style="margin-top:8px;display:flex;gap:8px;">
+            <button class="btn btn-primary btn-sm" onclick="addFSCRow()">&#10133; Ajouter un &eacute;l&egrave;ve au contr&ocirc;le</button>
+            <button class="btn btn-danger btn-sm" onclick="clearFSCRows()">&#128465; Effacer la liste</button>
+          </div>
+        </div>
+        <div style="margin-top:10px;" id="fsc-anomalies-box"></div>
+        <div class="form-group" style="margin-top:12px;"><label>&#128221; Observations FSC - &agrave; reporter dans le PV :</label>
+          <textarea id="obs-fsc-calc" class="save-data" placeholder="Ex : &Eacute;l&egrave;ve DUPONT &mdash; FSC de 30&euro; exc&egrave;de le reste &agrave; charge de 20&euro;. R&eacute;gularisation demand&eacute;e avant le XX/XX..."></textarea></div>
+      </div></div>
+
+      <div class="card"><div class="card-body"><div class="form-group"><label>📝 Observations droits constatés :</label>
+        <textarea id="obs-droits_constates" class="save-data" placeholder="Anomalies constatées, pièces manquantes, recommandations à l'ordonnateur..."></textarea></div>
+        <button class="btn btn-success" onclick="saveCurrentData()">💾 Valider et sauvegarder</button>
+      </div></div>
+    </section>
+
+    <!-- ==================== DÉPENSES ==================== -->
+    <section class="page" id="exec_depenses">
+      <div class="page-header"><h2>Contrôle des Dépenses (Demandes de paiement)</h2><p>Référentiel : décret n°2022-505 du 23/03/2022 &amp; décret GBCP 2012-1246</p></div>
+      <div class="info-box red"><strong>Responsabilité :</strong> L'agent comptable est personnellement et pécuniairement responsable de tout paiement irrégulier. Il <em>ne peut pas</em> se faire juge de l'opportunité, mais il <em>doit</em> contrôler la légalité et la régularité. En cas de doute sérieux, il SUSPEND le paiement et notifie l'ordonnateur. L'ordonnateur peut alors émettre un ordre de réquisition (sauf dans les 5 cas légaux de refus).<br><span class="ref">Art. 19-20 décret GBCP · 5 cas de refus de réquisition : indisponibilité crédits, absence SF, règlement non libératoire, manque fonds, absence visa CGEF</span></div>
+      <div class="card card-accent-red"><div class="card-header"><h3>📋 A — Contrôle de la Facture</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Mentions légales obligatoires sur la facture (Annexe C décret 2022-505)</div>
+          <div class="check-item"><input type="checkbox" id="exd-f1" class="save-data"><label for="exd-f1"><strong>Identification du fournisseur :</strong> Numéro SIRET (ou équivalent), raison sociale, adresse, TVA intracommunautaire si applicable.<span class="check-ref">Décret 2022-505 Annexe C — mentions obligatoires</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exd-f2" class="save-data"><label for="exd-f2"><strong>Éléments de la facture :</strong> Numéro de facture unique, date d'émission, date de prestation, désignation précise des fournitures/prestations, quantité, prix unitaire HT, taux TVA, montant TTC.<span class="check-ref">Décret 2022-505 Annexe C · CGI art. 289-II</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exd-f3" class="save-data"><label for="exd-f3"><strong>EPLE désigné comme destinataire :</strong> La facture mentionne explicitement l'EPLE comme adresse de facturation ou de livraison. Une facture adressée à une autre entité est irrecevable.<span class="check-ref">⚖️ Vade-mécum PJ 2022 §V — la facture doit mentionner l'EPLE</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exd-f4" class="save-data"><label for="exd-f4"><strong>RIB conforme à Op@le :</strong> L'IBAN figurant sur la facture correspond exactement au tiers enregistré dans Op@le. En cas de discordance (modification de RIB, cession de créance, affacturage) : BLOCAGE immédiat et vérification.<span class="check-jurisprudence">⚖️ Mise en débet pour paiement au cédant alors qu'un contrat d'affacturage existait — Vade-mécum PJ 2022 §II</span></label></div>
+        </div>
+      </div></div>
+      <div class="card card-accent-blue"><div class="card-header"><h3>✅ B — Certification du Service Fait</h3></div><div class="card-body">
+        <div class="info-box blue"><strong>Rappel réglementaire :</strong> Depuis le décret 2003-301 du 02/04/2003, la signature de l'ordonnateur sur la facture n'est plus requise pour la certification SF. C'est la signature du bordereau récapitulatif de demandes de paiement Op@le qui vaut certification du caractère exécutoire des PJ (art. D1617-23 CGCT). Ne PAS exiger la signature sur chaque pièce.<span class="ref">Art. D1617-23 CGCT · Décret 2003-301 du 02/04/2003</span></div>
+        <div class="checklist-block"><div class="checklist-title">Documents probants</div>
+          <div class="check-item"><input type="checkbox" id="exd-sf1" class="save-data"><label for="exd-sf1"><strong>Bordereau de demandes de paiement signé :</strong> Le bordereau récapitulatif de demandes de paiement est signé par l'ordonnateur. Cette signature emporte certification du caractère exécutoire de toutes les PJ annexées (Op@le génère ce bordereau).<span class="check-ref">Art. D1617-23 CGCT · Décret 2022-505</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exd-sf2" class="save-data"><label for="exd-sf2"><strong>Bon de livraison pour fournitures :</strong> Le bon de livraison signé par le réceptionnaire de l'EPLE est joint. Il correspond en quantité et nature aux fournitures facturées.<span class="check-ref">Décret 2022-505 — rubrique fournitures</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exd-sf3" class="save-data"><label for="exd-sf3"><strong>PV de réception pour travaux / marchés :</strong> Pour les prestations de service et travaux, un PV de réception (ou procès-verbal de réception des travaux) daté et signé est produit.<span class="check-ref">Décret 2022-505 — rubrique travaux et services</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exd-sf4" class="save-data"><label for="exd-sf4"><strong>Antériorité du service fait :</strong> La date du service fait (livraison, réception) est antérieure ou égale à la date du mandat. On ne peut pas payer par anticipation une prestation non encore effectuée (sauf avance formellement autorisée).<span class="check-ref">Principe de service fait · Art. 20 décret GBCP</span></label></div>
+        </div>
+      </div></div>
+      <div class="card card-accent-blue"><div class="card-header"><h3>📒 C — Imputation &amp; Crédits</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Validité de la liquidation</div>
+          <div class="check-item"><input type="checkbox" id="exd-i1" class="save-data"><label for="exd-i1"><strong>Imputation classe 6 cohérente :</strong> Le compte comptable retenu correspond à la nature réelle de la dépense. Le comptable n'est PAS lié par l'imputation de l'ordonnateur — il doit la vérifier.<span class="check-jurisprudence">⚖️ CE n°68700 Bulgnéville (2015) : le comptable doit vérifier la nature de la dépense pour contrôler l'exacte imputation</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exd-i2" class="save-data"><label for="exd-i2"><strong>Disponibilité des crédits :</strong> Vérifier dans Op@le que le compte budgétaire dispose de crédits suffisants. Une demande de paiement sur ligne budgétaire insuffisante doit être rejetée (1er cas légal de refus de réquisition).<span class="check-ref">Art. 19 décret GBCP · 1er cas : indisponibilité des crédits</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exd-i3" class="save-data"><label for="exd-i3"><strong>Budget exécutoire :</strong> Le budget ou la DBM qui ouvre les crédits est bien exécutoire. Un budget non exécutoire ne peut pas être exécuté (sauf douzièmes provisoires au 1er janvier).<span class="check-ref">Art. L421-13 Code de l'éducation · R421-61 CÉdu</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exd-i4" class="save-data"><label for="exd-i4"><strong>Exactitude de la liquidation :</strong> Le montant du mandat est exact : calcul des quantités × prix unitaire, application du taux de TVA correct, respect du devis ou du bon de commande.<span class="check-ref">Art. 20 décret GBCP — contrôle de l'exactitude du calcul de la liquidation</span></label></div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="form-group"><label>📝 Observations et rejets de mandats :</label>
+          <textarea id="obs-exec_depenses" class="save-data" placeholder="Ex: Demande de paiement n°X rejetée — RIB non conforme. Demande de paiement n°Y suspendue — imputation erronée (c/6232 → vérifier c/6536)..."></textarea></div>
+        <button class="btn btn-success" onclick="saveCurrentData()">💾 Valider et sauvegarder</button>
+      </div></div>
+    </section>
+
+    <!-- ==================== RECETTES ==================== -->
+    <section class="page" id="exec_recettes">
+      <div class="page-header"><h2>Contrôle des Recettes (Titres)</h2><p>Prise en charge et recouvrement · §134 instruction M9-6</p></div>
+      <div class="info-box blue"><strong>§13411 Instruction M9-6 :</strong> L'agent comptable contrôle (1) l'autorisation de percevoir la recette, (2) la mise en recouvrement des créances, (3) la régularité des réductions et annulations. Il ne peut pas refuser de prendre en charge un titre, mais il peut formuler des réserves écrites.</div>
+      <div class="card card-accent-green"><div class="card-header"><h3>📋 A — Prise en Charge des Titres</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Contrôle à la prise en charge</div>
+          <div class="check-item"><input type="checkbox" id="exr-t1" class="save-data"><label for="exr-t1"><strong>Autorisation de percevoir :</strong> Chaque titre est fondé sur une base légale (convention, arrêté de subvention, délibération CA, contrat) qui autorise la perception de cette recette.<span class="check-ref">§134111 M9-6 · Art. 13 décret GBCP</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exr-t2" class="save-data"><label for="exr-t2"><strong>Identification précise du débiteur :</strong> Nom complet + adresse pour les personnes physiques, SIRET + dénomination pour les personnes morales. Un titre non nominatif sans PJ est irrecevable.<span class="check-ref">Décret 2022-505 — nomenclature PJ recettes</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exr-t3" class="save-data"><label for="exr-t3"><strong>Montant justifié par le calcul :</strong> Un tableau de calcul détaillé (tarif × unités, ou montant de la convention) est joint au titre. Le montant est cohérent avec la pièce justificative.<span class="check-ref">§134112 M9-6 · contrôle de la mise en recouvrement</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exr-t4" class="save-data"><label for="exr-t4"><strong>Compte classe 7 correct :</strong> c/706 Prestations de services · c/7411 Subventions État · c/7421 Subventions Région · c/7422 Subventions Département · c/748 Autres aides.<span class="check-ref">Plan de comptes M9-6 — nomenclature comptable recettes</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exr-t5" class="save-data"><label for="exr-t5"><strong>Bon exercice budgétaire :</strong> Le titre est rattaché à l'exercice auquel la recette se rapporte. Pas de report irrégulier sur l'exercice suivant. Pour les subventions pluriannuelles, les règles de rattachement M9-6 sont respectées.<span class="check-ref">§2.3.3 Instruction M9-6 — rattachement des recettes à l'exercice</span></label></div>
+        </div>
+      </div></div>
+      <div class="card card-accent-sky"><div class="card-header"><h3>🏛️ B — Subventions Multi-financeurs</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Titres subventions</div>
+          <div class="check-item"><input type="checkbox" id="exr-s1" class="save-data"><label for="exr-s1"><strong>Convention valide et en cours :</strong> Pour chaque subvention, une convention signée par les parties est disponible et son montant est conforme au titre émis.<span class="check-ref">Loi 2000-321 du 12/04/2000 — subventions aux associations et EP</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exr-s2" class="save-data"><label for="exr-s2"><strong>Parts cofinanceurs séparées :</strong> Chaque financeur (État, Région, Département, Commune) fait l'objet d'un titre de recettes distinct avec le bon compte de produits (741x selon le financeur).<span class="check-ref">Plan de comptes M9-6 — c/7411 État · c/7421 Région · c/7422 Département</span></label></div>
+          <div class="check-item"><input type="checkbox" id="exr-s3" class="save-data"><label for="exr-s3"><strong>Pièces justificatives conformes au décret 2022-505 :</strong> Pour les subventions, la pièce justificative est l'arrêté ou la délibération d'attribution (pour les collectivités), ou la notification de subvention (pour l'État).<span class="check-ref">Décret 2022-505 — rubrique subventions de fonctionnement</span></label></div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="form-group"><label>📝 Observations et réserves sur les titres :</label>
+          <textarea id="obs-exec_recettes" class="save-data" placeholder="Ex: Titre n°X — convention non produite. Titre n°Y — période incorrecte..."></textarea></div>
+        <button class="btn btn-success" onclick="saveCurrentData()">💾 Valider et sauvegarder</button>
+      </div></div>
+    </section>
+
+    <!-- ==================== VOYAGES ==================== -->
+    <section class="page" id="voyages">
+      <div class="page-header"><h2>Voyages &amp; Sorties Scolaires</h2><p>Budget équilibré · Seuils marchés publics · Pièces justificatives</p></div>
+      <div class="info-box gold"><strong>Règle d'or :</strong> Le budget d'un voyage scolaire doit être équilibré AVANT l'engagement de la dépense. L'ordonnateur doit présenter un budget prévisionnel équilibré. <strong>Seuils marchés publics 2026 applicables aux voyages :</strong> À partir de <strong>40 000€ HT</strong> (cumul prestataire) une procédure MAPA est déclenchée ; à partir de <strong>90 000€ HT</strong>, la publication est obligatoire (BOAMP/JAL) ; à partir de <strong>216 000€ HT</strong>, appel d'offres formalisé.<span class="ref">Décrets n°2025-1386 et 2025-1383 du 29/12/2025 · Art. L2122-1 CCP · Seuils 2026-2027 (UE) · Nota : seuil dispense passera à 60 000€ HT au 01/04/2026</span></div>
+      <div class="card card-accent-gold"><div class="card-header"><h3>🚌 Calculateur de voyages</h3>
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-primary btn-sm" onclick="addVoyageLine()">➕ Ajouter</button>
+          <button class="btn btn-success btn-sm" onclick="saveVoyages()">💾 Enregistrer</button>
+        </div>
+      </div><div class="card-body">
+        <div id="voyage-container"></div>
+        <div style="background:#f0f4ff;border-radius:10px;padding:16px;margin-top:12px;">
+          <div class="g3">
+            <div><div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Cumul dépenses</div><div style="font-size:1.6rem;font-weight:800;font-family:'DM Mono';color:var(--navy);" id="cumul-dep">0,00 €</div></div>
+            <div><div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Cumul recettes</div><div style="font-size:1.6rem;font-weight:800;font-family:'DM Mono';color:var(--success);" id="cumul-rec">0,00 €</div></div>
+            <div><div style="font-size:.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:4px;">Écart global</div><div style="font-size:1.6rem;font-weight:800;font-family:'DM Mono';" id="cumul-ecart">0,00 €</div></div>
+          </div>
+          <div id="seuil-alerte" style="margin-top:12px;"></div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="form-group"><label>📝 Observations voyages :</label>
+          <textarea id="obs-voyages" class="save-data" placeholder="Recommandations à l'ordonnateur, budget à rééquilibrer, procédure MAPA à engager..."></textarea></div>
+      </div></div>
+    </section>
+
+    <!-- ==================== MARCHÉS PUBLICS ==================== -->
+    <section class="page" id="marches">
+      <div class="page-header"><h2>Marchés Publics</h2><p>Vérification du respect des seuils &amp; procédures · Code de la Commande Publique</p></div>
+      <div class="info-box red"><strong>Responsabilité de l'agent comptable :</strong> L'agent comptable doit refuser de payer une demande de paiement si la dépense devait faire l'objet d'une procédure de mise en concurrence qui n'a pas été respectée. Le non-respect des seuils est un motif de mise en débet.<br><span class="ref">Art. L2122-1 Code de la Commande Publique · Décrets n°2025-1386 &amp; 2025-1383 du 29/12/2025 · Seuils 2026-2027 en vigueur</span></div>
+      <div class="card card-accent-red"><div class="card-header"><h3>📊 Tableau des seuils 2026 — Fournitures &amp; Services (EPLE)</h3></div><div class="card-body">
+        <div class="marche-level"><div class="ml-seuil">0 — 39 999€ HT</div><div class="ml-desc"><strong>Achat direct sans formalité</strong> (jusqu'au 31/03/2026) : pas de mise en concurrence requise. <strong>À partir du 01/04/2026 : seuil relevé à 60 000€ HT.</strong> Attention : pas de fractionnement artificiel.<span class="check-ref">Art. R2122-8 CCP · Décret 2025-1386 du 29/12/2025</span></div></div>
+        <div class="marche-level" style="border-color:var(--gold);"><div class="ml-seuil" style="background:var(--gold);color:var(--navy);">40 000 — 89 999€ HT</div><div class="ml-desc"><strong>MAPA sans publication obligatoire :</strong> Mise en concurrence informelle (au moins 3 devis recommandés), pas d'obligation de publication au BOAMP/JAL. Bonne pratique : conserver les devis au dossier.<span class="check-ref">Art. L2122-1 CCP · Seuil de publicité : 90 000€ HT</span></div></div>
+        <div class="marche-level" style="border-color:var(--danger);"><div class="ml-seuil" style="background:var(--danger);">90 000 — 215 999€ HT</div><div class="ml-desc"><strong>MAPA avec publication obligatoire (BOAMP ou JAL) :</strong> Publication obligatoire, DCE à rédiger, délai de réponse, rapport d'analyse des offres, notification au titulaire, acte d'engagement.<br><strong>Pièces requises par le comptable :</strong> avis de publicité, DCE signé, PV d'ouverture, rapport d'analyse, notification, AE.<span class="check-ref">Art. R2131-2 CCP · Seuil de publicité 90 000€ HT · Décret 2025-1386</span></div></div>
+        <div class="marche-level" style="border-color:#7c3aed;"><div class="ml-seuil" style="background:#7c3aed;">≥ 216 000€ HT</div><div class="ml-desc"><strong>Appel d'offres ouvert (AO) obligatoire :</strong> Procédure formalisée avec publication JOUE + BOAMP, respect de délais stricts (Règlement UE 2025/2152). Seuil collectivités territoriales et EPLE = 216 000€ HT pour 2026-2027 (contre 221 000€ en 2024-2025).<span class="check-ref">Art. L2124-2 CCP · Seuils européens 2026-2027 · Règlement UE 2025/2152 du 22/10/2025</span></div></div>
+        <div class="marche-level" style="border-color:#6b7280;"><div class="ml-seuil" style="background:#6b7280;">Travaux ≥ 100 000€ HT</div><div class="ml-desc"><strong>MAPA travaux avec publication :</strong> Seuil de dispense de publicité pour les travaux = 100 000€ HT (pérennisé par décret 2025-1386). Au-delà, publication obligatoire. Seuil AO formalisé travaux = 5 404 000€ HT (2026-2027).<span class="check-ref">Décret 2025-1386 · Art. R2123-1 CCP · Seuil AO travaux : 5 404 000€ HT</span></div></div>
+        <div class="info-box gold" style="margin-top:12px;"><strong>⚠️ Fractionnement artificiel interdit :</strong> Diviser intentionnellement une commande pour rester sous un seuil de procédure constitue une faute de gestion. L'agent comptable doit être vigilant lorsqu'il constate des demandes de paiement successives de même nature auprès du même fournisseur.<br><span class="ref">Art. L2113-10 CCP · CE 10/02/1995 — Commune de La Ciotat · ⚠️ Risque de mise en débet</span></div>
+      </div></div>
+      <div class="card card-accent-blue"><div class="card-header"><h3>✅ Contrôle des marchés passés</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Vérification des pièces justificatives des marchés</div>
+          <div class="check-item"><input type="checkbox" id="mp-1" class="save-data"><label for="mp-1"><strong>Acte d'engagement / contrat signé :</strong> Un acte d'engagement (AE) ou contrat signé par les deux parties est présent au dossier. Le comptable ne peut pas payer sans cet acte fondateur.<span class="check-ref">Décret 2022-505 — rubrique marchés publics</span></label></div>
+          <div class="check-item"><input type="checkbox" id="mp-2" class="save-data"><label for="mp-2"><strong>Délibération ou bon de commande :</strong> La dépense a fait l'objet d'une délibération du CA (si &gt; seuil d'autorisation) ou d'un bon de commande dans le cadre du marché.<span class="check-ref">Art. R421-20 Code de l'éducation — compétences du CA en matière de marchés</span></label></div>
+          <div class="check-item"><input type="checkbox" id="mp-3" class="save-data"><label for="mp-3"><strong>Cohérence facture ↔ marché :</strong> La dépense s'inscrit bien dans l'objet, la durée, le montant maximum et les conditions tarifaires du marché. Pas de dépassement du montant notifié sans avenant.<span class="check-ref">Art. L2194-1 CCP — modification des marchés en cours d'exécution</span></label></div>
+          <div class="check-item"><input type="checkbox" id="mp-4" class="save-data"><label for="mp-4"><strong>Paiement direct sous-traitants :</strong> Si le titulaire a recours à des sous-traitants, les conditions du paiement direct sont vérifiées (acte de sous-traitance accepté, caution ou retenue).<span class="check-ref">Loi 75-1334 du 31/12/1975 — sous-traitance</span></label></div>
+          <div class="check-item"><input type="checkbox" id="mp-5" class="save-data"><label for="mp-5"><strong>Absence de fractionnement :</strong> Contrôler que le cumul des demandes de paiement passées au même fournisseur pour des prestations de même nature ne constitue pas un fractionnement artificiel.<span class="check-ref">Art. L2113-10 CCP — interdiction du fractionnement</span></label></div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="form-group"><label>📝 Observations marchés publics :</label>
+          <textarea id="obs-marches" class="save-data" placeholder="Ex: Fournisseur X — cumul dépenses en approche du seuil 15k. Procédure MAPA à engager..."></textarea></div>
+        <button class="btn btn-success" onclick="saveCurrentData()">💾 Valider et sauvegarder</button>
+      </div></div>
+    </section>
+
+    <!-- ==================== REGIE ==================== -->
+    <section class="page" id="regie">
+      <div class="page-header"><h2>Vérification des Régies</h2><p>Contrôle des régies de recettes et d'avances · Décret n°2019-798 du 26/07/2019 · Décret n°2020-542 du 07/05/2020 (EPLE)</p></div>
+      <div class="info-box purple"><strong>Responsabilité du gestionnaire public (RGP) :</strong> L'agent comptable est responsable des opérations des régisseurs qui lui sont rattachés. Sa RGP s'étend aux actions et omissions des régisseurs placés sous son autorité et sa surveillance, même s'il prouve avoir exercé les contrôles normaux.<br><span class="ref">CE 20/11/1981 — décision R. (Lebon p.434) · Ordonnance n°2022-408 du 23/03/2022 (RGP)</span></div>
+      <div class="info-box red"><strong>⚠️ Problème fréquemment constaté — Défaut de reversement au compte principal :</strong> Il est très fréquent que des régisseurs encaissent les recettes sur leur compte de dépôt de fonds au Trésor (DFT), puis <strong>oublient de virer ces sommes vers le compte bancaire principal de l'EPLE</strong>. Cette situation crée un solde anormal au c/585000 et constitue une irrégularité. Le régisseur doit verser les recettes encaissées dans les délais fixés par l'arrêté constitutif. L'agent comptable doit le lui rappeler formellement et assurer le suivi de ces reversements.<br><span class="ref">Art. 11 décret n°2019-798 du 26/07/2019 · Art. 10 décret n°2020-542 du 07/05/2020 · Arrêté du 13/08/2020</span></div>
+      <div class="card card-accent-purple"><div class="card-header"><h3>📋 Contrôle de la Constitution de la Régie</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Documents constitutifs</div>
+          <div class="check-item"><input type="checkbox" id="rg-1" class="save-data"><label for="rg-1"><strong>Arrêté constitutif valide :</strong> L'arrêté de création de la régie est signé par l'agent comptable. Il précise le type (recettes/avances), l'objet, le plafond d'encaissement, les moyens de paiement autorisés et les délais de versement.<span class="check-ref">Art. R421-57 Code de l'éducation · Décret n°2020-542 du 07/05/2020 (EPLE) · Décret n°2019-798 du 26/07/2019 Art. 1</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rg-2" class="save-data"><label for="rg-2"><strong>Régisseur nommé et agréé :</strong> L'arrêté de nomination du régisseur est signé par l'ordonnateur et l'agent comptable. Le régisseur a reçu délégation formelle de l'agent comptable. Vérifier qu'un mandataire suppléant est désigné.<span class="check-ref">Art. R421-58 Code de l'éducation · Décret n°2019-798 Art. 6 — mandataire suppléant obligatoire</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rg-3" class="save-data"><label for="rg-3"><strong>Cautionnement à jour :</strong> Le régisseur a constitué un cautionnement auprès d'un organisme agréé. Le montant est conforme au plafond de la régie. L'attestation de cautionnement est conservée au poste comptable. La dispense n'est applicable que si les sommes maniées n'excèdent pas les seuils réglementaires.<span class="check-ref">Décret n°2019-798 Art. 4 · Arrêté du 28/05/1993 (taux indemnités et cautionnements)</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rg-4" class="save-data"><label for="rg-4"><strong>Formation du régisseur :</strong> Le régisseur a été informé de ses obligations par l'agent comptable (versement périodique, conservation des pièces, tenue du journal de caisse, plafond de caisse). Une trace écrite de cette information est conservée.<span class="check-ref">Art. R421-60 Code de l'éducation · Décret n°2020-542 Art. 10</span></label></div>
+        </div>
+      </div></div>
+      <div class="card card-accent-sky"><div class="card-header"><h3>🔍 Contrôle des Opérations de la Régie</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Suivi des opérations</div>
+          <div class="check-item"><input type="checkbox" id="rg-5" class="save-data"><label for="rg-5"><strong>Journal de caisse tenu correctement :</strong> Le journal de caisse de la régie est tenu au jour le jour. Les encaissements sont enregistrés chronologiquement avec leur nature et leur montant. Les chèques sont remis à l'encaissement au plus tard le lendemain de leur réception.<span class="check-ref">Décret n°2019-798 Art. 15 · Décret n°2020-542 Art. 13 · Art. R421-63 Code de l'éducation</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rg-6" class="save-data"><label for="rg-6"><strong>Versements périodiques respectés :</strong> Le régisseur verse les encaissements au comptable dans les délais prévus par l'arrêté constitutif (généralement hebdomadaire ou dès dépassement du plafond de caisse). <strong>Rappel : le compte de dépôt de la régie ne doit pas conserver des fonds qui doivent être virés au compte principal de l'EPLE.</strong><span class="check-ref">Décret n°2019-798 Art. 11 — délais de versement · Décret n°2020-542 Art. 10</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rg-6b" class="save-data"><label for="rg-6b"><strong>⚠️ Reversement au compte principal EPLE vérifié :</strong> S'assurer que les recettes encaissées par le régisseur sur son compte DFT ont bien été virées vers le compte bancaire principal de l'établissement. Un oubli de reversement est une irrégularité fréquente et grave. Vérifier le rapprochement entre c/585000 et les virements reçus sur le DFT principal.<span class="check-ref">Art. 14 décret n°2019-798 — compte de dépôt du régisseur · c/585000 = transitoire régie · Anomalie fréquente à signaler en PV</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rg-7" class="save-data"><label for="rg-7"><strong>Concordance journaux ↔ versements :</strong> Le total des versements effectués correspond au total des encaissements du journal de caisse. Tout écart est une anomalie grave devant être signalée immédiatement.<span class="check-ref">⚠️ Écart = détournement potentiel — alerte immédiate à l'agent comptable · CE 20/11/1981</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rg-8" class="save-data"><label for="rg-8"><strong>Reçus et quittances délivrés :</strong> Pour chaque encaissement, un reçu ou une quittance a été délivré au débiteur. Les souches sont conservées et correspondent aux montants enregistrés.<span class="check-ref">Décret n°2019-798 Art. 15 · Art. R421-63 Code de l'éducation</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rg-9" class="save-data"><label for="rg-9"><strong>Plafond de caisse respecté :</strong> Le solde de caisse de la régie ne dépasse pas le plafond fixé par l'arrêté constitutif. Un dépassement oblige le régisseur à reverser immédiatement le surplus sur le compte de l'EPLE.<span class="check-ref">Décret n°2019-798 Art. 13 — plafond de caisse · Décret n°2020-542 Art. 11</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rg-10" class="save-data"><label for="rg-10"><strong>Compte 585000 débiteur ou nul :</strong> Les versements de la régie au compte bancaire de l'EPLE sont bien retracés au c/585. Ce compte est débiteur ou nul — jamais créditeur. Un c/585 créditeur indique que des sommes ont été virées en sens inverse ou que des reversements sont en attente.<span class="check-ref">Règle M9-6 · c/585 = transitoire encaissements régie · Si créditeur → régularisation obligatoire</span></label></div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="form-group"><label>📝 Observations régies :</label>
+          <textarea id="obs-regie" class="save-data" placeholder="Anomalies constatées, plafond dépassé, versements en retard..."></textarea></div>
+        <button class="btn btn-success" onclick="saveCurrentData()">💾 Valider et sauvegarder</button>
+      </div></div>
+    </section>
+
+    <!-- ==================== CLASSE 5 ==================== -->
+    <section class="page" id="classe5">
+      <div class="page-header"><h2>Audit Mensuel — Comptes de Trésorerie (Classe 5)</h2><p>Vérification des soldes · Instruction M9-6 · Obligation mensuelle</p></div>
+      <div class="info-box red"><strong>Obligation réglementaire :</strong> La vérification mensuelle des comptes de trésorerie est obligatoire. Un compte de caisse (531000) créditeur est un signal d'alarme majeur pouvant indiquer un détournement. Il engage immédiatement la RGP de l'agent comptable.</div>
+      <div class="card card-accent-blue"><div class="card-header"><h3>📊 Saisie et Diagnostic des Soldes</h3>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <input type="month" id="c5-periode" class="save-data" style="width:160px;font-size:.82rem;">
+          <button class="btn btn-primary btn-sm" onclick="auditC5()">🔍 Analyser</button>
+          <button class="btn btn-success btn-sm" onclick="saveCurrentData()">💾 Sauvegarder</button>
+        </div>
+      </div><div class="card-body" style="padding:0;">
+        <div class="info-box blue" style="margin:0 0 12px;font-size:.8rem;">
+          💡 <strong>Mode de saisie :</strong> Pour chaque compte, saisir le montant dans la colonne <strong style="color:var(--success);">◀ DÉBITEUR</strong> si l'EPLE <em>possède</em> de l'argent (cas normal pour la plupart des comptes), ou dans la colonne <strong style="color:var(--danger);">CRÉDITEUR ▶</strong> si le compte est à l'inverse. Le diagnostic s'effectue automatiquement.
+        </div>
+        <div style="overflow-x:auto;">
+        <table class="tbl" style="min-width:700px;">
+          <thead>
+            <tr style="background:var(--navy);color:white;">
+              <th style="width:90px;padding:10px 8px;text-align:left;">Compte</th>
+              <th style="padding:10px 8px;text-align:left;">Libellé &amp; règle M9-6</th>
+              <th style="width:175px;padding:10px 8px;text-align:center;background:#064e3b;border-right:2px solid white;">
+                ◀ DÉBITEUR<br><small style="font-weight:400;font-size:.71rem;opacity:.9;">L'EPLE détient (actif)</small>
+              </th>
+              <th style="width:175px;padding:10px 8px;text-align:center;background:#7f1d1d;">
+                CRÉDITEUR ▶<br><small style="font-weight:400;font-size:.71rem;opacity:.9;">L'EPLE doit (passif)</small>
+              </th>
+              <th style="width:100px;padding:10px 8px;text-align:center;">Diagnostic</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:10px 8px;"><strong>515100</strong></td>
+              <td style="padding:10px 8px;">DFT — Compte bancaire DRFiP<br><small style="color:var(--muted);font-size:.73rem;">Compte courant Trésor public · Doit toujours être débiteur</small></td>
+              <td style="padding:8px;text-align:center;background:#f0fdf4;border-right:2px solid #d1fae5;">
+                <input type="number" id="c5-5151" class="c5-val save-data" oninput="auditC5()" placeholder="ex: 45 230,00" step="0.01" style="width:135px;text-align:right;border:2px solid var(--success);border-radius:6px;padding:6px;font-size:.84rem;">
+              </td>
+              <td style="padding:8px;text-align:center;background:#fff8f8;">
+                <span style="color:#d1d5db;font-size:.77rem;">⟵ saisir à gauche</span>
+              </td>
+              <td style="padding:8px;text-align:center;" id="diag-5151"><span class="c5-diag-na">—</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;background:#fafafa;">
+              <td style="padding:10px 8px;"><strong>511700</strong></td>
+              <td style="padding:10px 8px;">Effets impayés<br><small style="color:var(--muted);font-size:.73rem;">Chèques sans provision, prélèvements rejetés · Débiteur à recouvrer</small></td>
+              <td style="padding:8px;text-align:center;background:#f0fdf4;border-right:2px solid #d1fae5;">
+                <input type="number" id="c5-5117" class="c5-val save-data" oninput="auditC5()" placeholder="ex: 320,00" step="0.01" style="width:135px;text-align:right;border:2px solid var(--success);border-radius:6px;padding:6px;font-size:.84rem;">
+              </td>
+              <td style="padding:8px;text-align:center;background:#fff8f8;">
+                <span style="color:#d1d5db;font-size:.77rem;">⟵ saisir à gauche</span>
+              </td>
+              <td style="padding:8px;text-align:center;" id="diag-5117"><span class="c5-diag-na">—</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:10px 8px;"><strong>515900</strong></td>
+              <td style="padding:10px 8px;">Virements internes / Demandes de paiement<br><small style="color:var(--muted);font-size:.73rem;">En attente de prise en charge DRFiP · Doit être créditeur ou nul</small></td>
+              <td style="padding:8px;text-align:center;background:#fff8f8;border-right:2px solid #d1fae5;">
+                <span style="color:#d1d5db;font-size:.77rem;">saisir à droite ⟶</span>
+              </td>
+              <td style="padding:8px;text-align:center;background:#f0fdf4;">
+                <input type="number" id="c5-5159" class="c5-val save-data" oninput="auditC5()" placeholder="ex: 8 500,00" step="0.01" style="width:135px;text-align:right;border:2px solid var(--success);border-radius:6px;padding:6px;font-size:.84rem;">
+              </td>
+              <td style="padding:8px;text-align:center;" id="diag-5159"><span class="c5-diag-na">—</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;background:#fff8f8;">
+              <td style="padding:10px 8px;"><strong style="color:var(--danger);">531000</strong></td>
+              <td style="padding:10px 8px;">Caisse espèces<br><small style="color:var(--danger);font-size:.73rem;font-weight:700;">⚠️ Ne doit JAMAIS être créditeur — encaissements non saisis / détournement possible</small></td>
+              <td style="padding:8px;text-align:center;background:#f0fdf4;border-right:2px solid #d1fae5;">
+                <input type="number" id="c5-531" class="c5-val save-data" oninput="auditC5()" placeholder="ex: 150,00" step="0.01" style="width:135px;text-align:right;border:2px solid var(--success);border-radius:6px;padding:6px;font-size:.84rem;">
+              </td>
+              <td style="padding:8px;text-align:center;background:#fef2f2;border:2px dashed var(--danger);">
+                <span style="color:var(--danger);font-size:.76rem;font-weight:700;">🚫 NE JAMAIS SAISIR ICI</span>
+              </td>
+              <td style="padding:8px;text-align:center;" id="diag-531"><span class="c5-diag-na">—</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;background:#fafafa;">
+              <td style="padding:10px 8px;"><strong>511200</strong></td>
+              <td style="padding:10px 8px;">Chèques à l'encaissement<br><small style="color:var(--muted);font-size:.73rem;">Chèques reçus non encore remis en banque · Débiteur ou nul</small></td>
+              <td style="padding:8px;text-align:center;background:#f0fdf4;border-right:2px solid #d1fae5;">
+                <input type="number" id="c5-5112" class="c5-val save-data" oninput="auditC5()" placeholder="ex: 2 400,00" step="0.01" style="width:135px;text-align:right;border:2px solid var(--success);border-radius:6px;padding:6px;font-size:.84rem;">
+              </td>
+              <td style="padding:8px;text-align:center;background:#fff8f8;">
+                <span style="color:#d1d5db;font-size:.77rem;">⟵ saisir à gauche</span>
+              </td>
+              <td style="padding:8px;text-align:center;" id="diag-5112"><span class="c5-diag-na">—</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #e2e8f0;">
+              <td style="padding:10px 8px;"><strong>585000</strong></td>
+              <td style="padding:10px 8px;">Régies — virements entre comptes<br><small style="color:var(--muted);font-size:.73rem;">Encaissements régie en attente de prise en charge · Débiteur ou nul</small></td>
+              <td style="padding:8px;text-align:center;background:#f0fdf4;border-right:2px solid #d1fae5;">
+                <input type="number" id="c5-585" class="c5-val save-data" oninput="auditC5()" placeholder="ex: 600,00" step="0.01" style="width:135px;text-align:right;border:2px solid var(--success);border-radius:6px;padding:6px;font-size:.84rem;">
+              </td>
+              <td style="padding:8px;text-align:center;background:#fff8f8;">
+                <span style="color:#d1d5db;font-size:.77rem;">⟵ saisir à gauche (reversement non effectué si créditeur)</span>
+              </td>
+              <td style="padding:8px;text-align:center;" id="diag-585"><span class="c5-diag-na">—</span></td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+      </div></div>
+      <div id="c5-synthese" style="margin-bottom:14px;"></div>
+      <div class="card"><div class="card-body">
+        <div class="form-group"><label>📝 Observations classe 5 :</label>
+          <textarea id="obs-classe5" class="save-data" placeholder="Ex: c/531000 créditeur de 450€ — régularisation demandée au régisseur, délai 5 jours ouvrables..."></textarea></div>
+      </div></div>
+    </section>
+
+    <!-- ==================== RECOUVREMENT ==================== -->
+    <section class="page" id="recouvrement">
+      <div class="page-header"><h2>Suivi du Recouvrement des Créances</h2><p>Balance âgée · Diligences · Art. R421-68 Code de l'éducation</p></div>
+      <div class="info-box red"><strong>Obligation de diligence :</strong> L'agent comptable a l'obligation d'engager les poursuites pour les créances non recouvrées à l'amiable. L'absence de diligences dans des délais raisonnables peut constituer une faute engageant sa RGP, même si le recouvrement est définitivement compromis. Il doit en justifier auprès du juge des comptes.<br><span class="ref">§134 instruction M9-6 · Art. R421-68 Code de l'éducation · §13491 M9-6 — justifications au juge</span></div>
+      <div class="card card-accent-red"><div class="card-header"><h3>📋 Tableau de suivi des créances</h3>
+        <button class="btn btn-primary btn-sm" onclick="addCreance()">➕ Ajouter une créance</button>
+      </div><div class="card-body">
+        <div id="creances-container"></div>
+        <div id="creances-stats" style="margin-top:12px;"></div>
+      </div></div>
+      <div class="card card-accent-blue"><div class="card-header"><h3>📜 Procédures de recouvrement</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Étapes obligatoires (§134 instruction M9-6)</div>
+          <div class="check-item"><input type="checkbox" id="rec-1" class="save-data"><label for="rec-1"><strong>Rappel amiable (J+30) :</strong> Envoi d'un rappel amiable par courrier simple au débiteur dès 30 jours de retard. Conserver la preuve (copie du courrier, accusé de réception).<span class="check-ref">Délai DGP 30 jours · §13451 M9-6</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rec-2" class="save-data"><label for="rec-2"><strong>Mise en demeure (J+60) :</strong> Envoi d'une mise en demeure par LR+AR à défaut de paiement après rappel. Ce document formel est nécessaire pour justifier l'engagement de poursuites.<span class="check-ref">§13452 M9-6</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rec-3" class="save-data"><label for="rec-3"><strong>État exécutoire (J+90) :</strong> Pour les créances persistantes, saisir l'ordonnateur afin qu'il décerne un état exécutoire, titre permettant le recouvrement forcé par voie de contrainte.<span class="check-ref">Art. R421-68 Code de l'éducation · §13455 M9-6</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rec-4" class="save-data"><label for="rec-4"><strong>Admission en non-valeur (ANV) :</strong> Lorsqu'une créance est définitivement irrécouvrable (insolvabilité justifiée, disparition du débiteur), l'agent comptable propose à l'ordonnateur une ANV. Ce n'est pas un abandon de créance mais une mesure comptable.<span class="check-ref">§1347 M9-6 · Art. L423-1 CGCT — ANV</span></label></div>
+          <div class="check-item"><input type="checkbox" id="rec-5" class="save-data"><label for="rec-5"><strong>Remise gracieuse :</strong> Si le débiteur est dans l'impossibilité avérée de payer, le comptable peut soumettre à l'ordonnateur une demande de remise gracieuse. L'ordonnateur décide, pas le comptable.<span class="check-ref">§13471 M9-6 — remise gracieuse sur demande du débiteur</span></label></div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="form-group"><label>📝 Observations recouvrement :</label>
+          <textarea id="obs-recouvrement" class="save-data" placeholder="Ex: Famille XXXX — ANV proposée à l'ordonnateur le XX/XX. Titre n°Y — état exécutoire en cours..."></textarea></div>
+        <button class="btn btn-success" onclick="saveCurrentData()">💾 Valider et sauvegarder</button>
+      </div></div>
+    </section>
+
+    <!-- ==================== IMMOBILISATIONS ==================== -->
+    <section class="page" id="immo">
+      <div class="page-header"><h2>Immobilisations &amp; Patrimoine</h2><p>Conservation des droits · Inventaire · Amortissements · Instruction M9-6 Tome 3</p></div>
+      <div class="info-box blue"><strong>Rôle de l'agent comptable :</strong> L'agent comptable est responsable de la conservation des biens dont il tient la comptabilité matière. Il doit s'assurer que l'inventaire physique est tenu à jour et que les amortissements sont correctement calculés et imputés.<br><span class="ref">Art. 11 décret GBCP · Instruction M9-6 Tome 3 — immobilisations · Annexe inventaire compte financier</span></div>
+      <div class="card card-accent-blue"><div class="card-header"><h3>📦 Contrôle des immobilisations</h3></div><div class="card-body">
+        <div class="checklist-block"><div class="checklist-title">Vérifications annuelles</div>
+          <div class="check-item"><input type="checkbox" id="imm-1" class="save-data"><label for="imm-1"><strong>Inventaire physique effectué :</strong> Un inventaire physique annuel des immobilisations corporelles a été réalisé. Les biens inventoriés correspondent aux lignes du compte financier (pièce 18b).<span class="check-ref">M9-6 Tome 3 · Pièce 18 du compte financier</span></label></div>
+          <div class="check-item"><input type="checkbox" id="imm-2" class="save-data"><label for="imm-2"><strong>Étiquetage des biens :</strong> Les immobilisations sont identifiées par un numéro d'inventaire gravé ou collé. Tout matériel informatique, équipement de cuisine, mobilier &gt; 500€ doit être inventorié.<span class="check-ref">Seuil d'immobilisation EPLE : 500€ HT (recommandé) · Durées d'amortissement MEN</span></label></div>
+          <div class="check-item"><input type="checkbox" id="imm-3" class="save-data"><label for="imm-3"><strong>Amortissements calculés et imputés :</strong> Les dotations aux amortissements de l'exercice ont été calculées selon les durées MEN (mobilier 10 ans, informatique 5 ans, etc.) et imputées au c/681 en fin d'exercice.<span class="check-ref">Tableau des durées d'amortissement MEN · c/68 — dotations · c/28 — amortissements</span></label></div>
+          <div class="check-item"><input type="checkbox" id="imm-4" class="save-data"><label for="imm-4"><strong>Sorties d'inventaire :</strong> Tout bien sorti (cession, mise au rebut, vol) a fait l'objet d'une délibération du CA et d'une écriture de sortie. La valeur nette comptable a été soldée.<span class="check-ref">Art. R421-2 Code de l'éducation — délibération CA pour aliénation · c/675 — valeurs comptables des éléments d'actif cédés</span></label></div>
+          <div class="check-item"><input type="checkbox" id="imm-5" class="save-data"><label for="imm-5"><strong>Subventions d'investissement :</strong> Les subventions d'investissement reçues sont correctement inscrites au passif du bilan (c/13) et reprises en produit (c/777) au rythme des amortissements des biens financés.<span class="check-ref">M9-6 Tome 3 — c/13 Subventions d'investissement · c/777 Quote-part virée au résultat</span></label></div>
+          <div class="check-item"><input type="checkbox" id="imm-6" class="save-data"><label for="imm-6"><strong>Assurance des biens :</strong> Les immobilisations de l'EPLE sont couvertes par les contrats d'assurance de la collectivité de rattachement (Région / Département). L'attestation est disponible.<span class="check-ref">Code de l'éducation R421-63 — obligations d'assurance</span></label></div>
+        </div>
+      </div></div>
+      <div class="card"><div class="card-body">
+        <div class="form-group"><label>📝 Observations immobilisations :</label>
+          <textarea id="obs-immo" class="save-data" placeholder="Ex: Inventaire à jour au XX/XX. 3 biens mis au rebut — délibération CA jointe. Amortissements imputés le XX/XX..."></textarea></div>
+        <button class="btn btn-success" onclick="saveCurrentData()">💾 Valider et sauvegarder</button>
+      </div></div>
+    </section>
+
+  </main><!-- /content -->
+</div><!-- /main-wrap -->
+
+<!-- ==================== PV OVERLAY ==================== -->
+<div id="pv-overlay">
+  <div class="pv-topbar no-print">
+    <div><strong>📜 Procès-Verbal de Vérification</strong></div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-success btn-sm" onclick="window.print()">🖨️ Imprimer</button>
+      <button class="btn btn-ghost btn-sm" onclick="closePV()">← Retour</button>
+    </div>
+  </div>
+  <div class="pv-body" id="pv-content"></div>
+</div>
+
+<div id="toast"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+// ============================================================
+// BASE DE DONNÉES
+// ============================================================
+let db = JSON.parse(localStorage.getItem('cic_pro_v57') || 'null') || {
+  etabs: [], data: {},
+  team: { ac:{nom:'',tel:'',email:''}, fp:{nom:'',tel:'',email:''}, ag:{nom:'',tel:'',email:''} }
+};
+let currentUAI = '';
+let voyageCounter = 0;
+let creanceCounter = 0;
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = function() {
+  updateTopbarDate();
+  updateEpleList();
+  renderDashboard();
+  loadTeamUI();
+  addVoyageLine();
+  addCreance();
+  setInterval(updateTopbarDate, 60000);
+};
+
+function updateTopbarDate() {
+  const now = new Date();
+  document.getElementById('topbar-date').textContent =
+    now.toLocaleDateString('fr-FR', {weekday:'short', day:'numeric', month:'short', year:'numeric'});
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const sec = document.getElementById(id);
+  if (sec) sec.classList.add('active');
+  const btn = document.querySelector(`button[onclick*="'${id}'"]`);
+  if (btn) btn.classList.add('active');
+  if (id === 'dashboard') renderDashboard();
+  if (id === 'ordonnateur') updateOrdoDisplay();
+}
+
+function showJour(id, btn) {
+  document.querySelectorAll('.jour-content').forEach(j => j.classList.remove('active'));
+  document.querySelectorAll('.jour-btn').forEach(b => b.classList.remove('active'));
+  const el = document.getElementById('jour-' + id);
+  if (el) el.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.innerHTML = (type==='ok'?'✅ ':type==='warn'?'⚠️ ':type==='err'?'🚨 ':'ℹ️ ') + msg;
+  t.style.background = type==='err' ? '#dc2626' : type==='warn' ? '#d97706' : '#0b1437';
+  t.className = 'show';
+  setTimeout(() => t.className = '', 3500);
+}
+
+function fmt(n) {
+  return parseFloat(n||0).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2}) + ' €';
+}
+
+// ============================================================
+// PERSISTANCE
+// ============================================================
+function persist() { localStorage.setItem('cic_pro_v57', JSON.stringify(db)); }
+
+function saveCurrentData() {
+  if (!currentUAI) { showToast('Sélectionnez un EPLE d\'abord', 'warn'); return; }
+  if (!db.data[currentUAI]) db.data[currentUAI] = {};
+  document.querySelectorAll('.save-data').forEach(el => {
+    if (el.type === 'checkbox') db.data[currentUAI][el.id] = el.checked;
+    else db.data[currentUAI][el.id] = el.value;
+  });
+  persist();
+  renderDashboard();
+  showToast('Données sauvegardées — ' + currentUAI, 'ok');
+}
+
+// ============================================================
+// ÉQUIPE
+// ============================================================
+function saveTeam() {
+  db.team = {
+    ac: { nom: document.getElementById('t-ac-nom').value, tel: document.getElementById('t-ac-tel').value, email: document.getElementById('t-ac-email').value },
+    fp: { nom: document.getElementById('t-fp-nom').value, tel: document.getElementById('t-fp-tel').value, email: document.getElementById('t-fp-email').value },
+    ag: { nom: document.getElementById('t-ag-nom').value, tel: document.getElementById('t-ag-tel').value, email: document.getElementById('t-ag-email').value }
+  };
+  persist();
+  renderTeamCards();
+  showToast('Équipe enregistrée', 'ok');
+}
+
+function loadTeamUI() {
+  const t = db.team;
+  if (t.ac) { document.getElementById('t-ac-nom').value = t.ac.nom||''; document.getElementById('t-ac-tel').value = t.ac.tel||''; document.getElementById('t-ac-email').value = t.ac.email||''; }
+  if (t.fp) { document.getElementById('t-fp-nom').value = t.fp.nom||''; document.getElementById('t-fp-tel').value = t.fp.tel||''; document.getElementById('t-fp-email').value = t.fp.email||''; }
+  if (t.ag) { document.getElementById('t-ag-nom').value = t.ag.nom||''; document.getElementById('t-ag-tel').value = t.ag.tel||''; document.getElementById('t-ag-email').value = t.ag.email||''; }
+  renderTeamCards();
+}
+
+function renderTeamCards() {
+  const t = db.team;
+  const getEplesFor = (role) => db.etabs.filter(e => e.cosign === role).map(e => `<span class="eple-chip">${e.uai}</span>`).join('');
+  const acEples = getEplesFor('ac');
+  document.getElementById('team-cards-display').innerHTML = [
+    { role:'ac', label:'Agent Comptable', cls:'', person: t.ac },
+    { role:'fp', label:'Fondée de Pouvoir', cls:'fp', person: t.fp },
+    { role:'ag', label:'Assistante de Gestion', cls:'ag', person: t.ag }
+  ].map(m => `
+    <div class="team-card ${m.cls}">
+      <div class="role ${m.role}">${m.label}</div>
+      <h4>${m.person.nom || '—'}</h4>
+      <div style="font-size:.76rem;color:var(--muted);">${m.person.tel||''}</div>
+      <div style="font-size:.76rem;color:var(--muted);">${m.person.email||''}</div>
+      <div class="eple-chips">${m.role==='ac'?(acEples||'<em style="font-size:.72rem;color:var(--muted);">Suivi général + attribués directs</em>'):getEplesFor(m.role)}</div>
+    </div>`).join('');
+}
+
+// ============================================================
+// EPLE
+// ============================================================
+function saveEple() {
+  const uai = (document.getElementById('p-uai').value||'').trim().toUpperCase();
+  if (!uai) { showToast('Code UAI obligatoire', 'err'); return; }
+  const etab = {
+    uai, nom: document.getElementById('p-nom').value,
+    ordo: document.getElementById('p-ordo').value,
+    sg: document.getElementById('p-sg').value,
+    regisseur: document.getElementById('p-regisseur').value,
+    restauration: document.getElementById('p-restauration').value,
+    eleves: document.getElementById('p-eleves').value,
+    exercice: document.getElementById('p-exercice').value,
+    cosign: document.getElementById('p-cosign').value
+  };
+  const idx = db.etabs.findIndex(e => e.uai === uai);
+  if (idx > -1) db.etabs[idx] = etab; else db.etabs.push(etab);
+  persist();
+  updateEpleList();
+  renderTeamCards();
+  showToast('EPLE enregistré : ' + uai, 'ok');
+}
+
+function deleteEple() {
+  if (!currentUAI) return;
+  if (!confirm(`Supprimer ${currentUAI} et toutes ses données ?`)) return;
+  db.etabs = db.etabs.filter(e => e.uai !== currentUAI);
+  delete db.data[currentUAI];
+  persist();
+  currentUAI = '';
+  updateEpleList();
+  showToast('EPLE supprimé', 'warn');
+}
+
+function updateEpleList() {
+  const sel = document.getElementById('uai-selector');
+  sel.innerHTML = '<option value="">— Sélectionner un EPLE rattaché —</option>' +
+    db.etabs.map(e => `<option value="${e.uai}">${e.uai} — ${e.nom}</option>`).join('');
+  if (currentUAI) sel.value = currentUAI;
+  document.getElementById('st-eples').textContent = db.etabs.length;
+}
+
+function changeEple(uai) {
+  currentUAI = uai;
+  if (!uai) return;
+  loadEpleData();
+  renderDashboard();
+  updateOrdoDisplay();
+  showToast('EPLE chargé : ' + uai, 'ok');
+}
+
+function loadEpleData() {
+  if (!currentUAI) return;
+  const etab = db.etabs.find(e => e.uai === currentUAI);
+  if (etab) {
+    document.getElementById('p-uai').value = etab.uai||'';
+    document.getElementById('p-nom').value = etab.nom||'';
+    document.getElementById('p-ordo').value = etab.ordo||'';
+    document.getElementById('p-sg').value = etab.sg||'';
+    document.getElementById('p-regisseur').value = etab.regisseur||'';
+    document.getElementById('p-restauration').value = etab.restauration||'Autonome';
+    document.getElementById('p-eleves').value = etab.eleves||'';
+    document.getElementById('p-exercice').value = etab.exercice||'';
+    document.getElementById('p-cosign').value = etab.cosign||'fp';
+  }
+  const data = db.data[currentUAI] || {};
+  document.querySelectorAll('.save-data').forEach(el => {
+    if (el.type === 'checkbox') el.checked = !!data[el.id];
+    else el.value = data[el.id] || '';
+  });
+  // voyages
+  const voy = data._voyages || [];
+  document.getElementById('voyage-container').innerHTML = '';
+  voyageCounter = 0;
+  if (voy.length) voy.forEach(v => addVoyageLine(v));
+  else addVoyageLine();
+  calcVoyageTotal();
+  // créances
+  const cre = data._creances || [];
+  document.getElementById('creances-container').innerHTML = '';
+  creanceCounter = 0;
+  if (cre.length) cre.forEach(c => addCreance(c));
+  else addCreance();
+  updateCreanceStats();
+  auditC5();
+}
+
+function updateOrdoDisplay() {
+  const etab = currentUAI ? db.etabs.find(e => e.uai === currentUAI) : null;
+  document.getElementById('ordo-nom-display').textContent = etab ? (etab.ordo || 'Non renseigné') : '—';
+  document.getElementById('ordo-etab-display').textContent = etab ? (etab.uai + ' — ' + etab.nom) : 'Aucun établissement sélectionné';
+}
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+const MODULES = [
+  { id:'droits_constates', label:'Droits Constatés', prefix:['dc-'], risk:'high' },
+  { id:'ordonnateur', label:'Contrôle Ordonnateur', prefix:['ord-'], risk:'high' },
+  { id:'exec_depenses', label:'Dépenses (Demandes de paiement)', prefix:['exd-'], risk:'high' },
+  { id:'exec_recettes', label:'Recettes (Titres)', prefix:['exr-'], risk:'med' },
+  { id:'voyages', label:'Voyages Scolaires', prefix:[], risk:'med', custom: true },
+  { id:'marches', label:'Marchés Publics', prefix:['mp-'], risk:'high' },
+  { id:'regie', label:'Régies', prefix:['rg-'], risk:'high' },
+  { id:'classe5', label:'Audit Classe 5', prefix:['c5-'], risk:'med', custom: true },
+  { id:'recouvrement', label:'Recouvrement Créances', prefix:['rec-'], risk:'med' },
+  { id:'immo', label:'Immobilisations', prefix:['imm-'], risk:'low' },
+  { id:'quotidien', label:'Vérification Quotidienne', prefix:['qlu-','qma-','qme-','qje-','qve-'], risk:'med' }
+];
+
+function renderDashboard() {
+  document.getElementById('st-eples').textContent = db.etabs.length;
+  const etab = currentUAI ? db.etabs.find(e => e.uai === currentUAI) : null;
+  if (!etab) return;
+  const data = db.data[currentUAI] || {};
+
+  document.getElementById('dash-eple-name').textContent = etab.uai + ' — ' + etab.nom;
+  document.getElementById('dash-eple-info').textContent = (etab.ordo ? 'Ordonnateur : ' + etab.ordo + ' · ' : '') + (etab.exercice ? 'Exercice ' + etab.exercice : '');
+
+  // Compter tous les checkboxes
+  let total = 0, checked = 0;
+  document.querySelectorAll('.save-data[type=checkbox]').forEach(el => {
+    total++;
+    if (data[el.id]) checked++;
+  });
+  const nok = total - checked;
+  const rate = total > 0 ? Math.round((checked/total)*100) : 0;
+
+  document.getElementById('st-ok').textContent = checked;
+  document.getElementById('st-nok').textContent = nok;
+  document.getElementById('st-rate').textContent = rate + '%';
+
+  const sc = document.getElementById('dash-score');
+  sc.textContent = rate + '%';
+  sc.className = 'di-score ' + (rate >= 80 ? 'green' : rate >= 50 ? 'orange' : 'red');
+
+  // Récap par module
+  const tbody = document.getElementById('dash-tbody');
+  tbody.innerHTML = MODULES.map(m => {
+    if (m.custom) {
+      let mLabel = m.id === 'voyages' ? 'Voyages Scolaires' : 'Audit Classe 5';
+      return `<tr><td>${mLabel}</td><td>—</td><td>—</td><td>—</td><td><span class="badge badge-info">Saisie manuelle</span></td><td>—</td></tr>`;
+    }
+    const ids = m.prefix.flatMap(p => Object.keys(data).filter(k => k.startsWith(p) && typeof data[k] === 'boolean'));
+    const mc = ids.filter(k => data[k]).length;
+    const mt = ids.length;
+    const mn = mt - mc;
+    const pct = mt > 0 ? Math.round((mc/mt)*100) : null;
+    const riskColor = m.risk === 'high' ? 'badge-nok' : m.risk === 'med' ? 'badge-warn' : 'badge-info';
+    const riskLabel = m.risk === 'high' ? '🔴 Élevé' : m.risk === 'med' ? '🟡 Moyen' : '🟢 Bas';
+    const statusBadge = mt === 0 ? '<span class="badge badge-info">Non démarré</span>' :
+      pct === 100 ? '<span class="badge badge-ok">✅ Complet</span>' :
+      `<span class="badge badge-warn">⏳ ${pct}%</span>`;
+    return `<tr>
+      <td><strong>${m.label}</strong></td>
+      <td class="td-center">${mt||'—'}</td>
+      <td class="td-center" style="color:var(--success);font-weight:600;">${mc||'—'}</td>
+      <td class="td-center" style="color:${mn>0?'var(--danger)':'var(--muted)'};font-weight:600;">${mn||'—'}</td>
+      <td>${statusBadge}</td>
+      <td><span class="badge ${riskColor}">${riskLabel}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+// ============================================================
+// ORDONNATEUR
+// ============================================================
+function updateOrdoDisplay() {
+  const etab = currentUAI ? db.etabs.find(e => e.uai === currentUAI) : null;
+  document.getElementById('ordo-nom-display').textContent = etab ? (etab.ordo || 'Non renseigné') : '—';
+  document.getElementById('ordo-etab-display').textContent = etab ? (etab.uai + ' — ' + etab.nom) : 'Aucun établissement sélectionné';
+}
+
+// ============================================================
+// VOYAGES
+// ============================================================
+function addVoyageLine(d) {
+  voyageCounter++;
+  const id = voyageCounter;
+  d = d || { nom:'', dep:0, rec:0, obs:'' };
+  const div = document.createElement('div');
+  div.className = 'voyage-card';
+  div.id = 'voyage-' + id;
+  div.innerHTML = `
+    <div class="voyage-header">
+      <strong>🚌 Voyage n°${id}</strong>
+      <button class="btn btn-danger btn-xs" onclick="this.closest('.voyage-card').remove(); calcVoyageTotal()">✕</button>
+    </div>
+    <div class="g2" style="margin-bottom:8px;">
+      <div class="form-group" style="margin:0;"><label>Nom / Destination</label><input type="text" class="v-nom" value="${d.nom||''}" placeholder="Voyage pédagogique Paris..."></div>
+      <div></div>
+    </div>
+    <div class="g3">
+      <div class="form-group" style="margin:0;"><label>💸 Dépenses prévues (€ HT)</label><input type="number" class="v-dep" value="${d.dep||''}" oninput="calcVoyageTotal()" placeholder="0.00" step="0.01"></div>
+      <div class="form-group" style="margin:0;"><label>💰 Recettes prévues (€)</label><input type="number" class="v-rec" value="${d.rec||''}" oninput="calcVoyageTotal()" placeholder="0.00" step="0.01"></div>
+      <div><label style="font-size:.78rem;font-weight:600;color:var(--muted);display:block;margin-bottom:5px;">⚖️ Solde</label><div class="v-balance" id="vb-${id}">À saisir</div></div>
+    </div>
+    <div class="form-group" style="margin-top:8px;margin-bottom:0;"><label>Prestataire / Observations</label><input type="text" class="v-obs" value="${d.obs||''}" placeholder="Cars Caraïbes — Devis n°..."></div>`;
+  document.getElementById('voyage-container').appendChild(div);
+  calcVoyageTotal();
+}
+
+// ============================================================
+// CALCULATEUR FSC
+// ============================================================
+let fscRows = [];
+let fscRowCounter = 0;
+
+function calcFSC() {
+  const frais = parseFloat(document.getElementById('fsc-frais').value)||0;
+  const bourse = parseFloat(document.getElementById('fsc-bourse').value)||0;
+  const aide = parseFloat(document.getElementById('fsc-aide').value)||0;
+  const reste = frais - bourse;
+  const exces = aide - Math.max(0, reste);
+  const res = document.getElementById('fsc-resultat');
+  if (!frais && !bourse && !aide) { res.innerHTML=''; return; }
+  let html = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:10px;">
+    <div style="background:#f0f4ff;border-radius:8px;padding:12px;text-align:center;"><div style="font-size:.72rem;font-weight:700;color:var(--muted);">FRAIS</div><div style="font-size:1.4rem;font-weight:800;color:var(--navy);">${fmt(frais)}</div></div>
+    <div style="background:#f0fdf4;border-radius:8px;padding:12px;text-align:center;"><div style="font-size:.72rem;font-weight:700;color:var(--muted);">BOURSE</div><div style="font-size:1.4rem;font-weight:800;color:var(--success);">−${fmt(bourse)}</div></div>
+    <div style="background:${reste>0?'#fffbeb':'#f0fdf4'};border-radius:8px;padding:12px;text-align:center;"><div style="font-size:.72rem;font-weight:700;color:var(--muted);">RESTE À CHARGE</div><div style="font-size:1.4rem;font-weight:800;color:${reste>0?'var(--gold)':'var(--success)'};">${fmt(reste)}</div></div>
+  </div>`;
+  if (exces > 0) {
+    html += `<div class="info-box red"><strong>🚨 AIDE FSC EXCESSIVE de ${fmt(exces)} !</strong> L'aide FSC de ${fmt(aide)} dépasse le reste à charge de ${fmt(reste)}. Conformément à la circulaire MEN 2017, l'aide devrait être plafonnée à ${fmt(Math.max(0,reste))}. Cet excédent doit être corrigé et figurera dans le PV avec un délai de régularisation.</div>`;
+  } else if (aide > 0 && reste > 0 && exces <= 0) {
+    html += `<div class="info-box green"><strong>✅ Aide FSC cohérente</strong> — L'aide de ${fmt(aide)} est ≤ au reste à charge de ${fmt(reste)}. Aucune anomalie détectée.</div>`;
+  } else if (reste <= 0) {
+    html += `<div class="info-box red"><strong>🚨 RESTE À CHARGE NUL OU NÉGATIF</strong> — La bourse (${fmt(bourse)}) couvre déjà l'intégralité des frais (${fmt(frais)}). Toute aide FSC serait irrégulière.</div>`;
+  }
+  res.innerHTML = html;
+}
+
+function addFSCRow() {
+  const nom = (document.getElementById('fsc-nom').value||'').trim().toUpperCase();
+  const prenom = (document.getElementById('fsc-prenom').value||'').trim();
+  const classe = (document.getElementById('fsc-classe').value||'').trim();
+  const frais = parseFloat(document.getElementById('fsc-frais').value)||0;
+  const bourse = parseFloat(document.getElementById('fsc-bourse').value)||0;
+  const aide = parseFloat(document.getElementById('fsc-aide').value)||0;
+  if (!frais && !bourse && !aide) { showToast('Saisir au moins un montant', 'warn'); return; }
+  const reste = frais - bourse;
+  const exces = aide - Math.max(0, reste);
+  const anom = exces > 0 || (reste <= 0 && aide > 0);
+  fscRowCounter++;
+  fscRows.push({ id: fscRowCounter, nom, prenom, classe, frais, bourse, aide, reste, exces, anom });
+  renderFSCRows();
+  // Clear inputs for next entry
+  document.getElementById('fsc-nom').value = '';
+  document.getElementById('fsc-prenom').value = '';
+  document.getElementById('fsc-classe').value = '';
+  document.getElementById('fsc-frais').value = '';
+  document.getElementById('fsc-bourse').value = '';
+  document.getElementById('fsc-aide').value = '';
+  document.getElementById('fsc-resultat').innerHTML = '';
+}
+
+function renderFSCRows() {
+  const cont = document.getElementById('fsc-rows');
+  if (!fscRows.length) { cont.innerHTML = '<em style="font-size:.8rem;color:var(--muted);">Aucun élève enregistré.</em>'; return; }
+  let html = '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.81rem;">';
+  html += '<thead><tr style="background:var(--navy);color:white;">';
+  html += '<th style="padding:8px;text-align:left;">Élève</th>';
+  html += '<th style="padding:8px;text-align:left;">Classe</th>';
+  html += '<th style="padding:8px;text-align:right;">Frais (€)</th>';
+  html += '<th style="padding:8px;text-align:right;">Bourse (€)</th>';
+  html += '<th style="padding:8px;text-align:right;">Reste à charge</th>';
+  html += '<th style="padding:8px;text-align:right;">Aide FSC</th>';
+  html += '<th style="padding:8px;text-align:center;">Statut</th>';
+  html += '<th style="padding:8px;text-align:center;">Suppr.</th>';
+  html += '</tr></thead><tbody>';
+  fscRows.forEach(r => {
+    const nomAff = [r.nom, r.prenom].filter(Boolean).join(' ') || '—';
+    html += `<tr style="border-bottom:1px solid #e2e8f0;background:${r.anom?'#fef2f2':'white'}">
+      <td style="padding:8px;font-weight:${r.anom?'700':'400'};color:${r.anom?'var(--danger)':'inherit'};">${nomAff}</td>
+      <td style="padding:8px;color:var(--muted);">${r.classe||'—'}</td>
+      <td style="padding:8px;text-align:right;">${fmt(r.frais)}</td>
+      <td style="padding:8px;text-align:right;color:var(--success);">${fmt(r.bourse)}</td>
+      <td style="padding:8px;text-align:right;font-weight:700;color:${r.reste>0?'var(--gold)':'var(--success)'};">${fmt(r.reste)}</td>
+      <td style="padding:8px;text-align:right;">${fmt(r.aide)}</td>
+      <td style="padding:8px;text-align:center;">${r.anom
+        ? `<span style="color:var(--danger);font-weight:700;font-size:.78rem;">🚨 Excès ${fmt(r.exces)}</span>`
+        : '<span style="color:var(--success);font-size:.78rem;">✅ Conforme</span>'}</td>
+      <td style="padding:8px;text-align:center;"><button class="btn btn-danger btn-xs" onclick="deleteFSCRow(${r.id})">✕</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  const anomRows = fscRows.filter(r => r.anom);
+  if (anomRows.length > 0) {
+    html += `<div class="info-box red" style="margin-top:10px;"><strong>🚨 ${anomRows.length} aide(s) FSC irrégulière(s) :</strong><ul style="margin:6px 0 0 16px;font-size:.83rem;">`;
+    anomRows.forEach(r => {
+      const nomAff = [r.nom, r.prenom].filter(Boolean).join(' ') || 'Élève sans nom';
+      html += `<li><strong>${nomAff}</strong>${r.classe?' ('+r.classe+')':''} — FSC ${fmt(r.aide)} / Reste à charge ${fmt(r.reste)} → excès de <strong>${fmt(r.exces)}</strong></li>`;
+    });
+    html += `</ul><div style="margin-top:6px;font-size:.8rem;">→ Ces cas doivent figurer dans le PV avec un délai de régularisation accordé à l'établissement (Circulaire MEN 2017).</div></div>`;
+  }
+  cont.innerHTML = html;
+  document.getElementById('fsc-anomalies-box').innerHTML = '';
+}
+
+function deleteFSCRow(id) {
+  fscRows = fscRows.filter(r => r.id !== id);
+  renderFSCRows();
+}
+
+function clearFSCRows() {
+  if (!confirm('Effacer toute la liste FSC ?')) return;
+  fscRows = [];
+  fscRowCounter = 0;
+  document.getElementById('fsc-rows').innerHTML = '';
+  document.getElementById('fsc-anomalies-box').innerHTML = '';
+  document.getElementById('fsc-resultat').innerHTML = '';
+  ['fsc-nom','fsc-prenom','fsc-classe','fsc-frais','fsc-bourse','fsc-aide'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+}
+
+// ============================================================
+function calcVoyageTotal() {
+  let td = 0, tr = 0;
+  document.querySelectorAll('.voyage-card').forEach(c => {
+    const d = parseFloat(c.querySelector('.v-dep').value)||0;
+    const r = parseFloat(c.querySelector('.v-rec').value)||0;
+    td += d; tr += r;
+    const id = c.id.replace('voyage-','');
+    const vb = document.getElementById('vb-'+id);
+    if (!vb) return;
+    const e = r - d;
+    if (!d && !r) { vb.textContent='À saisir'; vb.className='v-balance'; }
+    else if (Math.abs(e)<0.01) { vb.innerHTML='✅ Équilibré'; vb.className='v-balance ok'; }
+    else if (e>0) { vb.innerHTML=`✅ +${fmt(e)}`; vb.className='v-balance ok'; }
+    else { vb.innerHTML=`⚠️ Déficit ${fmt(e)}<br><small>L'ordonnateur doit rééquilibrer</small>`; vb.className='v-balance nok'; }
+  });
+  document.getElementById('cumul-dep').textContent = fmt(td);
+  document.getElementById('cumul-rec').textContent = fmt(tr);
+  const ec = tr - td;
+  const eel = document.getElementById('cumul-ecart');
+  eel.textContent = fmt(ec);
+  eel.style.color = ec >= 0 ? 'var(--success)' : 'var(--danger)';
+  const al = document.getElementById('seuil-alerte');
+  const S = 40000; // Seuil 2026 fournitures/services (avant 01/04/2026)
+  if (!td) { al.innerHTML=''; return; }
+  if (td >= S) al.innerHTML=`<div class="info-box red"><strong>🚨 ALERTE MARCHÉS PUBLICS 2026 :</strong> Cumul dépenses <strong>${fmt(td)}</strong> ≥ seuil <strong>${fmt(S)} HT</strong>. Procédure MAPA obligatoire. Ce point sera mentionné dans le PV de vérification.</div>`;
+  else if (td >= S*0.75) al.innerHTML=`<div class="info-box gold"><strong>⚠️ VIGILANCE :</strong> Cumul ${fmt(td)} — approche du seuil MAPA (${fmt(S)} HT). Surveiller les prochains engagements.</div>`;
+  else al.innerHTML=`<div class="info-box green"><strong>✅ Seuil marchés public respecté</strong> — Cumul dépenses : ${fmt(td)}</div>`;
+}
+
+function saveVoyages() {
+  if (!currentUAI) { showToast('Sélectionnez un EPLE d\'abord', 'warn'); return; }
+  if (!db.data[currentUAI]) db.data[currentUAI] = {};
+  const voy = [];
+  document.querySelectorAll('.voyage-card').forEach(c => {
+    voy.push({nom:c.querySelector('.v-nom').value, dep:c.querySelector('.v-dep').value, rec:c.querySelector('.v-rec').value, obs:c.querySelector('.v-obs').value});
+  });
+  db.data[currentUAI]._voyages = voy;
+  db.data[currentUAI]['obs-voyages'] = document.getElementById('obs-voyages').value;
+  persist();
+  showToast('Voyages enregistrés', 'ok');
+}
+
+// ============================================================
+// CLASSE 5
+// ============================================================
+const C5_RULES = [
+  { id:'5151', sign:'deb', label:'515100 DFT — Compte bancaire DRFiP', 
+    msg:'Le compte DFT (515100) présente un solde CRÉDITEUR, ce qui est anormalement impossible en situation normale. Ce compte doit toujours être débiteur (l\'EPLE a de l\'argent à la banque).', 
+    cause:'Virement entrant erroné, écriture inversée ou anomalie de saisie dans Op@le.',
+    action:'Contacter la DRFiP pour rapprochement immédiat. Analyser les dernières écritures et identifier l\'origine du crédit erroné.',
+    gravite:'⚠️ ANOMALIE' },
+  { id:'5117', sign:'deb', label:'511700 — Effets impayés (chèques sans provision)', 
+    msg:'Le compte 511700 présente un solde CRÉDITEUR. Ce compte retrace les chèques impayés et les prélèvements rejetés ; il doit être débiteur (créance à recouvrer) ou nul.', 
+    cause:'Écriture de régularisation passée à l\'envers, ou chèque rejeté non correctement comptabilisé.',
+    action:'Analyser les écritures de la période et identifier le mouvement créditeur. Régulariser avec la DRFiP et relancer les débiteurs concernés.',
+    gravite:'⚠️ ANOMALIE' },
+  { id:'5159', sign:'cred', label:'515900 — Virements internes / Demandes de paiement', 
+    msg:'Le compte 515900 présente un solde DÉBITEUR. Ce compte retrace les demandes de paiement en attente de traitement DRFiP ; il doit être créditeur ou nul.', 
+    cause:'Paiements comptabilisés à tort, double comptabilisation ou problème de réconciliation avec la DRFiP.',
+    action:'Analyser les écritures et contacter la DRFiP pour rapprochement et régularisation.',
+    gravite:'⚠️ ANOMALIE' },
+  { id:'531', sign:'deb', label:'531000 — Caisse espèces', 
+    msg:'🚨 ANOMALIE GRAVE : Le compte de caisse (531000) est CRÉDITEUR. Des espèces ont été déposées en banque ou réglées à des tiers sans avoir été saisies dans Op@le. Cette situation peut indiquer un détournement de fonds ou des encaissements non comptabilisés.', 
+    cause:'Recettes en espèces encaissées par le régisseur ou l\'établissement et non saisies dans Op@le. Dépôt en banque non comptabilisé.',
+    action:'🚨 RÉGULARISATION IMMÉDIATE OBLIGATOIRE. Demander à l\'EPLE de saisir dans Op@le tous les encaissements en espèces non comptabilisés. Vérifier le journal de caisse du régisseur.',
+    gravite:'🚨 ANOMALIE GRAVE' },
+  { id:'5112', sign:'deb', label:'511200 — Chèques à l\'encaissement', 
+    msg:'Le compte 511200 présente un solde CRÉDITEUR. Ce compte retrace les chèques reçus en attente de remise en banque ; il doit être débiteur ou nul.', 
+    cause:'Écriture comptable inversée, ou remise de chèques enregistrée avant l\'encaissement réel.',
+    action:'Vérifier le brouillard de caisse, les remises de chèques et rectifier les écritures erronées.',
+    gravite:'⚠️ ANOMALIE' },
+  { id:'585', sign:'deb', label:'585000 — Régies (virements entre comptes)', 
+    msg:'Le compte 585000 présente un solde CRÉDITEUR. Ce compte retrace les encaissements régie en attente de prise en charge par le comptable ; il doit être débiteur ou nul. Un solde créditeur indique que des virements du compte régie vers le compte principal ont été enregistrés sans contrepartie, ou que le régisseur n\'a pas reversé les sommes dues.', 
+    cause:'Le régisseur a encaissé des recettes sur son compte de dépôt DFT mais n\'a pas viré ces sommes vers le compte principal de l\'EPLE (problème fréquent).',
+    action:'Vérifier les journaux de régie. Demander au régisseur d\'effectuer immédiatement le virement des sommes dues vers le compte de l\'EPLE. Rappeler les obligations réglementaires de versement périodique (Art. 11 décret n°2019-798).',
+    gravite:'⚠️ ANOMALIE — Reversement non effectué probable' }
+];
+
+function auditC5() {
+  let anoms = 0;
+  const anomList = [];
+  C5_RULES.forEach(r => {
+    const val = parseFloat(document.getElementById('c5-'+r.id).value)||0;
+    const ok = r.sign==='deb' ? val>=0 : val<=0;
+    const diag = document.getElementById('diag-'+r.id);
+    if (!diag) return;
+    if (ok) diag.innerHTML = `<span class="c5-diag-ok">✅ Conforme</span>`;
+    else { 
+      diag.innerHTML = `<span class="c5-diag-nok">⚠️ Anomalie</span>`; 
+      anoms++;
+      anomList.push({ ...r, val });
+    }
+  });
+  const synth = document.getElementById('c5-synthese');
+  if (anoms === 0) {
+    synth.innerHTML = '<div class="info-box green"><strong>✅ Tous les comptes de trésorerie sont conformes</strong> pour cette période. Aucune anomalie détectée sur les 6 comptes vérifiés.</div>';
+  } else {
+    let html = `<div class="info-box red"><strong>🚨 ${anoms} anomalie(s) détectée(s)</strong> sur les comptes de trésorerie — Détail des anomalies :</div>`;
+    html += '<div style="margin-top:12px;">';
+    anomList.forEach((r, i) => {
+      const isGrave = r.gravite.includes('GRAVE');
+      html += `<div style="background:${isGrave?'#fef2f2':'#fffbeb'};border-left:4px solid ${isGrave?'var(--danger)':'var(--gold)'};border-radius:8px;padding:14px;margin-bottom:10px;">
+        <div style="font-weight:800;font-size:.9rem;color:${isGrave?'var(--danger)':'var(--gold)'};margin-bottom:4px;">${r.gravite} — ${r.label}</div>
+        <div style="font-size:.85rem;margin-bottom:6px;"><strong>Solde constaté :</strong> ${fmt(r.val)} €</div>
+        <div style="font-size:.84rem;margin-bottom:4px;"><strong>📋 Constat :</strong> ${r.msg}</div>
+        <div style="font-size:.84rem;margin-bottom:4px;color:#92400e;"><strong>🔍 Cause probable :</strong> ${r.cause}</div>
+        <div style="font-size:.84rem;color:#1e3a5f;"><strong>→ Action requise :</strong> ${r.action}</div>
+      </div>`;
+    });
+    html += '</div>';
+    synth.innerHTML = html;
+  }
+}
+
+// ============================================================
+// CRÉANCES
+// ============================================================
+function addCreance(d) {
+  creanceCounter++;
+  const id = creanceCounter;
+  d = d || { debiteur:'', titre:'', montant:0, date:'', statut:'en_cours' };
+  const urgClass = { en_cours:'', relance_1:'warning', relance_2:'urgent', forcé:'urgent', regle:'ok', anv:'' }[d.statut] || '';
+  const div = document.createElement('div');
+  div.className = `creance-row ${urgClass}`;
+  div.id = 'creance-' + id;
+  div.innerHTML = `
+    <input type="text" class="cr-debiteur" value="${d.debiteur||''}" placeholder="Nom du débiteur">
+    <input type="text" class="cr-titre" value="${d.titre||''}" placeholder="N° titre / Objet">
+    <input type="number" class="cr-montant" value="${d.montant||''}" placeholder="Montant €" step="0.01">
+    <input type="date" class="cr-date" value="${d.date||''}">
+    <select class="cr-statut" onchange="updateCreanceStats()">
+      <option value="en_cours" ${d.statut==='en_cours'?'selected':''}>En cours</option>
+      <option value="relance_1" ${d.statut==='relance_1'?'selected':''}>Relance 1</option>
+      <option value="relance_2" ${d.statut==='relance_2'?'selected':''}>Relance 2</option>
+      <option value="forcé" ${d.statut==='forcé'?'selected':''}>Forcé / EE</option>
+      <option value="regle" ${d.statut==='regle'?'selected':''}>✅ Réglé</option>
+      <option value="anv" ${d.statut==='anv'?'selected':''}>ANV proposée</option>
+    </select>
+    <button class="btn btn-danger btn-xs" onclick="this.closest('.creance-row').remove(); updateCreanceStats()">✕</button>`;
+  document.getElementById('creances-container').appendChild(div);
+  updateCreanceStats();
+}
+
+function updateCreanceStats() {
+  let total = 0, urgent = 0, montantTotal = 0, montantUrgent = 0;
+  document.querySelectorAll('.creance-row').forEach(c => {
+    const s = c.querySelector('.cr-statut').value;
+    const m = parseFloat(c.querySelector('.cr-montant').value)||0;
+    total++;
+    montantTotal += m;
+    if (s==='relance_2'||s==='forcé') { urgent++; montantUrgent += m; }
+    c.className = 'creance-row ' + ({ en_cours:'', relance_1:'warning', relance_2:'urgent', forcé:'urgent', regle:'ok', anv:'' }[s]||'');
+  });
+  const st = document.getElementById('creances-stats');
+  st.innerHTML = `<div class="g3">
+    <div class="stat-card" data-icon="📋" style="padding:12px 16px;"><div class="s-label">Total créances</div><div class="s-val" style="font-size:1.2rem;">${total}</div><div class="s-sub">${fmt(montantTotal)}</div></div>
+    <div class="stat-card red" data-icon="🚨" style="padding:12px 16px;"><div class="s-label">Urgentes (&gt;60j)</div><div class="s-val" style="font-size:1.2rem;color:var(--danger);">${urgent}</div><div class="s-sub">${fmt(montantUrgent)}</div></div>
+    <div class="stat-card green" data-icon="💡" style="padding:12px 16px;"><div class="s-label">Taux recouvrement</div><div class="s-val" style="font-size:1.2rem;">${total>0?Math.round(((total-urgent)/total)*100)+'%':'—'}</div></div>
+  </div>`;
+}
+
+function saveCreances() {
+  if (!currentUAI) return;
+  if (!db.data[currentUAI]) db.data[currentUAI] = {};
+  const cre = [];
+  document.querySelectorAll('.creance-row').forEach(c => {
+    cre.push({ debiteur: c.querySelector('.cr-debiteur').value, titre: c.querySelector('.cr-titre').value, montant: c.querySelector('.cr-montant').value, date: c.querySelector('.cr-date').value, statut: c.querySelector('.cr-statut').value });
+  });
+  db.data[currentUAI]._creances = cre;
+  persist();
+}
+
+// ============================================================
+// GÉNÉRATION DU PV
+// ============================================================
+function generatePV() {
+  if (!currentUAI) { showToast('Sélectionnez un EPLE pour générer le PV', 'warn'); return; }
+  saveCreances();
+  saveVoyages();
+
+  const etab = db.etabs.find(e => e.uai === currentUAI) || {};
+  const data = db.data[currentUAI] || {};
+  const team = db.team;
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('fr-FR',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+  // Cosignataire automatique
+  const cosignRole = etab.cosign || 'fp';
+  const cosignPerson = cosignRole === 'ac' ? team.ac : (cosignRole === 'fp' ? team.fp : team.ag);
+  const cosignTitle = cosignRole === 'ac' ? "L'Agent Comptable (suivi direct)" : (cosignRole === 'fp' ? 'La Fondée de Pouvoir' : "L'Assistante de Gestion");
+
+  // Construire les sections du PV - N'afficher QUE les anomalies et les observations
+  const buildModule = (moduleLabel, checks, obsKey) => {
+    // nok = items explicitement décochés (=false) — les items jamais touchés (undefined) sont ignorés
+    const nok = checks.filter(c => data[c.id] === false);
+    const verified = checks.filter(c => data[c.id] === true);
+    const obs = data[obsKey || ('obs-' + moduleLabel.toLowerCase().replace(/ /g,'_').replace(/[éèêë]/g,'e').replace(/[àâ]/g,'a').replace(/[ùû]/g,'u').replace(/[ôö]/g,'o').replace(/[îï]/g,'i').replace(/—/g,'-').replace(/[^a-z0-9_\-]/g,''))];
+    
+    // Ne pas inclure ce module dans le PV s'il n'a ni anomalie ni observation
+    if (nok.length === 0 && !obs) return '';
+    
+    let html = `<div class="pv-section"><div class="pv-section-h">📌 ${moduleLabel}</div>`;
+    
+    if (nok.length === 0) {
+      html += `<div class="pv-ok">✅ Module vérifié — aucune anomalie constatée (${verified.length} point(s) conformes).</div>`;
+    } else {
+      html += `<div style="margin-bottom:6px;font-size:.84rem;color:var(--danger);font-weight:700;">${nok.length} point(s) non conforme(s) — régularisation requise :</div>`;
+      nok.forEach(c => { html += `<div class="pv-nok">⚠️ <strong>${c.label}</strong><div class="pv-action">→ Action attendue : ${c.action}</div><div class="pv-ref">${c.ref||''}</div></div>`; });
+      if (verified.length > 0) html += `<div style="font-size:.82rem;color:var(--success);padding:4px 0;">✅ ${verified.length} point(s) conforme(s) vérifiés dans ce module.</div>`;
+    }
+    if (obs) {
+      html += `<div style="background:#f0f4ff;border-left:3px solid var(--blue);border-radius:6px;padding:10px;margin-top:8px;"><strong>Observations :</strong> <span style="font-style:italic;color:#555;font-size:.85rem;">${obs}</span></div>`;
+    }
+    html += '</div>';
+    return html;
+  };
+
+  const CHECKS = {
+    ordonnateur: [
+      {id:'ord-1',label:'Formulaire d\'accréditation modèle I',action:'Réclamer le formulaire conforme à l\'arrêté 25/07/2013 avec signature manuscrite à la première demande de paiement.',ref:'Art. 10 décret GBCP 2012-1246'},
+      {id:'ord-2',label:'Acte de nomination de l\'ordonnateur',action:'Joindre la copie de l\'arrêté de nomination à la première demande de paiement de l\'exercice.',ref:'R421-13 Code de l\'éducation'},
+      {id:'ord-3',label:'Cohérence des signatures (bordereau de demandes de paiement)',action:'Comparer la signature sur les bordereaux Op@le avec le formulaire d\'accréditation.',ref:'Vade-mécum PJ 2022'},
+      {id:'ord-4',label:'Acte de délégation (modèle II)',action:'Transmettre l\'acte de délégation précisant l\'étendue des compétences.',ref:'Arrêté 25/07/2013 modèle II'},
+      {id:'ord-5',label:'Délégation valide et non expirée',action:'Vérifier que le délégataire est toujours en poste et la délégation active.',ref:'R421-13 CÉdu'},
+      {id:'ord-6',label:'Mention d\'empêchement si applicable',action:'En cas d\'absence CE, désigner un ordonnateur suppléant auprès du rectorat.',ref:'R421-13 CÉdu'}
+    ],
+    droits_constates: [
+      {id:'dc-fs-1',label:'Frais scolaires — Effectif facturé = SIECLE',action:'Corriger les listes GFC/TurboSelf pour correspondre aux effectifs SIECLE.',ref:'Instruction M9-6 §1.3.1'},
+      {id:'dc-fs-2',label:'Frais scolaires — Tarifs votés CA',action:'Ajuster les tarifs logiciel pour correspondre à la délibération du CA.',ref:'R421-2 Code de l\'éducation'},
+      {id:'dc-fs-3',label:'Frais scolaires — Périodicité correcte',action:'Corriger les dates de facturation (vacances académiques Guadeloupe).',ref:'Calendrier académique'},
+      {id:'dc-fs-4',label:'Frais scolaires — État nominatif présent',action:'Joindre obligatoirement l\'état nominatif signé par l\'ordonnateur.',ref:'Décret 2022-505'},
+      {id:'dc-fs-5',label:'Frais scolaires — Concordance titre ↔ logiciel',action:'Régulariser l\'écart avant toute prise en charge.',ref:'M9-6 §2.3.1'},
+      {id:'dc-b-1',label:'Bourses — Liste ASBC importée',action:'Importer la liste officielle avant toute facturation.',ref:'Code de l\'éducation L531-1'},
+      {id:'dc-b-2',label:'Bourses — Déduction appliquée',action:'Vérifier par sondage et corriger pour chaque élève boursier.',ref:'M9-6 §1.3.2'},
+      {id:'dc-b-3',label:'Bourses — Prime d\'internat appliquée',action:'Vérifier et appliquer la prime d\'internat aux internes boursiers.',ref:'Circulaire MEN primes internat'},
+      {id:'dc-b-4',label:'Bourses — Prime de transport',action:'Vérifier l\'éligibilité et appliquer la prime régionale.',ref:'Délibération CR Guadeloupe'},
+      {id:'dc-b-5',label:'Bourses — Imputation c/744',action:'Corriger l\'imputation : utiliser le compte 744 (subventions).',ref:'Plan de comptes M9-6'},
+      {id:'dc-ro-1',label:'Remises d\'ordre — Certificat médical',action:'Exiger le certificat médical original. Sans justificatif = remise irrégulière.',ref:'M9-6 §1.3'},
+      {id:'dc-ro-2',label:'Remises d\'ordre — Convention de stage',action:'Joindre la convention de stage signée avec les dates précises.',ref:'Code de l\'éducation L124-1'},
+      {id:'dc-ro-3',label:'Remises d\'ordre — Décision d\'exclusion',action:'Joindre la décision signée du chef d\'établissement.',ref:'R511-13 Code de l\'éducation'},
+      {id:'dc-ro-4',label:'Remises d\'ordre — Calcul exact',action:'Refaire le calcul : jours d\'absence × tarif journalier hors frais fixes.',ref:'M9-6 méthode calcul remises'},
+      {id:'dc-ro-5',label:'Remises d\'ordre — État signé ordonnateur',action:'Faire signer l\'état des remises avant émission du titre rectificatif.',ref:'Décret 2022-505'},
+      {id:'dc-ro-6',label:'Remises d\'ordre — Comptabilisation c/709',action:'Corriger l\'imputation : c/709 ou réduction du titre initial.',ref:'Plan de comptes M9-6'},
+      {id:'dc-fsc-1',label:'FSC — Commission constituée',action:'Reconstituer la commission réglementaire et archiver ses PV.',ref:'Circulaire MEN FSC'},
+      {id:'dc-fsc-2',label:'FSC — Dossiers individuels complets',action:'Compléter les dossiers (justificatifs ressources + décision signée).',ref:'Instruction DSDEN'},
+      {id:'dc-fsc-3',label:'FSC — Imputation c/6571',action:'Corriger toutes les imputations FSC au compte 6571 exclusivement.',ref:'Plan de comptes M9-6'},
+      {id:'dc-fsc-4',label:'FSC — Convention de financement valide',action:'Récupérer la convention signée auprès de la DSDEN/CAF.',ref:'Convention FSC'},
+      {id:'dc-fsc-5',label:'FSC — Enveloppe non dépassée',action:'Suspendre les attributions et informer la commission du dépassement.',ref:'⚠️ Dépassement = irrégularité'},
+      {id:'dc-fsc-6',label:'FSC — Réclamations traitées',action:'Traiter dans les délais et notifier par écrit les refus motivés.',ref:'Principe contradictoire'}
+    ],
+    exec_depenses: [
+      {id:'exd-f1',label:'Facture — Identification fournisseur (SIRET)',action:'Rejeter et demander une facture avec SIRET et mentions légales.',ref:'Décret 2022-505 Annexe C'},
+      {id:'exd-f2',label:'Facture — Mentions légales complètes',action:'Rejeter et demander une facture conforme au CGI art.289.',ref:'CGI art.289-II'},
+      {id:'exd-f3',label:'Facture — EPLE désigné comme destinataire',action:'La facture doit mentionner explicitement l\'EPLE. Rejeter sinon.',ref:'Vade-mécum PJ 2022 §V'},
+      {id:'exd-f4',label:'Facture — RIB conforme Op@le',action:'BLOQUER. Vérifier l\'identité du créancier. Mettre à jour le tiers dans Op@le.',ref:'⚖️ Mise en débet affacturage'},
+      {id:'exd-sf1',label:'Service fait — Bordereau signé ordonnateur',action:'Renvoyer pour signature du bordereau récapitulatif.',ref:'Art. D1617-23 CGCT'},
+      {id:'exd-sf2',label:'Service fait — Bon de livraison',action:'Réclamer le BL signé au service gestionnaire.',ref:'Décret 2022-505 rubrique fournitures'},
+      {id:'exd-sf3',label:'Service fait — PV de réception travaux',action:'Exiger le PV de réception avant tout paiement de travaux.',ref:'Décret 2022-505 rubrique travaux'},
+      {id:'exd-sf4',label:'Service fait — Antériorité de la date',action:'Vérifier que la date SF est antérieure à la date du mandat.',ref:'Principe du service fait'},
+      {id:'exd-i1',label:'Imputation — Compte classe 6 cohérent',action:'Corriger l\'imputation en accord avec l\'ordonnateur. Suspendre si nécessaire.',ref:'⚖️ CE Bulgnéville n°68700 (2015)'},
+      {id:'exd-i2',label:'Imputation — Crédits disponibles',action:'BLOQUER. Demander une DM votée en CA avant paiement.',ref:'Art. 19 décret GBCP — 1er cas refus réquisition'},
+      {id:'exd-i3',label:'Imputation — Budget exécutoire',action:'Vérifier le caractère exécutoire. Sans budget exécutoire = dépenses hors crédits.',ref:'R421-61 Code de l\'éducation'},
+      {id:'exd-i4',label:'Imputation — Exactitude de la liquidation',action:'Refaire le calcul et corriger la demande de paiement avant traitement.',ref:'Art. 20 décret GBCP'}
+    ],
+    exec_recettes: [
+      {id:'exr-t1',label:'Titre — Autorisation de percevoir',action:'Suspendre la prise en charge. Réclamer la convention ou l\'arrêté.',ref:'§134111 M9-6'},
+      {id:'exr-t2',label:'Titre — Identité précise du débiteur',action:'Compléter l\'identification avant prise en charge.',ref:'Décret 2022-505'},
+      {id:'exr-t3',label:'Titre — Montant justifié par calcul',action:'Joindre un tableau de calcul détaillé au titre.',ref:'§134112 M9-6'},
+      {id:'exr-t4',label:'Titre — Compte classe 7 correct',action:'Corriger l\'imputation avec le bon compte de produits.',ref:'Plan de comptes M9-6'},
+      {id:'exr-t5',label:'Titre — Bon exercice budgétaire',action:'Rattacher à l\'exercice correct et régulariser.',ref:'§2.3.3 M9-6'},
+      {id:'exr-s1',label:'Subventions — Convention valide',action:'Récupérer la convention signée avant prise en charge.',ref:'Loi 2000-321'},
+      {id:'exr-s2',label:'Subventions — Titres séparés par financeur',action:'Émettre des titres distincts pour chaque cofinanceur.',ref:'Plan de comptes M9-6'},
+      {id:'exr-s3',label:'Subventions — PJ décret 2022-505 conforme',action:'Joindre l\'arrêté ou notification de subvention conforme.',ref:'Décret 2022-505 rubrique subventions'}
+    ],
+    marches: [
+      {id:'mp-1',label:'Marchés — Acte d\'engagement présent',action:'Réclamer l\'AE signé. Aucun paiement sans acte fondateur.',ref:'Décret 2022-505 rubrique marchés'},
+      {id:'mp-2',label:'Marchés — Délibération CA ou bon de commande',action:'Joindre la délibération ou le BC dans le cadre du marché.',ref:'R421-20 Code de l\'éducation'},
+      {id:'mp-3',label:'Marchés — Cohérence facture ↔ marché',action:'Vérifier que la dépense est dans l\'objet et le montant du marché.',ref:'Art. L2194-1 CCP'},
+      {id:'mp-4',label:'Marchés — Sous-traitants (paiement direct)',action:'Vérifier l\'acte de sous-traitance accepté et les conditions.',ref:'Loi 75-1334 du 31/12/1975'},
+      {id:'mp-5',label:'Marchés — Absence de fractionnement',action:'Alerter l\'ordonnateur sur le risque de fractionnement artificiel.',ref:'Art. L2113-10 CCP · CE Commune de La Ciotat'}
+    ],
+    regie: [
+      {id:'rg-1',label:'Régie — Arrêté constitutif valide',action:'Mettre à jour ou renouveler l\'arrêté de la régie (objet, plafond, moyens de paiement, délais de versement).',ref:'Décret n°2020-542 du 07/05/2020 (EPLE) · Décret n°2019-798 du 26/07/2019 Art. 1'},
+      {id:'rg-2',label:'Régie — Régisseur nommé, agréé et mandataire suppléant désigné',action:'Nommer formellement le régisseur par arrêté joint et désigner un mandataire suppléant.',ref:'Art. R421-58 Code de l\'éducation · Décret n°2019-798 Art. 6'},
+      {id:'rg-3',label:'Régie — Cautionnement à jour',action:'Réclamer l\'attestation de cautionnement en cours de validité.',ref:'Décret n°2019-798 Art. 4 · Arrêté 28/05/1993'},
+      {id:'rg-4',label:'Régie — Formation du régisseur assurée',action:'Dispenser la formation réglementaire et en garder trace écrite.',ref:'Art. R421-60 Code de l\'éducation · Décret n°2020-542 Art. 10'},
+      {id:'rg-5',label:'Régie — Journal de caisse tenu correctement',action:'Exiger la remise du journal de caisse à jour. Remise des chèques au plus tard le lendemain.',ref:'Décret n°2019-798 Art. 15 · Décret n°2020-542 Art. 13'},
+      {id:'rg-6',label:'Régie — Versements périodiques respectés',action:'Rappeler les délais de versement prévus par l\'arrêté. Ne pas laisser des fonds stationner sur le compte DFT régie.',ref:'Décret n°2019-798 Art. 11 — délais de versement'},
+      {id:'rg-6b',label:'⚠️ Régie — Reversement au compte principal EPLE (c/585000)',action:'Demander immédiatement le virement des fonds restant sur le compte DFT du régisseur vers le compte bancaire principal de l\'EPLE. Vérifier le rapprochement c/585000. Ce manquement fréquent doit être régularisé dans un délai de 15 jours.',ref:'Art. 14 décret n°2019-798 · c/585000 = compte transitoire · Anomalie fréquente'},
+      {id:'rg-7',label:'Régie — Concordance journaux ↔ versements',action:'⚠️ Écart = anomalie grave. Signaler immédiatement. Analyser les pièces du régisseur.',ref:'CE 20/11/1981 — RGP régisseurs · Ordonnance 2022-408'},
+      {id:'rg-8',label:'Régie — Reçus et quittances délivrés',action:'Vérifier les souches de reçus et les rapprocher des encaissements.',ref:'Décret n°2019-798 Art. 15 · Art. R421-63 Code de l\'éducation'},
+      {id:'rg-9',label:'Régie — Plafond de caisse respecté',action:'Demander un versement immédiat si le plafond est dépassé.',ref:'Décret n°2019-798 Art. 13 · Décret n°2020-542 Art. 11'},
+      {id:'rg-10',label:'Régie — c/585000 débiteur ou nul',action:'Analyser les écritures et régulariser le compte de régie. Si créditeur = reversement non effectué.',ref:'Règle M9-6 c/585 · Décret n°2019-798 Art. 14'}
+    ],
+    recouvrement: [
+      {id:'rec-1',label:'Recouvrement — Rappels amiables J+30',action:'Envoyer les rappels en conservant la preuve d\'envoi.',ref:'§13451 M9-6'},
+      {id:'rec-2',label:'Recouvrement — Mise en demeure J+60',action:'Envoyer LR+AR pour les créances persistantes.',ref:'§13452 M9-6'},
+      {id:'rec-3',label:'Recouvrement — État exécutoire J+90',action:'Saisir l\'ordonnateur pour décernement d\'un état exécutoire.',ref:'R421-68 Code de l\'éducation'},
+      {id:'rec-4',label:'Recouvrement — ANV proposée si irrécouvrable',action:'Constituer le dossier ANV et le soumettre à l\'ordonnateur.',ref:'§1347 M9-6'},
+      {id:'rec-5',label:'Recouvrement — Remise gracieuse étudiée',action:'Soumettre une demande de remise gracieuse à l\'ordonnateur.',ref:'§13471 M9-6'}
+    ],
+    immo: [
+      {id:'imm-1',label:'Immobilisations — Inventaire physique effectué',action:'Réaliser l\'inventaire annuel et le rapprocher de la pièce 18 du CF.',ref:'M9-6 Tome 3 · Pièce 18 CF'},
+      {id:'imm-2',label:'Immobilisations — Étiquetage des biens',action:'Procéder à l\'inventaire et à l\'étiquetage des biens &gt; 500€.',ref:'Seuil d\'immobilisation EPLE'},
+      {id:'imm-3',label:'Immobilisations — Amortissements imputés',action:'Calculer et imputer les dotations aux amortissements selon le tableau MEN.',ref:'M9-6 Tome 3 — durées amortissements'},
+      {id:'imm-4',label:'Immobilisations — Sorties régularisées',action:'Délibérer en CA et comptabiliser la sortie (c/675).',ref:'R421-2 Code de l\'éducation'},
+      {id:'imm-5',label:'Immobilisations — Subventions d\'investissement',action:'Vérifier la reprise en résultat au rythme des amortissements (c/777).',ref:'M9-6 Tome 3 — c/13 subventions investissement'},
+      {id:'imm-6',label:'Immobilisations — Assurance des biens',action:'Vérifier la couverture assurance avec la collectivité de rattachement.',ref:'R421-63 Code de l\'éducation'}
+    ]
+  };
+
+  // Voyages anomalies
+  const voyages = data._voyages || [];
+  const totalDep = voyages.reduce((s,v)=>s+(parseFloat(v.dep)||0),0);
+  const totalRec = voyages.reduce((s,v)=>s+(parseFloat(v.rec)||0),0);
+  const voyDeseq = voyages.filter(v=>(parseFloat(v.rec)||0)<(parseFloat(v.dep)||0));
+
+  // C5 anomalies
+  const c5Anoms = C5_RULES.filter(r => {
+    const val = parseFloat(data['c5-'+r.id]||0);
+    return r.sign==='deb' ? val<0 : val>0;
+  });
+
+  // Compter total anomalies
+  let totalAnoms = 0;
+  // Compter uniquement les items explicitement décochés (=false), pas les non touchés
+  Object.values(CHECKS).forEach(checks => checks.forEach(c => { if (data[c.id] === false) totalAnoms++; }));
+  totalAnoms += voyDeseq.length + (totalDep>=40000?1:0) + c5Anoms.length;
+
+  let html = `
+    <div class="pv-entete">
+      <div class="pv-title">Procès-Verbal de Vérification Pédagogique</div>
+      <div class="pv-sub">Agence Comptable des Établissements Publics Locaux d'Enseignement</div>
+      <div class="pv-meta">
+        <strong>Établissement rattaché :</strong> ${etab.uai||'—'} — ${etab.nom||'—'}<br>
+        <strong>Ordonnateur :</strong> ${etab.ordo||'Non renseigné'}<br>
+        <strong>Secrétaire Général(e) :</strong> ${etab.sg||'Non renseigné'}<br>
+        <strong>Exercice :</strong> ${etab.exercice||'—'}<br>
+        <strong>Date de vérification :</strong> ${dateStr}<br>
+        <strong>Période Classe 5 vérifiée :</strong> ${data['c5-periode']||'Non précisée'}<br>
+        <strong>Agent Comptable :</strong> ${team.ac.nom||'—'}
+      </div>
+    </div>
+
+    <div class="pv-section">
+      <div class="pv-section-h">Préambule Réglementaire</div>
+      <p>Le présent procès-verbal est établi dans le cadre du contrôle interne comptable exercé par l'Agence Comptable sur les opérations de l'établissement rattaché désigné ci-dessus, en application du <strong>décret n°2012-1246 du 7 novembre 2012</strong> relatif à la gestion budgétaire et comptable publique (GBCP), de l'instruction budgétaire et comptable M9-6, de la nomenclature des pièces justificatives issue du <strong>décret n°2022-505 du 23 mars 2022</strong>, et des jurisprudences administratives applicables à la responsabilité des comptables publics.</p>
+      <p style="margin-top:8px;">Ce document est pédagogique. Il accompagne l'établissement dans la compréhension de ses obligations réglementaires et dans l'amélioration continue de la qualité de sa gestion. Les anomalies identifiées doivent être régularisées dans les délais indiqués. <strong>Total des points de vigilance identifiés : ${totalAnoms}</strong>.</p>
+    </div>`;
+
+  // Générer chaque module (seuls les modules avec anomalies ou observations apparaissent)
+  const modulesSections = [
+    buildModule('Contrôle de l\'Ordonnateur', CHECKS.ordonnateur, 'obs-ordonnateur'),
+    buildModule('Droits Constatés', CHECKS.droits_constates, 'obs-droits_constates'),
+    buildModule('Exécution Budgétaire — Dépenses (Demandes de paiement)', CHECKS.exec_depenses, 'obs-exec_depenses'),
+    buildModule('Exécution Budgétaire — Recettes (Titres)', CHECKS.exec_recettes, 'obs-exec_recettes'),
+    buildModule('Marchés Publics', CHECKS.marches, 'obs-marches'),
+    buildModule('Régies', CHECKS.regie, 'obs-regie'),
+    buildModule('Recouvrement des Créances', CHECKS.recouvrement, 'obs-recouvrement'),
+    buildModule('Immobilisations et Patrimoine', CHECKS.immo, 'obs-immobilisations'),
+  ].filter(s => s !== '').join('');
+
+  // Ajouter les sections modules au PV
+  html += modulesSections;
+  if (!modulesSections) {
+    html += '<div class="pv-section"><div class="pv-ok">✅ Aucune anomalie constatée sur l\'ensemble des modules de contrôle vérifiés.</div></div>';
+  }
+
+  // Voyages — seulement si anomalies ou seuil dépassé
+  const voyObs = data['obs-voyages'];
+  if (voyDeseq.length > 0 || totalDep >= 40000 || voyObs) {
+    html += `<div class="pv-section"><div class="pv-section-h">📌 Voyages Scolaires</div>`;
+    if (voyages.length) {
+      html += `<p><strong>${voyages.length} voyage(s) vérifiés</strong> — Dépenses : <strong>${fmt(totalDep)}</strong> / Recettes : <strong>${fmt(totalRec)}</strong></p><br>`;
+      voyDeseq.forEach(v => {
+        const e = (parseFloat(v.rec)||0)-(parseFloat(v.dep)||0);
+        html += `<div class="pv-nok">⚠️ <strong>${v.nom||'Sans nom'}</strong> — Déséquilibre : Dép. ${fmt(v.dep)}, Rec. ${fmt(v.rec)}, Déficit <strong>${fmt(e)}</strong><div class="pv-action">→ L'ordonnateur doit présenter un budget équilibré avant tout engagement. Une décision modificative (DM) peut être nécessaire.</div></div>`;
+      });
+      if (totalDep >= 40000) html += `<div class="pv-nok">🚨 <strong>ALERTE MARCHÉS PUBLICS 2026</strong> — Cumul dépenses voyages <strong>${fmt(totalDep)}</strong> ≥ seuil MAPA <strong>40 000€ HT</strong>. Procédure MAPA obligatoire avant tout nouvel engagement auprès du même prestataire.<div class="pv-action">→ L'ordonnateur doit engager une procédure MAPA et communiquer les résultats à l'agence avant tout engagement supplémentaire. À compter du 01/04/2026, le seuil de dispense sera relevé à 60 000€ HT.</div><div class="pv-ref">Décrets n°2025-1386 et 2025-1383 du 29/12/2025 · Art. L2122-1 CCP</div></div>`;
+    }
+    if (voyObs) html += `<div style="background:#f0f4ff;border-left:3px solid var(--blue);border-radius:6px;padding:10px;margin-top:8px;"><strong>Observations :</strong> <em style="color:#555;">${voyObs}</em></div>`;
+    html += '</div>';
+  }
+
+  // Classe 5 — seulement si anomalies ou observations
+  const c5Obs = data['obs-classe5'];
+  const fscCalcObs = data['obs-fsc-calc'];
+  if (c5Anoms.length > 0 || c5Obs) {
+    html += `<div class="pv-section"><div class="pv-section-h">📌 Audit Classe 5 — Comptes de Trésorerie (${data['c5-periode']||'—'})</div>`;
+    c5Anoms.forEach(r => {
+      const val = parseFloat(data['c5-'+r.id]||0);
+      html += `<div class="pv-nok">${r.gravite.includes('GRAVE')?'🚨':'⚠️'} <strong>${r.label}</strong> — Solde constaté : <strong>${fmt(val)} €</strong><br><em>${r.msg}</em><div class="pv-action">→ Action requise : ${r.action}</div></div>`;
+    });
+    if (c5Obs) html += `<div style="background:#f0f4ff;border-left:3px solid var(--blue);border-radius:6px;padding:10px;margin-top:8px;"><strong>Observations :</strong> <em style="color:#555;">${c5Obs}</em></div>`;
+    html += '</div>';
+  }
+
+  // FSC calculateur — si observations ou anomalies nominatives
+  if (fscCalcObs || fscRows.filter(r => r.anom).length > 0) {
+    const anomFSC = fscRows.filter(r => r.anom);
+    html += `<div class="pv-section"><div class="pv-section-h">📌 Fonds Social des Cantines — Contrôle de cohérence nominatif</div>
+      <div class="pv-nok">⚠️ <strong>Incohérences constatées dans l'attribution des aides FSC (Circulaire MEN 2017)</strong>`;
+    if (anomFSC.length > 0) {
+      html += `<ul style="margin:8px 0 4px 16px;font-size:.84rem;">`;
+      anomFSC.forEach(r => {
+        const nomAff = [r.nom, r.prenom].filter(Boolean).join(' ') || 'Élève sans nom';
+        html += `<li><strong>${nomAff}</strong>${r.classe?' — Classe : '+r.classe:''} — Frais : ${fmt(r.frais)} / Bourse : ${fmt(r.bourse)} / Reste à charge : ${fmt(r.reste)} / Aide FSC accordée : ${fmt(r.aide)} → <strong>Excès de ${fmt(r.exces)}</strong></li>`;
+      });
+      html += `</ul>`;
+    }
+    html += `<div class="pv-action">→ L'établissement dispose d'un délai de <strong>30 jours</strong> à compter de la notification du présent PV pour corriger les attributions identifiées (réduction ou remboursement) et transmettre les justificatifs à l'agence comptable.</div>
+        <div class="pv-ref">Circulaire MEN 2017 sur les fonds sociaux · Instruction DSDEN Guadeloupe · c/6571</div>
+      </div>`;
+    if (fscCalcObs) html += `<div style="background:#f0f4ff;border-left:3px solid var(--blue);border-radius:6px;padding:10px;margin-top:8px;"><strong>Observations complémentaires :</strong> <em style="color:#555;">${fscCalcObs}</em></div>`;
+    html += '</div>';
+  }
+
+  // Conclusion
+  html += `<div class="pv-section"><div class="pv-section-h">Conclusion</div>
+    <p>${totalAnoms === 0
+      ? 'Après vérification exhaustive de l\'ensemble des modules, aucune anomalie n\'a été constatée. La gestion comptable de l\'établissement rattaché est conforme aux règles M9-6, au décret GBCP et à la nomenclature des pièces justificatives en vigueur. Ce procès-verbal est établi à titre informatif pour traçabilité du contrôle exercé.'
+      : `Un total de <strong>${totalAnoms} point(s) de vigilance</strong> a été identifié lors de cette vérification. L'établissement rattaché est invité à régulariser les situations signalées dans les meilleurs délais et à retourner les pièces manquantes à l'agence comptable. Un suivi sera effectué lors de la prochaine vérification.`
+    }</p>
+  </div>`;
+
+  // Signatures
+  html += `
+    <div class="pv-sigs">
+      <div class="pv-sig">
+        <strong>L'Agent Comptable</strong>
+        <small>Visa final — Autorité comptable</small>
+        ${team.ac.nom ? `<div class="sig-assigned">${team.ac.nom}</div>` : ''}
+        <div style="border-top:1px solid #ccc;margin-top:50px;padding-top:8px;font-size:.8rem;">Nom &amp; Signature</div>
+      </div>
+      <div class="pv-sig">
+        <strong>${cosignTitle}</strong>
+        <small>Contrôle de second niveau</small>
+        ${cosignPerson.nom ? `<div class="sig-assigned">Attitré(e) : ${etab.nom||etab.uai}<br>${cosignPerson.nom}</div>` : ''}
+        <div style="border-top:1px solid #ccc;margin-top:50px;padding-top:8px;font-size:.8rem;">Nom &amp; Signature</div>
+      </div>
+      <div class="pv-sig">
+        <strong>L'Ordonnateur</strong>
+        <small>Chef d'établissement — Pour information et action</small>
+        ${etab.ordo ? `<div class="sig-assigned">${etab.ordo}</div>` : ''}
+        <div style="border-top:1px solid #ccc;margin-top:50px;padding-top:8px;font-size:.8rem;">Nom &amp; Signature</div>
+      </div>
+    </div>`;
+
+  document.getElementById('pv-content').innerHTML = html;
+  document.getElementById('pv-overlay').style.display = 'block';
+}
+
+function closePV() {
+  document.getElementById('pv-overlay').style.display = 'none';
+}
+</script>
+</body>
+</html>
