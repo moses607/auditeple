@@ -1,0 +1,51 @@
+import { useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { LogEntry, fmtDate } from '@/lib/types';
+import { loadState } from '@/lib/store';
+
+export default function PisteAudit() {
+  const logs: LogEntry[] = loadState('piste_audit', []);
+  const [search, setSearch] = useState('');
+
+  const filtered = logs.filter(l => {
+    if (!search) return true;
+    const s = search.toLowerCase();
+    return l.action.toLowerCase().includes(s) || l.details.toLowerCase().includes(s) || l.utilisateur.toLowerCase().includes(s);
+  });
+
+  return (
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold">Piste d'Audit</h1>
+        <p className="text-xs text-muted-foreground mt-1">Réf. : Traçabilité CRC — Horodatage ISO 8601</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        <Card><CardContent className="pt-4 text-center"><p className="text-2xl font-bold">{logs.length}</p><p className="text-xs text-muted-foreground">Total actions</p></CardContent></Card>
+        <Card><CardContent className="pt-4 text-center"><p className="text-2xl font-bold">{filtered.length}</p><p className="text-xs text-muted-foreground">Affichées</p></CardContent></Card>
+      </div>
+
+      <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher..." />
+
+      {logs.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">Aucune action enregistrée. La piste d'audit se construit au fur et à mesure de l'utilisation de l'application.</CardContent></Card>}
+
+      {filtered.length > 0 && (
+        <Card><CardContent className="pt-6 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead><tr className="border-b text-xs text-muted-foreground"><th className="text-left p-2">Horodatage</th><th className="text-left p-2">Utilisateur</th><th className="p-2">Action</th><th className="text-left p-2">Détails</th></tr></thead>
+            <tbody>{filtered.slice(0, 200).map(l => (
+              <tr key={l.id} className="border-b">
+                <td className="p-2 font-mono text-xs">{l.timestamp}</td>
+                <td className="p-2 font-bold">{l.utilisateur}</td>
+                <td className="p-2"><Badge>{l.action}</Badge></td>
+                <td className="p-2 text-xs text-muted-foreground max-w-[300px]">{l.details}</td>
+              </tr>
+            ))}</tbody>
+          </table>
+        </CardContent></Card>
+      )}
+    </div>
+  );
+}
