@@ -20,8 +20,6 @@ import FondsRoulement from "./pages/FondsRoulement";
 import ControleCaisse from "./pages/ControleCaisse";
 import Stocks from "./pages/Stocks";
 import RapprochementBancaire from "./pages/RapprochementBancaire";
-import Bourses from "./pages/Bourses";
-import FondsSociaux from "./pages/FondsSociaux";
 import Restauration from "./pages/Restauration";
 import AnalyseFinanciere from "./pages/AnalyseFinanciere";
 import Recouvrement from "./pages/Recouvrement";
