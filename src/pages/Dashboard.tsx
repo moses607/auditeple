@@ -58,12 +58,11 @@ export default function Dashboard() {
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Tableau de bord</h1>
-        {params.etablissement && (
+        {currentEtab ? (
           <p className="text-sm text-muted-foreground mt-1">
-            {params.etablissement} {params.uai && `(${params.uai})`} — Exercice {params.exercice}
+            {currentEtab.nom} ({currentEtab.uai}) — Exercice {params.exercice}
           </p>
-        )}
-        {!params.etablissement && (
+        ) : (
           <p className="text-sm text-muted-foreground mt-1">
             Commencez par renseigner les <NavLink to="/parametres" className="text-primary underline">paramètres de l'audit</NavLink>.
           </p>
