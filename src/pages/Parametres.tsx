@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { TeamMember } from '@/lib/types';
+import { lookupUAI, UAIResult } from '@/lib/uai-lookup';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, Search } from 'lucide-react';
+import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const TYPES_ETABLISSEMENT = [
@@ -18,9 +19,40 @@ const TYPES_ETABLISSEMENT = [
 export default function ParametresPage() {
   const { params, update } = useAuditParams();
   const [newMember, setNewMember] = useState<Partial<TeamMember>>({});
+  const [uaiInput, setUaiInput] = useState(params.uai || '');
+  const [searching, setSearching] = useState(false);
+  const [lookupError, setLookupError] = useState('');
 
-  const handleUAIChange = (uai: string) => {
-    update({ uai: uai.toUpperCase() });
+  const handleUAILookup = async () => {
+    const code = uaiInput.trim().toUpperCase();
+    if (!/^\d{7}[A-Z]$/.test(code)) {
+      setLookupError('Format UAI invalide. Attendu : 7 chiffres + 1 lettre (ex: 0131234A)');
+      return;
+    }
+    setSearching(true);
+    setLookupError('');
+    try {
+      const result = await lookupUAI(code);
+      if (result) {
+        update({
+          uai: result.uai,
+          etablissement: result.nom,
+          typeEtablissement: result.type,
+          adresse: result.adresse,
+          codePostal: result.codePostal,
+          ville: result.ville,
+          academie: result.academie,
+        });
+        toast.success(`Établissement trouvé : ${result.nom}`);
+        setLookupError('');
+      } else {
+        setLookupError('Aucun établissement trouvé pour ce code UAI.');
+      }
+    } catch {
+      setLookupError('Erreur de recherche. Vérifiez votre connexion.');
+    } finally {
+      setSearching(false);
+    }
   };
 
   const addMember = () => {
@@ -46,6 +78,15 @@ export default function ParametresPage() {
     toast.success('Membre supprimé');
   };
 
+  const clearEtablissement = () => {
+    update({
+      uai: '', etablissement: '', typeEtablissement: '',
+      adresse: '', codePostal: '', ville: '', academie: '',
+    });
+    setUaiInput('');
+    toast.success('Établissement réinitialisé');
+  };
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
@@ -55,53 +96,82 @@ export default function ParametresPage() {
         </p>
       </div>
 
+      {/* Identification par UAI */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Établissement</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-primary" />
+            Identification de l'établissement
+          </CardTitle>
         </CardHeader>
-        <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Code UAI (identifiant principal)</Label>
+            <Label>Code UAI (identifiant national unique)</Label>
             <div className="flex gap-2">
               <Input
-                value={params.uai}
-                onChange={e => handleUAIChange(e.target.value)}
-                placeholder="0123456A"
-                className="font-mono text-lg tracking-wider"
+                value={uaiInput}
+                onChange={e => setUaiInput(e.target.value.toUpperCase())}
+                placeholder="0131234A"
+                className="font-mono text-lg tracking-wider max-w-[200px]"
                 maxLength={8}
+                onKeyDown={e => e.key === 'Enter' && handleUAILookup()}
               />
+              <Button onClick={handleUAILookup} disabled={searching} className="gap-2">
+                {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                Rechercher
+              </Button>
             </div>
-            <p className="text-xs text-muted-foreground">Le numéro UAI identifie de manière unique l'établissement. Saisissez-le pour éviter les erreurs.</p>
+            <p className="text-xs text-muted-foreground">
+              Saisissez le numéro UAI puis cliquez sur Rechercher. L'établissement sera identifié automatiquement via l'annuaire national de l'éducation.
+            </p>
+            {lookupError && (
+              <div className="flex items-center gap-2 text-sm text-destructive mt-1">
+                <AlertCircle className="h-4 w-4" />
+                {lookupError}
+              </div>
+            )}
           </div>
-          <div className="space-y-2">
-            <Label>Nom de l'établissement</Label>
-            <Input value={params.etablissement} onChange={e => update({ etablissement: e.target.value })} placeholder="Lycée Victor Hugo" />
-          </div>
-          <div className="space-y-2">
-            <Label>Type d'établissement</Label>
-            <Select value={params.typeEtablissement} onValueChange={v => update({ typeEtablissement: v })}>
-              <SelectTrigger><SelectValue placeholder="Sélectionner..." /></SelectTrigger>
-              <SelectContent>
-                {TYPES_ETABLISSEMENT.map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Académie</Label>
-            <Input value={params.academie} onChange={e => update({ academie: e.target.value })} placeholder="Académie de..." />
-          </div>
-          <div className="md:col-span-2 space-y-2">
-            <Label>Adresse</Label>
-            <Input value={params.adresse} onChange={e => update({ adresse: e.target.value })} placeholder="Adresse complète" />
-          </div>
-          <div className="space-y-2">
-            <Label>Ville</Label>
-            <Input value={params.ville} onChange={e => update({ ville: e.target.value })} />
-          </div>
-          <div className="space-y-2">
-            <Label>Code postal</Label>
-            <Input value={params.codePostal} onChange={e => update({ codePostal: e.target.value })} />
-          </div>
+
+          {/* Establishment display card */}
+          {params.etablissement && params.uai ? (
+            <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-4 space-y-3">
+              <div className="flex items-start justify-between">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="h-5 w-5 text-primary" />
+                  <span className="font-semibold text-foreground">Établissement enregistré</span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={clearEtablissement} className="text-xs text-muted-foreground">
+                  Changer
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="text-muted-foreground">Nom :</span>
+                  <span className="ml-2 font-medium">{params.etablissement}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">UAI :</span>
+                  <span className="ml-2 font-mono font-medium">{params.uai}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Type :</span>
+                  <span className="ml-2">{params.typeEtablissement || '—'}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Académie :</span>
+                  <span className="ml-2">{params.academie || '—'}</span>
+                </div>
+                <div className="md:col-span-2">
+                  <span className="text-muted-foreground">Adresse :</span>
+                  <span className="ml-2">{params.adresse} {params.codePostal} {params.ville}</span>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 p-4 text-center text-sm text-muted-foreground">
+              Aucun établissement enregistré. Saisissez un code UAI ci-dessus pour commencer.
+            </div>
+          )}
         </CardContent>
       </Card>
 
