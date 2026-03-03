@@ -25,7 +25,6 @@ import FondsSociaux from "./pages/FondsSociaux";
 import Restauration from "./pages/Restauration";
 import AnalyseFinanciere from "./pages/AnalyseFinanciere";
 import Recouvrement from "./pages/Recouvrement";
-import CommandePublique from "./pages/CommandePublique";
 import Subventions from "./pages/Subventions";
 import BudgetsAnnexes from "./pages/BudgetsAnnexes";
 import CartographieRisques from "./pages/CartographieRisques";
@@ -68,7 +67,6 @@ const App = () => (
             <Route path="/analyse-financiere" element={<AnalyseFinanciere />} />
             <Route path="/fonds-roulement" element={<FondsRoulement />} />
             <Route path="/recouvrement" element={<Recouvrement />} />
-            <Route path="/commande-publique" element={<CommandePublique />} />
             <Route path="/marches" element={<Marches />} />
             <Route path="/subventions" element={<Subventions />} />
             <Route path="/budgets-annexes" element={<BudgetsAnnexes />} />
