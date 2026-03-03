@@ -3,7 +3,7 @@ import { useAuditParams } from '@/hooks/useAuditStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { NavLink } from '@/components/NavLink';
-import { CartoRisque } from '@/lib/types';
+import { CartoRisque, getSelectedEtablissement } from '@/lib/types';
 import { loadState } from '@/lib/store';
 import {
   Settings, ClipboardCheck, UserCheck, Receipt, CreditCard,
@@ -27,6 +27,7 @@ const RISK_COLORS = ['hsl(0, 72%, 51%)', 'hsl(25, 95%, 53%)', 'hsl(45, 93%, 47%)
 export default function Dashboard() {
   const modules = getModules();
   const { params } = useAuditParams();
+  const currentEtab = getSelectedEtablissement(params);
   const enabledModules = modules.filter(m => m.enabled && m.id !== 'parametres');
   const risques: CartoRisque[] = loadState('cartographie', []);
 

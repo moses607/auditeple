@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { loadState, saveState } from '@/lib/store';
 import { useAuditParams } from '@/hooks/useAuditStore';
+import { getSelectedEtablissement } from '@/lib/types';
 
 // Structure conforme au modèle espaceple.org (format paysage, exercice N-1)
 const SECTIONS_ANNEXE = [

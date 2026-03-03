@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Trash2, Search } from 'lucide-react';
-import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate } from '@/lib/types';
+import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate, getSelectedEtablissement } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { getModules } from '@/lib/audit-modules';
