@@ -20,8 +20,6 @@ import FondsRoulement from "./pages/FondsRoulement";
 import ControleCaisse from "./pages/ControleCaisse";
 import Stocks from "./pages/Stocks";
 import RapprochementBancaire from "./pages/RapprochementBancaire";
-import Bourses from "./pages/Bourses";
-import FondsSociaux from "./pages/FondsSociaux";
 import Restauration from "./pages/Restauration";
 import AnalyseFinanciere from "./pages/AnalyseFinanciere";
 import Recouvrement from "./pages/Recouvrement";
@@ -47,7 +45,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Dashboard />} />
             {/* CONTRÔLES SUR PLACE */}
-            <Route path="/controle-caisse" element={<ControleCaisse />} />
+            <Route path="/controle-caisse" element={<Regies />} />
             <Route path="/stocks" element={<Stocks />} />
             <Route path="/rapprochement" element={<RapprochementBancaire />} />
             <Route path="/regies" element={<Regies />} />
@@ -60,8 +58,8 @@ const App = () => (
             <Route path="/depenses/pieces" element={<Depenses />} />
             {/* GESTION COMPTABLE */}
             <Route path="/voyages" element={<Voyages />} />
-            <Route path="/bourses" element={<Bourses />} />
-            <Route path="/fonds-sociaux" element={<FondsSociaux />} />
+            <Route path="/bourses" element={<DroitsConstates />} />
+            <Route path="/fonds-sociaux" element={<DroitsConstates />} />
             <Route path="/restauration" element={<Restauration />} />
             {/* FINANCES & BUDGET */}
             <Route path="/analyse-financiere" element={<AnalyseFinanciere />} />

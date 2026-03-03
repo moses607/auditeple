@@ -21,10 +21,9 @@ export const SECTIONS = [
 
 const DEFAULT_MODULES: ModuleConfig[] = [
   // ═══ CONTRÔLES SUR PLACE ═══
-  { id: 'controle-caisse', label: 'Contrôle Caisse', path: '/controle-caisse', icon: 'Landmark', enabled: true, section: 'CONTRÔLES SUR PLACE' },
+  { id: 'regies', label: 'Régies', path: '/regies', icon: 'Calculator', enabled: true, section: 'CONTRÔLES SUR PLACE' },
   { id: 'stocks', label: 'Stocks Denrées', path: '/stocks', icon: 'Package', enabled: true, section: 'CONTRÔLES SUR PLACE' },
   { id: 'rapprochement', label: 'Rappro. Bancaire', path: '/rapprochement', icon: 'Scale', enabled: true, section: 'CONTRÔLES SUR PLACE' },
-  { id: 'regies', label: 'Régies', path: '/regies', icon: 'Calculator', enabled: true, section: 'CONTRÔLES SUR PLACE' },
 
   // ═══ VÉRIFICATION & ORDONNATEUR ═══
   { id: 'verification', label: 'Vérification quotidienne', path: '/verification', icon: 'ClipboardCheck', enabled: true, section: 'VÉRIFICATION & ORDONNATEUR' },
@@ -39,8 +38,6 @@ const DEFAULT_MODULES: ModuleConfig[] = [
 
   // ═══ GESTION COMPTABLE ═══
   { id: 'voyages', label: 'Voyages Scolaires', path: '/voyages', icon: 'Plane', enabled: true, section: 'GESTION COMPTABLE' },
-  { id: 'bourses', label: 'Bourses', path: '/bourses', icon: 'GraduationCap', enabled: true, section: 'GESTION COMPTABLE' },
-  { id: 'fonds-sociaux', label: 'Fonds Sociaux', path: '/fonds-sociaux', icon: 'Heart', enabled: true, section: 'GESTION COMPTABLE' },
   { id: 'restauration', label: 'Restauration', path: '/restauration', icon: 'UtensilsCrossed', enabled: true, section: 'GESTION COMPTABLE' },
 
   // ═══ FINANCES & BUDGET ═══
