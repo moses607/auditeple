@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Trash2, Pencil, AlertTriangle } from 'lucide-react';
 import { loadState, saveState } from '@/lib/store';
-import { fmt, ECHELONS_BOURSES } from '@/lib/types';
+import { fmt, fmtDate, ECHELONS_BOURSES } from '@/lib/types';
+import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 /* ═══ TYPES ═══ */
