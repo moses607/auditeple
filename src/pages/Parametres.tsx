@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, Save } from 'lucide-react';
+import { Plus, Trash2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 
 const TYPES_ETABLISSEMENT = [
@@ -18,6 +18,10 @@ const TYPES_ETABLISSEMENT = [
 export default function ParametresPage() {
   const { params, update } = useAuditParams();
   const [newMember, setNewMember] = useState<Partial<TeamMember>>({});
+
+  const handleUAIChange = (uai: string) => {
+    update({ uai: uai.toUpperCase() });
+  };
 
   const addMember = () => {
     if (!newMember.nom || !newMember.prenom) {
@@ -57,12 +61,21 @@ export default function ParametresPage() {
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Nom de l'établissement</Label>
-            <Input value={params.etablissement} onChange={e => update({ etablissement: e.target.value })} placeholder="Lycée Victor Hugo" />
+            <Label>Code UAI (identifiant principal)</Label>
+            <div className="flex gap-2">
+              <Input
+                value={params.uai}
+                onChange={e => handleUAIChange(e.target.value)}
+                placeholder="0123456A"
+                className="font-mono text-lg tracking-wider"
+                maxLength={8}
+              />
+            </div>
+            <p className="text-xs text-muted-foreground">Le numéro UAI identifie de manière unique l'établissement. Saisissez-le pour éviter les erreurs.</p>
           </div>
           <div className="space-y-2">
-            <Label>Code UAI</Label>
-            <Input value={params.uai} onChange={e => update({ uai: e.target.value })} placeholder="0123456A" />
+            <Label>Nom de l'établissement</Label>
+            <Input value={params.etablissement} onChange={e => update({ etablissement: e.target.value })} placeholder="Lycée Victor Hugo" />
           </div>
           <div className="space-y-2">
             <Label>Type d'établissement</Label>
