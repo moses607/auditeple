@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Trash2, Search } from 'lucide-react';
-import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate } from '@/lib/types';
+import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate, getSelectedEtablissement } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { getModules } from '@/lib/audit-modules';
@@ -30,6 +30,7 @@ const AUDITABLE_MODULES = [
 
 export default function PVAudit() {
   const { params } = useAuditParams();
+  const currentEtab = getSelectedEtablissement(params);
   const [items, setItems] = useState<PVAuditItem[]>(() => loadState('pv_audit', []));
   const [form, setForm] = useState<any>(null);
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
@@ -62,7 +63,7 @@ export default function PVAudit() {
     setForm({
       date: new Date().toISOString().split('T')[0],
       type: 'Contrôle global',
-      lieu: params.etablissement || '',
+      lieu: currentEtab?.nom || '',
       objet: `Audit des modules : ${selectedModules.map(id => allModules.find(m => m.id === id)?.label || id).join(', ')}`,
       verifications: flat,
       constatsLibres: '',
@@ -190,10 +191,10 @@ export default function PVAudit() {
           <CardHeader className="bg-muted/50 border-b">
             <div className="text-center space-y-1">
               <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Agence comptable</p>
-              <p className="font-bold text-lg">{params.etablissement || 'Établissement'}</p>
-              {params.uai && <p className="text-xs text-muted-foreground">UAI : {params.uai}</p>}
-              {params.adresse && <p className="text-xs text-muted-foreground">{params.adresse} — {params.codePostal} {params.ville}</p>}
-              <p className="text-xs text-muted-foreground">Académie : {params.academie || '—'}</p>
+              <p className="font-bold text-lg">{currentEtab?.nom || 'Établissement'}</p>
+              {currentEtab?.uai && <p className="text-xs text-muted-foreground">UAI : {currentEtab.uai}</p>}
+              {currentEtab?.adresse && <p className="text-xs text-muted-foreground">{currentEtab.adresse} — {currentEtab.codePostal} {currentEtab.ville}</p>}
+              <p className="text-xs text-muted-foreground">Académie : {currentEtab?.academie || '—'}</p>
             </div>
           </CardHeader>
           <CardContent className="space-y-4 pt-4">

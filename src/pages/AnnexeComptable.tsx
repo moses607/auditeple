@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useState } from 'react';
 import { loadState, saveState } from '@/lib/store';
 import { useAuditParams } from '@/hooks/useAuditStore';
+import { getSelectedEtablissement } from '@/lib/types';
 
 // Structure conforme au modèle espaceple.org (format paysage, exercice N-1)
 const SECTIONS_ANNEXE = [
@@ -102,6 +103,7 @@ const SECTIONS_ANNEXE = [
 
 export default function AnnexeComptablePage() {
   const { params } = useAuditParams();
+  const currentEtab = getSelectedEtablissement(params);
   const exerciceN1 = params.exercice ? String(parseInt(params.exercice) - 1) : String(new Date().getFullYear() - 1);
   const [data, setData] = useState<Record<string, string>>(() => loadState('annexe_comptable', {}));
 
@@ -135,8 +137,8 @@ export default function AnnexeComptablePage() {
         <CardContent className="pt-4">
           <div className="text-center space-y-1">
             <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Annexe au compte financier</p>
-            <p className="font-bold text-lg">{params.etablissement || 'Établissement'}</p>
-            {params.uai && <p className="text-xs text-muted-foreground">UAI : {params.uai} — {params.typeEtablissement}</p>}
+            <p className="font-bold text-lg">{currentEtab?.nom || 'Établissement'}</p>
+            {currentEtab?.uai && <p className="text-xs text-muted-foreground">UAI : {currentEtab.uai} — {currentEtab.type}</p>}
             <p className="text-sm font-bold">Exercice {exerciceN1}</p>
           </div>
         </CardContent>

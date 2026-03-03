@@ -1,27 +1,24 @@
 import { useState } from 'react';
 import { useAuditParams } from '@/hooks/useAuditStore';
-import { TeamMember } from '@/lib/types';
-import { lookupUAI, UAIResult } from '@/lib/uai-lookup';
+import { TeamMember, Etablissement, getSelectedEtablissement } from '@/lib/types';
+import { lookupUAI } from '@/lib/uai-lookup';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2, MapPin } from 'lucide-react';
 import { toast } from 'sonner';
-
-const TYPES_ETABLISSEMENT = [
-  'Collège', 'Lycée général', 'Lycée professionnel', 'Lycée polyvalent',
-  'EREA', 'ERPD', 'Campus des métiers',
-];
 
 export default function ParametresPage() {
   const { params, update } = useAuditParams();
   const [newMember, setNewMember] = useState<Partial<TeamMember>>({});
-  const [uaiInput, setUaiInput] = useState(params.uai || '');
+  const [uaiInput, setUaiInput] = useState('');
   const [searching, setSearching] = useState(false);
   const [lookupError, setLookupError] = useState('');
+
+  const current = getSelectedEtablissement(params);
 
   const handleUAILookup = async () => {
     const code = uaiInput.trim().toUpperCase();
@@ -29,21 +26,33 @@ export default function ParametresPage() {
       setLookupError('Format UAI invalide. Attendu : 7 chiffres + 1 lettre (ex: 0131234A)');
       return;
     }
+    // Check if already registered
+    if (params.etablissements.some(e => e.uai === code)) {
+      setLookupError('Cet établissement est déjà enregistré dans le groupement.');
+      return;
+    }
     setSearching(true);
     setLookupError('');
     try {
       const result = await lookupUAI(code);
       if (result) {
-        update({
+        const newEtab: Etablissement = {
+          id: crypto.randomUUID(),
           uai: result.uai,
-          etablissement: result.nom,
-          typeEtablissement: result.type,
+          nom: result.nom,
+          type: result.type,
           adresse: result.adresse,
           codePostal: result.codePostal,
           ville: result.ville,
           academie: result.academie,
+        };
+        const updated = [...params.etablissements, newEtab];
+        update({
+          etablissements: updated,
+          selectedEtablissementId: params.selectedEtablissementId || newEtab.id,
         });
-        toast.success(`Établissement trouvé : ${result.nom}`);
+        toast.success(`Établissement ajouté : ${result.nom}`);
+        setUaiInput('');
         setLookupError('');
       } else {
         setLookupError('Aucun établissement trouvé pour ce code UAI.');
@@ -53,6 +62,19 @@ export default function ParametresPage() {
     } finally {
       setSearching(false);
     }
+  };
+
+  const removeEtab = (id: string) => {
+    const updated = params.etablissements.filter(e => e.id !== id);
+    const newSelected = params.selectedEtablissementId === id
+      ? (updated[0]?.id || '')
+      : params.selectedEtablissementId;
+    update({ etablissements: updated, selectedEtablissementId: newSelected });
+    toast.success('Établissement retiré du groupement');
+  };
+
+  const selectEtab = (id: string) => {
+    update({ selectedEtablissementId: id });
   };
 
   const addMember = () => {
@@ -78,35 +100,26 @@ export default function ParametresPage() {
     toast.success('Membre supprimé');
   };
 
-  const clearEtablissement = () => {
-    update({
-      uai: '', etablissement: '', typeEtablissement: '',
-      adresse: '', codePostal: '', ville: '', academie: '',
-    });
-    setUaiInput('');
-    toast.success('Établissement réinitialisé');
-  };
-
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-foreground">Paramètres & Équipe</h1>
+        <h1 className="text-2xl font-bold text-foreground">Paramètres & Groupement comptable</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Les données sont sauvegardées automatiquement dans votre navigateur.
+          Enregistrez les établissements du groupement comptable puis sélectionnez celui sur lequel travailler.
         </p>
       </div>
 
-      {/* Identification par UAI */}
+      {/* Ajout UAI */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Building2 className="h-5 w-5 text-primary" />
-            Identification de l'établissement
+            Ajouter un établissement au groupement
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-2">
-            <Label>Code UAI (identifiant national unique)</Label>
+            <Label>Code UAI</Label>
             <div className="flex gap-2">
               <Input
                 value={uaiInput}
@@ -118,11 +131,11 @@ export default function ParametresPage() {
               />
               <Button onClick={handleUAILookup} disabled={searching} className="gap-2">
                 {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-                Rechercher
+                Rechercher &amp; Ajouter
               </Button>
             </div>
             <p className="text-xs text-muted-foreground">
-              Saisissez le numéro UAI puis cliquez sur Rechercher. L'établissement sera identifié automatiquement via l'annuaire national de l'éducation.
+              Saisissez le code UAI puis validez. L'établissement sera recherché automatiquement et ajouté au groupement.
             </p>
             {lookupError && (
               <div className="flex items-center gap-2 text-sm text-destructive mt-1">
@@ -131,50 +144,81 @@ export default function ParametresPage() {
               </div>
             )}
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Establishment display card */}
-          {params.etablissement && params.uai ? (
-            <div className="rounded-lg border-2 border-primary/30 bg-primary/5 p-4 space-y-3">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary" />
-                  <span className="font-semibold text-foreground">Établissement enregistré</span>
-                </div>
-                <Button variant="ghost" size="sm" onClick={clearEtablissement} className="text-xs text-muted-foreground">
-                  Changer
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                <div>
-                  <span className="text-muted-foreground">Nom :</span>
-                  <span className="ml-2 font-medium">{params.etablissement}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">UAI :</span>
-                  <span className="ml-2 font-mono font-medium">{params.uai}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Type :</span>
-                  <span className="ml-2">{params.typeEtablissement || '—'}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Académie :</span>
-                  <span className="ml-2">{params.academie || '—'}</span>
-                </div>
-                <div className="md:col-span-2">
-                  <span className="text-muted-foreground">Adresse :</span>
-                  <span className="ml-2">{params.adresse} {params.codePostal} {params.ville}</span>
-                </div>
-              </div>
+      {/* Liste des établissements */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Building2 className="h-5 w-5 text-primary" />
+            Groupement comptable
+            <Badge variant="secondary" className="ml-auto text-xs">
+              {params.etablissements.length} établissement{params.etablissements.length > 1 ? 's' : ''}
+            </Badge>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {params.etablissements.length === 0 ? (
+            <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+              Aucun établissement enregistré. Ajoutez-en un ci-dessus avec son code UAI.
             </div>
           ) : (
-            <div className="rounded-lg border border-dashed border-muted-foreground/30 bg-muted/30 p-4 text-center text-sm text-muted-foreground">
-              Aucun établissement enregistré. Saisissez un code UAI ci-dessus pour commencer.
+            <div className="space-y-2">
+              {params.etablissements.map(e => {
+                const isSelected = e.id === params.selectedEtablissementId;
+                return (
+                  <div
+                    key={e.id}
+                    className={`rounded-lg border-2 p-3 flex items-center gap-3 cursor-pointer transition-all ${
+                      isSelected
+                        ? 'border-primary bg-primary/5 shadow-sm'
+                        : 'border-border hover:border-primary/40 hover:bg-muted/50'
+                    }`}
+                    onClick={() => selectEtab(e.id)}
+                  >
+                    <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
+                      isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                    }`}>
+                      <Building2 className="h-4 w-4" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-sm text-foreground truncate">{e.nom}</span>
+                        {isSelected && (
+                          <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0">
+                            Actif
+                          </Badge>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                        <span className="font-mono">{e.uai}</span>
+                        <span>{e.type}</span>
+                        {e.ville && (
+                          <span className="flex items-center gap-0.5">
+                            <MapPin className="h-3 w-3" />{e.ville}
+                          </span>
+                        )}
+                        {e.academie && <span>Ac. {e.academie}</span>}
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="shrink-0 text-destructive hover:text-destructive"
+                      onClick={(ev) => { ev.stopPropagation(); removeEtab(e.id); }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </CardContent>
       </Card>
 
+      {/* Audit params */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Audit</CardTitle>
@@ -203,6 +247,7 @@ export default function ParametresPage() {
         </CardContent>
       </Card>
 
+      {/* Équipe */}
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Équipe d'audit</CardTitle>
@@ -223,9 +268,7 @@ export default function ParametresPage() {
               ))}
             </div>
           )}
-
           <Separator />
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Input placeholder="Nom" value={newMember.nom || ''} onChange={e => setNewMember(p => ({ ...p, nom: e.target.value }))} />
             <Input placeholder="Prénom" value={newMember.prenom || ''} onChange={e => setNewMember(p => ({ ...p, prenom: e.target.value }))} />

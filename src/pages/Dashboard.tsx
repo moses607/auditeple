@@ -3,7 +3,7 @@ import { useAuditParams } from '@/hooks/useAuditStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { NavLink } from '@/components/NavLink';
-import { CartoRisque } from '@/lib/types';
+import { CartoRisque, getSelectedEtablissement } from '@/lib/types';
 import { loadState } from '@/lib/store';
 import {
   Settings, ClipboardCheck, UserCheck, Receipt, CreditCard,
@@ -27,6 +27,7 @@ const RISK_COLORS = ['hsl(0, 72%, 51%)', 'hsl(25, 95%, 53%)', 'hsl(45, 93%, 47%)
 export default function Dashboard() {
   const modules = getModules();
   const { params } = useAuditParams();
+  const currentEtab = getSelectedEtablissement(params);
   const enabledModules = modules.filter(m => m.enabled && m.id !== 'parametres');
   const risques: CartoRisque[] = loadState('cartographie', []);
 
@@ -58,12 +59,11 @@ export default function Dashboard() {
     <div className="max-w-5xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold">Tableau de bord</h1>
-        {params.etablissement && (
+        {currentEtab ? (
           <p className="text-sm text-muted-foreground mt-1">
-            {params.etablissement} {params.uai && `(${params.uai})`} — Exercice {params.exercice}
+            {currentEtab.nom} ({currentEtab.uai}) — Exercice {params.exercice}
           </p>
-        )}
-        {!params.etablissement && (
+        ) : (
           <p className="text-sm text-muted-foreground mt-1">
             Commencez par renseigner les <NavLink to="/parametres" className="text-primary underline">paramètres de l'audit</NavLink>.
           </p>

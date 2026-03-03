@@ -7,20 +7,31 @@ export interface TeamMember {
   telephone: string;
 }
 
-export interface AuditParams {
-  etablissement: string;
+export interface Etablissement {
+  id: string;
   uai: string;
+  nom: string;
+  type: string;
   adresse: string;
-  ville: string;
   codePostal: string;
+  ville: string;
   academie: string;
-  typeEtablissement: string;
+}
+
+export interface AuditParams {
+  etablissements: Etablissement[];
+  selectedEtablissementId: string;
   agentComptable: string;
   ordonnateur: string;
   dateDebut: string;
   dateFin: string;
   exercice: string;
   equipe: TeamMember[];
+}
+
+// Helper to get current establishment from params
+export function getSelectedEtablissement(params: AuditParams): Etablissement | undefined {
+  return params.etablissements.find(e => e.id === params.selectedEtablissementId);
 }
 
 export interface AuditModule {
@@ -353,8 +364,8 @@ export const TYPES_CONTROLE_PV = [
 ];
 
 export const DEFAULT_AUDIT_PARAMS: AuditParams = {
-  etablissement: '', uai: '', adresse: '', ville: '', codePostal: '',
-  academie: '', typeEtablissement: '', agentComptable: '', ordonnateur: '',
+  etablissements: [], selectedEtablissementId: '',
+  agentComptable: '', ordonnateur: '',
   dateDebut: '', dateFin: '', exercice: new Date().getFullYear().toString(), equipe: [],
 };
 
