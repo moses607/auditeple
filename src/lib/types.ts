@@ -164,6 +164,8 @@ export interface SubventionItem {
   consomme: number;
   reliquat: number;
   statut: string;
+  dateVersement: string;
+  observations: string;
 }
 
 // ═══ CRÉANCES / RECOUVREMENT ═══
@@ -328,10 +330,13 @@ export const FONCTIONS_COMPTABLES = [
 ];
 
 export const TACHES_COMPTABLES = [
-  'Liquidation dépenses', 'Mandatement', 'Émission titres', 'Recouvrement',
+  'Liquidation dépenses', 'Demande de paiement', 'Émission titres', 'Recouvrement',
   'Tenue comptabilité', 'Contrôle caisse', 'Inventaire stocks', 'Rapprochement bancaire',
   'Suivi bourses', 'Gestion régies', 'Commande publique', 'Voyages scolaires',
-  'Paye', 'Patrimoine', 'Restauration',
+  'Paye', 'Patrimoine', 'Restauration', 'Encaissement recettes', 'Visa des dépenses',
+  'Gestion des immobilisations', 'Déclarations fiscales', 'Gestion des contrats',
+  'Suivi des subventions', 'Archivage comptable', 'Contrôle des habilitations',
+  'Gestion des régies d\'avances', 'Gestion des régies de recettes',
 ];
 
 export const NIVEAUX_RISQUE = [
