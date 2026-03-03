@@ -8,6 +8,27 @@ import { Plus, Trash2 } from 'lucide-react';
 import { PlanControleItem } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 
+const TYPES_CONTROLE_M96 = [
+  { type: 'Contrôle de caisse et des valeurs inactives', ref: 'M9-6 2026 § 4.3.1 — Vérification de l\'existence et de la concordance des fonds' },
+  { type: 'Contrôle du compte DFT', ref: 'M9-6 2026 § 4.3.2 — Rapprochement solde comptable / solde bancaire' },
+  { type: 'Rapprochement bancaire', ref: 'M9-6 2026 § 4.3.3 — État de rapprochement mensuel obligatoire' },
+  { type: 'Contrôle des régies', ref: 'M9-6 2026 § 4.4 — Vérification des plafonds, comptabilité du régisseur, versements' },
+  { type: 'Vérification des stocks et inventaire', ref: 'M9-6 2026 § 4.5 — Inventaire physique, rapprochement stock théorique/réel' },
+  { type: 'Contrôle des droits constatés', ref: 'M9-6 2026 § 3.2 — Exhaustivité des recettes, créances non recouvrées' },
+  { type: 'Contrôle de la liquidation des dépenses', ref: 'M9-6 2026 § 3.3 — Validité de la créance, service fait, exactitude de la liquidation' },
+  { type: 'Suivi du recouvrement', ref: 'M9-6 2026 § 3.2.4 — Diligences de recouvrement, admissions en non-valeur' },
+  { type: 'Contrôle des bourses', ref: 'M9-6 2026 § 3.2.2 — Exactitude des liquidations, versements trimestriels' },
+  { type: 'Contrôle des voyages scolaires', ref: 'M9-6 2026 § 3.5 — Budget prévisionnel, pièces justificatives, seuils marchés' },
+  { type: 'Contrôle de la commande publique', ref: 'M9-6 2026 § 3.3.2 — Respect des seuils, procédures de mise en concurrence' },
+  { type: 'Contrôle de la restauration', ref: 'M9-6 2026 § 4.5.2 — Coût denrée, fréquentation, impayés' },
+  { type: 'Contrôle des fonds sociaux', ref: 'M9-6 2026 § 3.2.3 — Commissions, justificatifs, comptes dédiés' },
+  { type: 'Vérification du patrimoine', ref: 'M9-6 2026 § 4.6 — Inventaire des immobilisations, amortissements' },
+  { type: 'Contrôle des subventions', ref: 'M9-6 2026 § 3.2.5 — Notifications, conditions d\'emploi, déchéance quadriennale' },
+  { type: 'Contrôle des budgets annexes (SRH, etc.)', ref: 'M9-6 2026 § 2.2 — Équilibre, taux d\'exécution, compte 185' },
+  { type: 'Vérification de la piste d\'audit', ref: 'M9-6 2026 § 5.1 — Traçabilité des opérations comptables' },
+  { type: 'Contrôle de l\'organigramme fonctionnel', ref: 'M9-6 2026 § 1.2 — Séparation des tâches, habilitations' },
+];
+
 export default function PlanControle() {
   const [items, setItems] = useState<PlanControleItem[]>(() => loadState('plan_controle', []));
   const [form, setForm] = useState<any>(null);
@@ -24,7 +45,13 @@ export default function PlanControle() {
 
   const submit = () => {
     if (!form || !form.type) return;
-    const item: PlanControleItem = { id: crypto.randomUUID(), type: form.type, frequence: form.frequence, risque: form.risque, reference: form.reference, planning: form.dates ? form.dates.split(',').map((d: string) => d.trim()).filter(Boolean) : [], realises: [], objectif: form.objectif };
+    const selected = TYPES_CONTROLE_M96.find(t => t.type === form.type);
+    const item: PlanControleItem = {
+      id: crypto.randomUUID(), type: form.type, frequence: form.frequence,
+      risque: form.risque, reference: selected?.ref || form.reference,
+      planning: form.dates ? form.dates.split(',').map((d: string) => d.trim()).filter(Boolean) : [],
+      realises: [], objectif: form.objectif,
+    };
     save([...items, item]);
     setForm(null);
   };
@@ -37,9 +64,9 @@ export default function PlanControle() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Plan de Contrôle — CICF</h1>
-          <p className="text-xs text-muted-foreground mt-1">Réf. : Exigence CRC — Plan annuel hiérarchisé par risques</p>
+          <p className="text-xs text-muted-foreground mt-1">Réf. : Exigence CRC — Plan annuel hiérarchisé par risques — M9-6 2026</p>
         </div>
-        <Button onClick={() => setForm({ type: '', frequence: 'Trimestriel', risque: 'MOYEN', reference: '', dates: '', objectif: '' })}><Plus className="h-4 w-4 mr-2" /> Nouveau contrôle</Button>
+        <Button onClick={() => setForm({ type: TYPES_CONTROLE_M96[0].type, frequence: 'Trimestriel', risque: 'MOYEN', reference: TYPES_CONTROLE_M96[0].ref, dates: '', objectif: '' })}><Plus className="h-4 w-4 mr-2" /> Nouveau contrôle</Button>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
@@ -50,8 +77,20 @@ export default function PlanControle() {
 
       {form && (
         <Card className="border-primary"><CardContent className="pt-6 space-y-3">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-            <div className="space-y-1"><Label className="text-xs">Type de contrôle</Label><Input value={form.type} onChange={e => setForm({ ...form, type: e.target.value })} placeholder="Régies, Stocks..." /></div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="space-y-1 md:col-span-2">
+              <Label className="text-xs">Type de contrôle</Label>
+              <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.type} onChange={e => {
+                const sel = TYPES_CONTROLE_M96.find(t => t.type === e.target.value);
+                setForm({ ...form, type: e.target.value, reference: sel?.ref || '' });
+              }}>
+                {TYPES_CONTROLE_M96.map(t => <option key={t.type} value={t.type}>{t.type}</option>)}
+              </select>
+            </div>
+            <div className="space-y-1 md:col-span-2">
+              <Label className="text-xs">Référence M9-6 2026</Label>
+              <p className="text-xs p-2 rounded bg-muted text-muted-foreground">{form.reference || 'Sélectionnez un type de contrôle'}</p>
+            </div>
             <div className="space-y-1"><Label className="text-xs">Fréquence</Label>
               <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.frequence} onChange={e => setForm({ ...form, frequence: e.target.value })}>
                 <option>Mensuel</option><option>Trimestriel</option><option>Semestriel</option><option>Annuel</option>
@@ -62,8 +101,7 @@ export default function PlanControle() {
                 <option>ÉLEVÉ</option><option>MOYEN</option><option>FAIBLE</option>
               </select>
             </div>
-            <div className="space-y-1"><Label className="text-xs">Référence</Label><Input value={form.reference} onChange={e => setForm({ ...form, reference: e.target.value })} placeholder="M9-6 §..." /></div>
-            <div className="space-y-1"><Label className="text-xs">Dates planifiées</Label><Input value={form.dates} onChange={e => setForm({ ...form, dates: e.target.value })} placeholder="2025-03-31, 2025-06-30" /></div>
+            <div className="space-y-1"><Label className="text-xs">Dates planifiées (séparées par des virgules)</Label><Input value={form.dates} onChange={e => setForm({ ...form, dates: e.target.value })} placeholder="2026-03-31, 2026-06-30" /></div>
             <div className="space-y-1"><Label className="text-xs">Objectif</Label><Input value={form.objectif} onChange={e => setForm({ ...form, objectif: e.target.value })} /></div>
           </div>
           <div className="flex gap-2"><Button onClick={submit}>Ajouter</Button><Button variant="outline" onClick={() => setForm(null)}>Annuler</Button></div>
@@ -81,13 +119,14 @@ export default function PlanControle() {
                 <div>
                   <Badge variant={p.risque === 'ÉLEVÉ' ? 'destructive' : p.risque === 'MOYEN' ? 'default' : 'secondary'} className="mr-2">{p.risque}</Badge>
                   <span className="font-bold">{p.type}</span>
-                  <span className="text-xs text-muted-foreground ml-2">— {p.frequence} — {p.reference}</span>
+                  <span className="text-xs text-muted-foreground ml-2">— {p.frequence}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-muted-foreground">{p.realises.length}/{p.planning.length}</span>
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== p.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                 </div>
               </div>
+              <p className="text-xs text-muted-foreground mb-2">{p.reference}</p>
               {p.objectif && <p className="text-xs text-muted-foreground italic mb-2">{p.objectif}</p>}
               <div className="flex flex-wrap gap-2">
                 {p.planning.map(d => {

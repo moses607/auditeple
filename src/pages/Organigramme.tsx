@@ -25,7 +25,7 @@ export default function OrganigrammePage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Organigramme Fonctionnel</h1>
-          <p className="text-xs text-muted-foreground mt-1">Réf. : Prérequis CICF — Organigramme fonctionnel nominatif annuel — Séparation des tâches</p>
+          <p className="text-xs text-muted-foreground mt-1">Réf. : Prérequis CICF — Organigramme fonctionnel nominatif annuel — Séparation des tâches — Cartop@le</p>
         </div>
         <Button onClick={() => setForm({ nom: '', fonction: 'Agent Comptable', telephone: '', email: '', taches: [] })}><Plus className="h-4 w-4 mr-2" /> Membre</Button>
       </div>
@@ -49,7 +49,7 @@ export default function OrganigrammePage() {
             <div className="space-y-1"><Label className="text-xs">Courriel</Label><Input value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
           </div>
           <div>
-            <Label className="text-xs">Tâches attribuées</Label>
+            <Label className="text-xs">Tâches attribuées (Op@le / Cartop@le)</Label>
             <div className="flex flex-wrap gap-2 mt-2">
               {TACHES_COMPTABLES.map(t => (
                 <button key={t} onClick={() => setForm({ ...form, taches: form.taches.includes(t) ? form.taches.filter((x: string) => x !== t) : [...form.taches, t] })}

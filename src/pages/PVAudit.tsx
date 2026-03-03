@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,18 +8,64 @@ import { Textarea } from '@/components/ui/textarea';
 import { Plus, Trash2 } from 'lucide-react';
 import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
+import { useAuditParams } from '@/hooks/useAuditStore';
+
+// Collect anomalies from all modules
+function collectAnomalies(): PVVerification[] {
+  const anomalies: PVVerification[] = [];
+
+  // Cartographie risques critiques
+  const risques = loadState<any[]>('cartographie', []);
+  risques.filter(r => r.probabilite * r.impact * r.maitrise >= 40).forEach(r => {
+    anomalies.push({ label: `Risque critique: ${r.risque}`, reference: `Processus: ${r.processus}`, criticite: 'MAJEURE', status: 'anomalie', observations: `Score ${r.probabilite * r.impact * r.maitrise} — Action: ${r.action || 'Non définie'}` });
+  });
+
+  // Stocks écarts
+  const stocks = loadState<any[]>('stocks', []);
+  stocks.filter(s => s.ecart !== 0).forEach(s => {
+    anomalies.push({ label: `Écart stock: ${s.nom}`, reference: 'Inventaire physique', criticite: s.ecart > 5 ? 'MAJEURE' : 'MINEURE', status: 'anomalie', observations: `Théorique: ${s.theo}, Physique: ${s.phys}, Écart: ${s.ecart}` });
+  });
+
+  // Rapprochement bancaire écarts
+  const rappro = loadState<any[]>('rapprochement', []);
+  rappro.filter(r => r.ecart !== 0).forEach(r => {
+    anomalies.push({ label: `Écart rapprochement bancaire du ${r.date}`, reference: 'M9-6 § 4.3.3', criticite: 'MAJEURE', status: 'anomalie', observations: `DFT: ${r.dft}, Compta: ${r.compta}, Écart: ${r.ecart}` });
+  });
+
+  // Subventions sous-consommées
+  const subv = loadState<any[]>('subventions', []);
+  subv.filter(s => s.statut === 'Sous-consommé' || s.reliquat > 0).forEach(s => {
+    anomalies.push({ label: `Subvention ${s.type} sous-consommée`, reference: 'Suivi subventions', criticite: 'MINEURE', status: 'anomalie', observations: `Reliquat: ${s.reliquat}€` });
+  });
+
+  return anomalies;
+}
+
+// Auto-generate recommendations
+function generateRecommandations(verifications: PVVerification[]): string {
+  const anom = verifications.filter(v => v.status === 'anomalie');
+  if (anom.length === 0) return 'Aucune anomalie relevée. L\'agent comptable est invité à maintenir la qualité de ses procédures.';
+  const lines = anom.map((a, i) => `${i + 1}. ${a.label}: ${a.observations || 'Régularisation à effectuer dans les meilleurs délais.'}`);
+  return `Les anomalies suivantes appellent une régularisation :\n${lines.join('\n')}\n\nL'ordonnateur et l'agent comptable sont invités à mettre en œuvre les mesures correctives dans les délais impartis.`;
+}
 
 export default function PVAudit() {
+  const { params } = useAuditParams();
   const [items, setItems] = useState<PVAuditItem[]>(() => loadState('pv_audit', []));
   const [form, setForm] = useState<any>(null);
   const save = (d: PVAuditItem[]) => { setItems(d); saveState('pv_audit', d); };
 
-  const newPV = () => setForm({
-    date: new Date().toISOString().split('T')[0], type: 'Contrôle de caisse', lieu: '', objet: '',
-    verifications: [], constatsLibres: '', recommandations: '', conclusions: '',
-    signataire1: '', signataire2: '', delai: '30 jours', phase: 'provisoire',
-    reponseOrdonnateur: '', dateReponse: '', conforme: false,
-  });
+  const newPV = () => {
+    const autoAnomalies = collectAnomalies();
+    const reco = generateRecommandations(autoAnomalies);
+    setForm({
+      date: new Date().toISOString().split('T')[0], type: 'Contrôle global', lieu: params.etablissement || '', objet: '',
+      verifications: autoAnomalies, constatsLibres: '', recommandations: reco, conclusions: '',
+      signataire1: params.agentComptable || '', signataire2: params.ordonnateur || '',
+      delai: '30 jours', phase: 'provisoire',
+      reponseOrdonnateur: '', dateReponse: '', conforme: false,
+    });
+  };
 
   const submit = () => {
     if (!form || !form.objet) return;
@@ -32,7 +78,8 @@ export default function PVAudit() {
   const updateVerif = (idx: number, updates: Partial<PVVerification>) => {
     const nv = [...(form.verifications || [])];
     nv[idx] = { ...nv[idx], ...updates };
-    setForm({ ...form, verifications: nv });
+    const reco = generateRecommandations(nv);
+    setForm({ ...form, verifications: nv, recommandations: reco });
   };
 
   const addVerif = () => {
@@ -46,7 +93,7 @@ export default function PVAudit() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Procès-Verbaux d'Audit</h1>
-          <p className="text-xs text-muted-foreground mt-1">Réf. : CRC / DGFiP / Rectorat — PV contradictoire — Double signature</p>
+          <p className="text-xs text-muted-foreground mt-1">Réf. : CRC / DGFiP / Rectorat — PV contradictoire — Double signature — Anomalies auto-détectées</p>
         </div>
         <Button onClick={newPV}><Plus className="h-4 w-4 mr-2" /> Nouveau PV</Button>
       </div>
@@ -59,8 +106,17 @@ export default function PVAudit() {
 
       {form && (
         <Card className="border-destructive">
-          <CardHeader><CardTitle className="text-lg text-destructive">Rédiger un PV</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
+          {/* Entête agence comptable */}
+          <CardHeader className="bg-muted/50 border-b">
+            <div className="text-center space-y-1">
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Agence comptable</p>
+              <p className="font-bold text-lg">{params.etablissement || 'Établissement'}</p>
+              {params.uai && <p className="text-xs text-muted-foreground">UAI : {params.uai}</p>}
+              {params.adresse && <p className="text-xs text-muted-foreground">{params.adresse} — {params.codePostal} {params.ville}</p>}
+              <p className="text-xs text-muted-foreground">Académie : {params.academie || '—'}</p>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-4">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="space-y-1"><Label className="text-xs">Date</Label><Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} /></div>
               <div className="space-y-1"><Label className="text-xs">Type</Label>
@@ -75,10 +131,10 @@ export default function PVAudit() {
             {/* Points de vérification */}
             <div className="border rounded-lg p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <h4 className="text-sm font-bold">Points de vérification</h4>
+                <h4 className="text-sm font-bold">Points de vérification {form.verifications?.length > 0 && `(${form.verifications.filter((v: PVVerification) => v.status === 'anomalie').length} anomalie(s) auto-détectées)`}</h4>
                 <Button size="sm" variant="outline" onClick={addVerif}><Plus className="h-3 w-3 mr-1" /> Ajouter</Button>
               </div>
-              <p className="text-xs text-muted-foreground">Seules les anomalies apparaîtront sur le PV imprimable.</p>
+              <p className="text-xs text-muted-foreground">Les anomalies sont automatiquement collectées depuis les modules. Seules les anomalies apparaîtront sur le PV imprimable.</p>
               {(form.verifications || []).map((v: PVVerification, i: number) => (
                 <div key={i} className={`p-3 rounded border ${v.status === 'anomalie' ? 'border-destructive bg-destructive/5' : v.status === 'conforme' ? 'border-green-500 bg-green-50' : 'border-border'}`}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
@@ -103,12 +159,30 @@ export default function PVAudit() {
             </div>
 
             <Textarea value={form.constatsLibres} onChange={e => setForm({ ...form, constatsLibres: e.target.value })} rows={2} placeholder="Constats complémentaires..." />
-            <Textarea value={form.recommandations} onChange={e => setForm({ ...form, recommandations: e.target.value })} rows={2} placeholder="Recommandations..." />
+            
+            <div className="space-y-1">
+              <Label className="text-xs font-bold">Recommandations (générées automatiquement)</Label>
+              <Textarea value={form.recommandations} onChange={e => setForm({ ...form, recommandations: e.target.value })} rows={4} />
+            </div>
+            
             <Textarea value={form.conclusions} onChange={e => setForm({ ...form, conclusions: e.target.value })} rows={2} placeholder="Conclusions..." />
 
             <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1"><Label className="text-xs">Signataire 1 (AC)</Label><Input value={form.signataire1} onChange={e => setForm({ ...form, signataire1: e.target.value })} /></div>
-              <div className="space-y-1"><Label className="text-xs">Signataire 2 (CE)</Label><Input value={form.signataire2} onChange={e => setForm({ ...form, signataire2: e.target.value })} /></div>
+              <div className="space-y-1">
+                <Label className="text-xs">Signataire — Agent comptable</Label>
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire1} onChange={e => setForm({ ...form, signataire1: e.target.value })}>
+                  <option value="">Sélectionner...</option>
+                  {params.agentComptable && <option value={params.agentComptable}>{params.agentComptable} (AC)</option>}
+                  {params.equipe.map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
+                </select>
+              </div>
+              <div className="space-y-1">
+                <Label className="text-xs">Signataire — Ordonnateur</Label>
+                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire2} onChange={e => setForm({ ...form, signataire2: e.target.value })}>
+                  <option value="">Sélectionner...</option>
+                  {params.ordonnateur && <option value={params.ordonnateur}>{params.ordonnateur} (Ordonnateur)</option>}
+                </select>
+              </div>
             </div>
 
             {/* Phase contradictoire */}
@@ -135,7 +209,7 @@ export default function PVAudit() {
         </Card>
       )}
 
-      {items.length === 0 && !form && <Card><CardContent className="py-12 text-center text-muted-foreground">Aucun PV. Cliquez « Nouveau PV » pour commencer.</CardContent></Card>}
+      {items.length === 0 && !form && <Card><CardContent className="py-12 text-center text-muted-foreground">Aucun PV. Cliquez « Nouveau PV » pour commencer. Les anomalies seront automatiquement collectées depuis tous les modules.</CardContent></Card>}
 
       {items.map(p => {
         const anom = (p.verifications || []).filter(v => v.status === 'anomalie').length;
@@ -155,6 +229,7 @@ export default function PVAudit() {
               </div>
               <p className="text-sm"><strong>Objet:</strong> {p.objet}</p>
               {anom > 0 && <p className="text-xs text-destructive font-bold mt-1">{anom} anomalie(s)</p>}
+              <p className="text-xs text-muted-foreground mt-1">Signé par : {p.signataire1 || '—'} / {p.signataire2 || '—'}</p>
             </CardContent>
           </Card>
         );

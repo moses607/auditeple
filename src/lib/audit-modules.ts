@@ -47,8 +47,7 @@ const DEFAULT_MODULES: ModuleConfig[] = [
   { id: 'analyse-financiere', label: 'Analyse Financière', path: '/analyse-financiere', icon: 'TrendingUp', enabled: true, section: 'FINANCES & BUDGET' },
   { id: 'fonds-roulement', label: 'Fonds de Roulement', path: '/fonds-roulement', icon: 'BarChart3', enabled: true, section: 'FINANCES & BUDGET' },
   { id: 'recouvrement', label: 'Recouvrement', path: '/recouvrement', icon: 'AlertTriangle', enabled: true, section: 'FINANCES & BUDGET' },
-  { id: 'commande-publique', label: 'Commande Publique', path: '/commande-publique', icon: 'Target', enabled: true, section: 'FINANCES & BUDGET' },
-  { id: 'marches', label: 'Marchés Publics', path: '/marches', icon: 'FileText', enabled: true, section: 'FINANCES & BUDGET' },
+  { id: 'marches', label: 'Commande & Marchés Publics', path: '/marches', icon: 'FileText', enabled: true, section: 'FINANCES & BUDGET' },
   { id: 'subventions', label: 'Subventions', path: '/subventions', icon: 'Building', enabled: true, section: 'FINANCES & BUDGET' },
   { id: 'budgets-annexes', label: 'Budgets Annexes', path: '/budgets-annexes', icon: 'Building2', enabled: true, section: 'FINANCES & BUDGET' },
 
