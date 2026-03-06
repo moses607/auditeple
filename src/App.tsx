@@ -49,7 +49,7 @@ const App = () => (
           <AppLayout>
             <Routes>
               <Route path="/" element={<Dashboard />} />
-              <Route path="/controle-caisse" element={<Regies />} />
+              <Route path="/controle-caisse" element={<ControleCaisse />} />
               <Route path="/stocks" element={<Stocks />} />
               <Route path="/rapprochement" element={<RapprochementBancaire />} />
               <Route path="/regies" element={<Regies />} />
@@ -60,8 +60,8 @@ const App = () => (
               <Route path="/depenses/liquidation" element={<Depenses />} />
               <Route path="/depenses/pieces" element={<Depenses />} />
               <Route path="/voyages" element={<Voyages />} />
-              <Route path="/bourses" element={<DroitsConstates />} />
-              <Route path="/fonds-sociaux" element={<DroitsConstates />} />
+              <Route path="/bourses" element={<Bourses />} />
+              <Route path="/fonds-sociaux" element={<FondsSociaux />} />
               <Route path="/restauration" element={<Restauration />} />
               <Route path="/analyse-financiere" element={<AnalyseFinanciere />} />
               <Route path="/fonds-roulement" element={<FondsRoulement />} />
