@@ -32,6 +32,9 @@ import PlanAction from "./pages/PlanAction";
 import PlanControle from "./pages/PlanControle";
 import PVAudit from "./pages/PVAudit";
 import PisteAudit from "./pages/PisteAudit";
+import Bourses from "./pages/Bourses";
+import FondsSociaux from "./pages/FondsSociaux";
+import CommandePublique from "./pages/CommandePublique";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
