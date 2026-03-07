@@ -1,4 +1,4 @@
-import { getModules } from '@/lib/audit-modules';
+import { getModules, SECTIONS } from '@/lib/audit-modules';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +10,17 @@ import {
   Plane, FileText, Calculator, BookOpen, TrendingUp, ArrowRight,
   Landmark, Package, Scale, GraduationCap, Heart, UtensilsCrossed,
   AlertTriangle, Target, Building, Building2, Map, GitFork, ListChecks,
-  Calendar, ClipboardList, BarChart3,
+  Calendar, ClipboardList, BarChart3, Shield, ChevronRight,
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+
+import heroImg from '@/assets/hero-audit.png';
+import sectionControles from '@/assets/section-controles.png';
+import sectionVerification from '@/assets/section-verification.png';
+import sectionComptable from '@/assets/section-comptable.png';
+import sectionFinances from '@/assets/section-finances.png';
+import sectionControleInterne from '@/assets/section-controle-interne.png';
+import sectionRestitution from '@/assets/section-restitution.png';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Settings, ClipboardCheck, UserCheck, Receipt, CreditCard,
@@ -24,6 +32,39 @@ const ICON_MAP: Record<string, React.ElementType> = {
 
 const RISK_COLORS = ['hsl(0, 72%, 51%)', 'hsl(25, 95%, 53%)', 'hsl(45, 93%, 47%)', 'hsl(142, 71%, 45%)'];
 
+const SECTION_CONFIG: Record<string, { color: string; bgClass: string; image: string }> = {
+  'CONTRÔLES SUR PLACE': {
+    color: 'text-section-controles',
+    bgClass: 'from-[hsl(210,85%,50%)] to-[hsl(210,85%,65%)]',
+    image: sectionControles,
+  },
+  'VÉRIFICATION & ORDONNATEUR': {
+    color: 'text-section-verification',
+    bgClass: 'from-[hsl(152,60%,40%)] to-[hsl(152,60%,55%)]',
+    image: sectionVerification,
+  },
+  'GESTION COMPTABLE': {
+    color: 'text-section-comptable',
+    bgClass: 'from-[hsl(270,55%,50%)] to-[hsl(270,55%,65%)]',
+    image: sectionComptable,
+  },
+  'FINANCES & BUDGET': {
+    color: 'text-section-finances',
+    bgClass: 'from-[hsl(38,92%,50%)] to-[hsl(38,92%,62%)]',
+    image: sectionFinances,
+  },
+  'CONTRÔLE INTERNE': {
+    color: 'text-section-controle-interne',
+    bgClass: 'from-[hsl(174,65%,40%)] to-[hsl(174,65%,55%)]',
+    image: sectionControleInterne,
+  },
+  'AUDIT & RESTITUTION': {
+    color: 'text-section-restitution',
+    bgClass: 'from-[hsl(220,72%,42%)] to-[hsl(220,72%,58%)]',
+    image: sectionRestitution,
+  },
+};
+
 export default function Dashboard() {
   const modules = getModules();
   const { params } = useAuditParams();
@@ -31,7 +72,6 @@ export default function Dashboard() {
   const enabledModules = modules.filter(m => m.enabled && m.id !== 'parametres');
   const risques: CartoRisque[] = loadState('cartographie', []);
 
-  // Risk level distribution
   const riskDistrib = risques.reduce((acc, r) => {
     const n = r.probabilite * r.impact * r.maitrise;
     if (n >= 40) acc[0].value++;
@@ -46,7 +86,6 @@ export default function Dashboard() {
     { name: 'Faible', value: 0 },
   ]);
 
-  // Risk by process
   const processByRisk = Object.entries(
     risques.reduce<Record<string, number>>((acc, r) => {
       acc[r.processus] = (acc[r.processus] || 0) + r.probabilite * r.impact * r.maitrise;
@@ -56,24 +95,52 @@ export default function Dashboard() {
     .sort((a, b) => b.score - a.score);
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Tableau de bord</h1>
-        {currentEtab ? (
-          <p className="text-sm text-muted-foreground mt-1">
-            {currentEtab.nom} ({currentEtab.uai}) — Exercice {params.exercice}
-          </p>
-        ) : (
-          <p className="text-sm text-muted-foreground mt-1">
-            Commencez par renseigner les <NavLink to="/parametres" className="text-primary underline">paramètres de l'audit</NavLink>.
-          </p>
-        )}
+    <div className="max-w-6xl mx-auto space-y-8">
+      {/* Hero Banner */}
+      <div className="relative rounded-2xl overflow-hidden gradient-hero p-8 md:p-10 shadow-elevated">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/40" />
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 hidden lg:block">
+          <img src={heroImg} alt="" className="h-full w-full object-cover object-left opacity-30 mix-blend-luminosity" />
+        </div>
+        <div className="relative z-10">
+          <h1 className="text-3xl md:text-4xl font-bold text-primary-foreground tracking-tight">
+            Tableau de bord
+          </h1>
+          {currentEtab ? (
+            <p className="text-primary-foreground/80 mt-2 text-sm md:text-base">
+              {currentEtab.nom} ({currentEtab.uai}) — Exercice {params.exercice}
+            </p>
+          ) : (
+            <p className="text-primary-foreground/80 mt-2 text-sm">
+              Commencez par renseigner les{' '}
+              <NavLink to="/parametres" className="underline text-primary-foreground hover:text-primary-foreground/90">
+                paramètres de l'audit
+              </NavLink>.
+            </p>
+          )}
+          <div className="flex flex-wrap gap-3 mt-5">
+            <div className="glass rounded-lg px-4 py-2 text-sm">
+              <span className="text-primary-foreground/60">Modules actifs</span>
+              <span className="text-primary-foreground font-bold ml-2">{enabledModules.length}</span>
+            </div>
+            <div className="glass rounded-lg px-4 py-2 text-sm">
+              <span className="text-primary-foreground/60">Risques identifiés</span>
+              <span className="text-primary-foreground font-bold ml-2">{risques.length}</span>
+            </div>
+            {params.equipe.length > 0 && (
+              <div className="glass rounded-lg px-4 py-2 text-sm">
+                <span className="text-primary-foreground/60">Équipe</span>
+                <span className="text-primary-foreground font-bold ml-2">{params.equipe.length} membre{params.equipe.length > 1 ? 's' : ''}</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Risk Charts */}
       {risques.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-300">
             <CardHeader><CardTitle className="text-lg">Répartition des risques</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
@@ -88,7 +155,7 @@ export default function Dashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-300">
             <CardHeader><CardTitle className="text-lg">Score de risque par processus</CardTitle></CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={250}>
@@ -109,40 +176,57 @@ export default function Dashboard() {
         </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center justify-between">
-            Modules sélectionnés
-            <Badge variant="outline">{enabledModules.length} actif{enabledModules.length > 1 ? 's' : ''}</Badge>
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-            {enabledModules.map(mod => {
-              const Icon = ICON_MAP[mod.icon] || FileText;
-              return (
-                <NavLink
-                  key={mod.id}
-                  to={mod.path}
-                  className="flex items-center gap-3 p-3 rounded-lg border border-border hover:bg-muted transition-colors group"
-                >
-                  <Icon className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-medium flex-1">{mod.label}</span>
-                  <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                </NavLink>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Section Cards with images */}
+      <div className="space-y-5">
+        <h2 className="text-xl font-bold text-foreground">Modules d'audit</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {SECTIONS.map(section => {
+            const sectionModules = enabledModules.filter(m => m.section === section);
+            if (sectionModules.length === 0) return null;
+            const config = SECTION_CONFIG[section];
 
+            return (
+              <Card key={section} className="shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden group">
+                {/* Section header with gradient */}
+                <div className={`bg-gradient-to-r ${config.bgClass} p-4 flex items-center gap-3`}>
+                  <img src={config.image} alt="" className="h-10 w-10 object-contain rounded-lg bg-white/20 p-1" />
+                  <h3 className="text-sm font-bold text-white tracking-wide uppercase">{section}</h3>
+                </div>
+                <CardContent className="p-3">
+                  <div className="space-y-1">
+                    {sectionModules.map(mod => {
+                      const Icon = ICON_MAP[mod.icon] || FileText;
+                      return (
+                        <NavLink
+                          key={mod.id}
+                          to={mod.path}
+                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-muted transition-colors group/item"
+                          activeClassName="bg-primary/10"
+                        >
+                          <Icon className={`h-4 w-4 ${config.color}`} />
+                          <span className="text-sm font-medium flex-1 text-foreground">{mod.label}</span>
+                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover/item:opacity-100 transition-opacity" />
+                        </NavLink>
+                      );
+                    })}
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Team */}
       {params.equipe.length > 0 && (
-        <Card>
+        <Card className="shadow-card">
           <CardHeader><CardTitle className="text-lg">Équipe d'audit</CardTitle></CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {params.equipe.map(m => (
-                <Badge key={m.id} variant="secondary">{m.prenom} {m.nom} — {m.fonction}</Badge>
+                <Badge key={m.id} variant="secondary" className="text-xs px-3 py-1.5">
+                  {m.prenom} {m.nom} — {m.fonction}
+                </Badge>
               ))}
             </div>
           </CardContent>
