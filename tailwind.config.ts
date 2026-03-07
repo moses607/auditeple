@@ -57,6 +57,22 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        success: {
+          DEFAULT: "hsl(var(--success))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        warning: {
+          DEFAULT: "hsl(var(--warning))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        section: {
+          controles: "hsl(var(--section-controles))",
+          verification: "hsl(var(--section-verification))",
+          comptable: "hsl(var(--section-comptable))",
+          finances: "hsl(var(--section-finances))",
+          "controle-interne": "hsl(var(--section-controle-interne))",
+          restitution: "hsl(var(--section-restitution))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
