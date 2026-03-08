@@ -22,12 +22,51 @@ import sectionFinances from '@/assets/section-finances.png';
 import sectionControleInterne from '@/assets/section-controle-interne.png';
 import sectionRestitution from '@/assets/section-restitution.png';
 
+// Module images
+import modRegies from '@/assets/mod-regies.png';
+import modStocks from '@/assets/mod-stocks.png';
+import modRapprochement from '@/assets/mod-rapprochement.png';
+import modVerification from '@/assets/mod-verification.png';
+import modOrdonnateur from '@/assets/mod-ordonnateur.png';
+import modDroitsConstates from '@/assets/mod-droits-constates.png';
+import modDepenses from '@/assets/mod-depenses.png';
+import modVoyages from '@/assets/mod-voyages.png';
+import modRestauration from '@/assets/mod-restauration.png';
+import modAnalyseFinanciere from '@/assets/mod-analyse-financiere.png';
+import modFondsRoulement from '@/assets/mod-fonds-roulement.png';
+import modRecouvrement from '@/assets/mod-recouvrement.png';
+import modMarches from '@/assets/mod-marches.png';
+import modSubventions from '@/assets/mod-subventions.png';
+import modBudgetsAnnexes from '@/assets/mod-budgets-annexes.png';
+import modCartographie from '@/assets/mod-cartographie.png';
+import modOrganigramme from '@/assets/mod-organigramme.png';
+import modPlanAction from '@/assets/mod-plan-action.png';
+import modPlanControle from '@/assets/mod-plan-controle.png';
+import modPvAudit from '@/assets/mod-pv-audit.png';
+import modAnnexeComptable from '@/assets/mod-annexe-comptable.png';
+import modPisteAudit from '@/assets/mod-piste-audit.png';
+import modParametres from '@/assets/mod-parametres.png';
+
 const ICON_MAP: Record<string, React.ElementType> = {
   Settings, ClipboardCheck, UserCheck, Receipt, CreditCard,
   Plane, FileText, Calculator, BookOpen, TrendingUp,
   Landmark, Package, Scale, GraduationCap, Heart, UtensilsCrossed,
   AlertTriangle, Target, Building, Building2, Map, GitFork, ListChecks,
   Calendar, ClipboardList, BarChart3,
+};
+
+const MODULE_IMAGES: Record<string, string> = {
+  regies: modRegies, stocks: modStocks, rapprochement: modRapprochement,
+  verification: modVerification, ordonnateur: modOrdonnateur,
+  'droits-constates': modDroitsConstates, depenses: modDepenses,
+  voyages: modVoyages, restauration: modRestauration,
+  'analyse-financiere': modAnalyseFinanciere, 'fonds-roulement': modFondsRoulement,
+  recouvrement: modRecouvrement, marches: modMarches, subventions: modSubventions,
+  'budgets-annexes': modBudgetsAnnexes, cartographie: modCartographie,
+  organigramme: modOrganigramme, 'plan-action': modPlanAction,
+  'plan-controle': modPlanControle, 'pv-audit': modPvAudit,
+  'annexe-comptable': modAnnexeComptable, 'piste-audit': modPisteAudit,
+  parametres: modParametres,
 };
 
 const RISK_COLORS = ['hsl(0, 72%, 51%)', 'hsl(25, 95%, 53%)', 'hsl(45, 93%, 47%)', 'hsl(142, 71%, 45%)'];
