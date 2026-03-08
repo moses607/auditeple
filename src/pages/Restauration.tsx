@@ -198,21 +198,28 @@ export default function Restauration() {
           {items.length > 0 && (
             <Card><CardContent className="pt-6 overflow-x-auto">
               <table className="w-full text-sm">
-                <thead><tr className="border-b text-xs text-muted-foreground"><th className="p-2">Mois</th><th className="p-2">Repas</th><th className="text-right p-2">C.mat</th><th className="text-right p-2">C.tot</th><th className="text-right p-2">Tarif</th><th className="p-2">Fréq.</th><th className="text-right p-2">Impayés</th><th className="p-2">Bio%</th><th className="p-2">Dur%</th><th></th></tr></thead>
-                <tbody>{items.map(x => (
+                <thead><tr className="border-b text-xs text-muted-foreground"><th className="p-2">Mois</th><th className="p-2">Repas</th><th className="p-2">DP</th><th className="p-2">Jours</th><th className="p-2">Fréq.</th><th className="text-right p-2">C.mat</th><th className="text-right p-2">C.tot</th><th className="text-right p-2">Tarif</th><th className="text-right p-2">Impayés</th><th className="p-2">Bio%</th><th className="p-2">Dur%</th><th></th></tr></thead>
+                <tbody>{items.map(x => {
+                  const taux = calcTauxFrequentation(x.repas, x.dpInscrits, x.joursService);
+                  return (
                   <tr key={x.id} className="border-b">
-                    <td className="p-2 font-bold">{x.mois}</td><td className="p-2 font-mono">{x.repas.toLocaleString('fr-FR')}</td>
-                    <td className="p-2 text-right font-mono">{x.coutMatieres.toFixed(2)}</td><td className="p-2 text-right font-mono font-bold">{x.coutTotal.toFixed(2)}</td>
-                    <td className="p-2 text-right font-mono">{x.tarif.toFixed(2)}</td><td className="p-2 font-bold">{x.frequentation}%</td>
+                    <td className="p-2 font-bold">{x.mois}</td>
+                    <td className="p-2 font-mono">{x.repas.toLocaleString('fr-FR')}</td>
+                    <td className="p-2 font-mono">{x.dpInscrits}</td>
+                    <td className="p-2 font-mono">{x.joursService}</td>
+                    <td className="p-2 font-bold" title="Indicatif — paiement à la prestation en lycée">{taux !== null ? `${taux.toFixed(1)}%` : '—'}</td>
+                    <td className="p-2 text-right font-mono">{x.coutMatieres.toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono font-bold">{x.coutTotal.toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono">{x.tarif.toFixed(2)}</td>
                     <td className={`p-2 text-right font-mono font-bold ${x.impayes > 0 ? 'text-destructive' : 'text-green-600'}`}>{fmt(x.impayes)}</td>
                     <td className={`p-2 font-bold ${x.bio >= 20 ? 'text-green-600' : 'text-destructive'}`}>{x.bio}%</td>
                     <td className={`p-2 font-bold ${x.durable >= 50 ? 'text-green-600' : 'text-destructive'}`}>{x.durable}%</td>
                     <td className="p-2"><div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...x, repas: String(x.repas), coutMatieres: String(x.coutMatieres), coutPersonnel: String(x.coutPersonnel), coutEnergie: String(x.coutEnergie), tarif: String(x.tarif), frequentation: String(x.frequentation), impayes: String(x.impayes), bio: String(x.bio), durable: String(x.durable) })}><Pencil className="h-3 w-3" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...x, repas: String(x.repas), effectifTotal: String(x.effectifTotal), dpInscrits: String(x.dpInscrits), joursService: String(x.joursService), coutMatieres: String(x.coutMatieres), coutPersonnel: String(x.coutPersonnel), coutEnergie: String(x.coutEnergie), tarif: String(x.tarif), impayes: String(x.impayes), bio: String(x.bio), durable: String(x.durable) })}><Pencil className="h-3 w-3" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== x.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                     </div></td>
                   </tr>
-                ))}</tbody>
+                );})}</tbody>
               </table>
             </CardContent></Card>
           )}
