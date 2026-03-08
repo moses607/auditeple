@@ -153,18 +153,42 @@ export default function Restauration() {
           {form && (
             <Card className="border-primary">
               <CardContent className="pt-6 space-y-3">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="space-y-1"><Label className="text-xs">Mois</Label><Input type="month" value={form.mois} onChange={e => setForm({ ...form, mois: e.target.value })} /></div>
-                  <div className="space-y-1"><Label className="text-xs">Nb repas</Label><Input type="number" value={form.repas} onChange={e => setForm({ ...form, repas: e.target.value })} /></div>
+                  <div className="space-y-1"><Label className="text-xs">Effectif total élèves</Label><Input type="number" value={form.effectifTotal} onChange={e => setForm({ ...form, effectifTotal: e.target.value })} placeholder="Ex: 850" /></div>
+                  <div className="space-y-1"><Label className="text-xs">DP inscrits</Label><Input type="number" value={form.dpInscrits} onChange={e => setForm({ ...form, dpInscrits: e.target.value })} placeholder="Ex: 620" /></div>
+                  <div className="space-y-1"><Label className="text-xs">Jours de service</Label><Input type="number" value={form.joursService} onChange={e => setForm({ ...form, joursService: e.target.value })} placeholder="Ex: 20" /></div>
+                  <div className="space-y-1"><Label className="text-xs">Nb repas servis</Label><Input type="number" value={form.repas} onChange={e => setForm({ ...form, repas: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Coût matière (€)</Label><Input type="number" value={form.coutMatieres} onChange={e => setForm({ ...form, coutMatieres: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Coût personnel (€)</Label><Input type="number" value={form.coutPersonnel} onChange={e => setForm({ ...form, coutPersonnel: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Coût énergie (€)</Label><Input type="number" value={form.coutEnergie} onChange={e => setForm({ ...form, coutEnergie: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Tarif (€)</Label><Input type="number" value={form.tarif} onChange={e => setForm({ ...form, tarif: e.target.value })} /></div>
-                  <div className="space-y-1"><Label className="text-xs">Fréquentation %</Label><Input type="number" value={form.frequentation} onChange={e => setForm({ ...form, frequentation: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Impayés (€)</Label><Input type="number" value={form.impayes} onChange={e => setForm({ ...form, impayes: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">% Bio</Label><Input type="number" value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">% Durable</Label><Input type="number" value={form.durable} onChange={e => setForm({ ...form, durable: e.target.value })} /></div>
                 </div>
+
+                {/* Calcul automatique de la fréquentation */}
+                {(() => {
+                  const repas = parseInt(form.repas) || 0;
+                  const dp = parseInt(form.dpInscrits) || 0;
+                  const jours = parseInt(form.joursService) || 0;
+                  const taux = calcTauxFrequentation(repas, dp, jours);
+                  if (taux !== null) {
+                    return (
+                      <div className="p-3 rounded-lg border bg-muted/50">
+                        <p className="text-sm"><strong>Taux de fréquentation calculé :</strong> {taux.toFixed(1)}%
+                          <span className="text-xs text-muted-foreground ml-2">({repas} repas / {dp} DP × {jours} jours)</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 italic">
+                          ⚠️ En lycée, les DP payant à la prestation, ce taux est indicatif. L'absentéisme et les repas non pris ne sont pas décomptés automatiquement.
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
                 <div className="flex gap-2"><Button onClick={submit}>Valider</Button><Button variant="outline" onClick={() => setForm(null)}>Annuler</Button></div>
               </CardContent>
             </Card>
