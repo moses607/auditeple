@@ -66,10 +66,25 @@ export default function Restauration() {
   }));
   const updateContrat = (k: string, v: any) => { const n = { ...contrat, [k]: v }; setContrat(n); saveState('rest_contrat', n); };
 
+  const calcTauxFrequentation = (repas: number, dpInscrits: number, joursService: number) => {
+    if (dpInscrits <= 0 || joursService <= 0) return null;
+    return (repas / (dpInscrits * joursService)) * 100;
+  };
+
   const submit = () => {
     if (!form || !form.mois) return;
     const cm = parseFloat(form.coutMatieres) || 0, cp = parseFloat(form.coutPersonnel) || 0, ce = parseFloat(form.coutEnergie) || 0;
-    const item: RestaurationMois = { id: form.id || crypto.randomUUID(), mois: form.mois, repas: parseInt(form.repas) || 0, coutMatieres: cm, coutPersonnel: cp, coutEnergie: ce, coutTotal: cm + cp + ce, tarif: parseFloat(form.tarif) || 3.80, frequentation: parseFloat(form.frequentation) || 0, impayes: parseFloat(form.impayes) || 0, bio: parseFloat(form.bio) || 0, durable: parseFloat(form.durable) || 0 };
+    const item: RestaurationMois = {
+      id: form.id || crypto.randomUUID(), mois: form.mois,
+      repas: parseInt(form.repas) || 0,
+      effectifTotal: parseInt(form.effectifTotal) || 0,
+      dpInscrits: parseInt(form.dpInscrits) || 0,
+      joursService: parseInt(form.joursService) || 0,
+      coutMatieres: cm, coutPersonnel: cp, coutEnergie: ce, coutTotal: cm + cp + ce,
+      tarif: parseFloat(form.tarif) || 3.80,
+      impayes: parseFloat(form.impayes) || 0,
+      bio: parseFloat(form.bio) || 0, durable: parseFloat(form.durable) || 0,
+    };
     if (form.id) save(items.map(i => i.id === form.id ? item : i));
     else save([item, ...items]);
     setForm(null);
@@ -122,7 +137,7 @@ export default function Restauration() {
         {/* ═══ SUIVI MENSUEL ═══ */}
         <TabsContent value="suivi" className="space-y-4">
           <div className="flex justify-end">
-            <Button onClick={() => setForm({ mois: new Date().toISOString().slice(0, 7), repas: '', coutMatieres: '', coutPersonnel: '', coutEnergie: '', tarif: last?.tarif || 3.80, frequentation: '', impayes: '', bio: '', durable: '' })}><Plus className="h-4 w-4 mr-2" /> Nouveau mois</Button>
+            <Button onClick={() => setForm({ mois: new Date().toISOString().slice(0, 7), repas: '', effectifTotal: '', dpInscrits: '', joursService: '', coutMatieres: '', coutPersonnel: '', coutEnergie: '', tarif: last?.tarif || 3.80, impayes: '', bio: '', durable: '' })}><Plus className="h-4 w-4 mr-2" /> Nouveau mois</Button>
           </div>
 
           {last && (
@@ -138,18 +153,42 @@ export default function Restauration() {
           {form && (
             <Card className="border-primary">
               <CardContent className="pt-6 space-y-3">
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                   <div className="space-y-1"><Label className="text-xs">Mois</Label><Input type="month" value={form.mois} onChange={e => setForm({ ...form, mois: e.target.value })} /></div>
-                  <div className="space-y-1"><Label className="text-xs">Nb repas</Label><Input type="number" value={form.repas} onChange={e => setForm({ ...form, repas: e.target.value })} /></div>
+                  <div className="space-y-1"><Label className="text-xs">Effectif total élèves</Label><Input type="number" value={form.effectifTotal} onChange={e => setForm({ ...form, effectifTotal: e.target.value })} placeholder="Ex: 850" /></div>
+                  <div className="space-y-1"><Label className="text-xs">DP inscrits</Label><Input type="number" value={form.dpInscrits} onChange={e => setForm({ ...form, dpInscrits: e.target.value })} placeholder="Ex: 620" /></div>
+                  <div className="space-y-1"><Label className="text-xs">Jours de service</Label><Input type="number" value={form.joursService} onChange={e => setForm({ ...form, joursService: e.target.value })} placeholder="Ex: 20" /></div>
+                  <div className="space-y-1"><Label className="text-xs">Nb repas servis</Label><Input type="number" value={form.repas} onChange={e => setForm({ ...form, repas: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Coût matière (€)</Label><Input type="number" value={form.coutMatieres} onChange={e => setForm({ ...form, coutMatieres: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Coût personnel (€)</Label><Input type="number" value={form.coutPersonnel} onChange={e => setForm({ ...form, coutPersonnel: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Coût énergie (€)</Label><Input type="number" value={form.coutEnergie} onChange={e => setForm({ ...form, coutEnergie: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Tarif (€)</Label><Input type="number" value={form.tarif} onChange={e => setForm({ ...form, tarif: e.target.value })} /></div>
-                  <div className="space-y-1"><Label className="text-xs">Fréquentation %</Label><Input type="number" value={form.frequentation} onChange={e => setForm({ ...form, frequentation: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">Impayés (€)</Label><Input type="number" value={form.impayes} onChange={e => setForm({ ...form, impayes: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">% Bio</Label><Input type="number" value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} /></div>
                   <div className="space-y-1"><Label className="text-xs">% Durable</Label><Input type="number" value={form.durable} onChange={e => setForm({ ...form, durable: e.target.value })} /></div>
                 </div>
+
+                {/* Calcul automatique de la fréquentation */}
+                {(() => {
+                  const repas = parseInt(form.repas) || 0;
+                  const dp = parseInt(form.dpInscrits) || 0;
+                  const jours = parseInt(form.joursService) || 0;
+                  const taux = calcTauxFrequentation(repas, dp, jours);
+                  if (taux !== null) {
+                    return (
+                      <div className="p-3 rounded-lg border bg-muted/50">
+                        <p className="text-sm"><strong>Taux de fréquentation calculé :</strong> {taux.toFixed(1)}%
+                          <span className="text-xs text-muted-foreground ml-2">({repas} repas / {dp} DP × {jours} jours)</span>
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1 italic">
+                          ⚠️ En lycée, les DP payant à la prestation, ce taux est indicatif. L'absentéisme et les repas non pris ne sont pas décomptés automatiquement.
+                        </p>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
+
                 <div className="flex gap-2"><Button onClick={submit}>Valider</Button><Button variant="outline" onClick={() => setForm(null)}>Annuler</Button></div>
               </CardContent>
             </Card>
@@ -159,21 +198,28 @@ export default function Restauration() {
           {items.length > 0 && (
             <Card><CardContent className="pt-6 overflow-x-auto">
               <table className="w-full text-sm">
-                <thead><tr className="border-b text-xs text-muted-foreground"><th className="p-2">Mois</th><th className="p-2">Repas</th><th className="text-right p-2">C.mat</th><th className="text-right p-2">C.tot</th><th className="text-right p-2">Tarif</th><th className="p-2">Fréq.</th><th className="text-right p-2">Impayés</th><th className="p-2">Bio%</th><th className="p-2">Dur%</th><th></th></tr></thead>
-                <tbody>{items.map(x => (
+                <thead><tr className="border-b text-xs text-muted-foreground"><th className="p-2">Mois</th><th className="p-2">Repas</th><th className="p-2">DP</th><th className="p-2">Jours</th><th className="p-2">Fréq.</th><th className="text-right p-2">C.mat</th><th className="text-right p-2">C.tot</th><th className="text-right p-2">Tarif</th><th className="text-right p-2">Impayés</th><th className="p-2">Bio%</th><th className="p-2">Dur%</th><th></th></tr></thead>
+                <tbody>{items.map(x => {
+                  const taux = calcTauxFrequentation(x.repas, x.dpInscrits, x.joursService);
+                  return (
                   <tr key={x.id} className="border-b">
-                    <td className="p-2 font-bold">{x.mois}</td><td className="p-2 font-mono">{x.repas.toLocaleString('fr-FR')}</td>
-                    <td className="p-2 text-right font-mono">{x.coutMatieres.toFixed(2)}</td><td className="p-2 text-right font-mono font-bold">{x.coutTotal.toFixed(2)}</td>
-                    <td className="p-2 text-right font-mono">{x.tarif.toFixed(2)}</td><td className="p-2 font-bold">{x.frequentation}%</td>
+                    <td className="p-2 font-bold">{x.mois}</td>
+                    <td className="p-2 font-mono">{x.repas.toLocaleString('fr-FR')}</td>
+                    <td className="p-2 font-mono">{x.dpInscrits}</td>
+                    <td className="p-2 font-mono">{x.joursService}</td>
+                    <td className="p-2 font-bold" title="Indicatif — paiement à la prestation en lycée">{taux !== null ? `${taux.toFixed(1)}%` : '—'}</td>
+                    <td className="p-2 text-right font-mono">{x.coutMatieres.toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono font-bold">{x.coutTotal.toFixed(2)}</td>
+                    <td className="p-2 text-right font-mono">{x.tarif.toFixed(2)}</td>
                     <td className={`p-2 text-right font-mono font-bold ${x.impayes > 0 ? 'text-destructive' : 'text-green-600'}`}>{fmt(x.impayes)}</td>
                     <td className={`p-2 font-bold ${x.bio >= 20 ? 'text-green-600' : 'text-destructive'}`}>{x.bio}%</td>
                     <td className={`p-2 font-bold ${x.durable >= 50 ? 'text-green-600' : 'text-destructive'}`}>{x.durable}%</td>
                     <td className="p-2"><div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...x, repas: String(x.repas), coutMatieres: String(x.coutMatieres), coutPersonnel: String(x.coutPersonnel), coutEnergie: String(x.coutEnergie), tarif: String(x.tarif), frequentation: String(x.frequentation), impayes: String(x.impayes), bio: String(x.bio), durable: String(x.durable) })}><Pencil className="h-3 w-3" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...x, repas: String(x.repas), effectifTotal: String(x.effectifTotal), dpInscrits: String(x.dpInscrits), joursService: String(x.joursService), coutMatieres: String(x.coutMatieres), coutPersonnel: String(x.coutPersonnel), coutEnergie: String(x.coutEnergie), tarif: String(x.tarif), impayes: String(x.impayes), bio: String(x.bio), durable: String(x.durable) })}><Pencil className="h-3 w-3" /></Button>
                       <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== x.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                     </div></td>
                   </tr>
-                ))}</tbody>
+                );})}</tbody>
               </table>
             </CardContent></Card>
           )}
