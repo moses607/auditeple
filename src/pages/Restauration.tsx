@@ -137,7 +137,7 @@ export default function Restauration() {
         {/* ═══ SUIVI MENSUEL ═══ */}
         <TabsContent value="suivi" className="space-y-4">
           <div className="flex justify-end">
-            <Button onClick={() => setForm({ mois: new Date().toISOString().slice(0, 7), repas: '', coutMatieres: '', coutPersonnel: '', coutEnergie: '', tarif: last?.tarif || 3.80, frequentation: '', impayes: '', bio: '', durable: '' })}><Plus className="h-4 w-4 mr-2" /> Nouveau mois</Button>
+            <Button onClick={() => setForm({ mois: new Date().toISOString().slice(0, 7), repas: '', effectifTotal: '', dpInscrits: '', joursService: '', coutMatieres: '', coutPersonnel: '', coutEnergie: '', tarif: last?.tarif || 3.80, impayes: '', bio: '', durable: '' })}><Plus className="h-4 w-4 mr-2" /> Nouveau mois</Button>
           </div>
 
           {last && (
