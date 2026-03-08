@@ -153,12 +153,14 @@ export interface RestaurationMois {
   id: string;
   mois: string;
   repas: number;
+  effectifTotal: number;
+  dpInscrits: number;
+  joursService: number;
   coutMatieres: number;
   coutPersonnel: number;
   coutEnergie: number;
   coutTotal: number;
   tarif: number;
-  frequentation: number;
   impayes: number;
   bio: number;
   durable: number;

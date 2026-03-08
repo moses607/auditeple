@@ -66,10 +66,25 @@ export default function Restauration() {
   }));
   const updateContrat = (k: string, v: any) => { const n = { ...contrat, [k]: v }; setContrat(n); saveState('rest_contrat', n); };
 
+  const calcTauxFrequentation = (repas: number, dpInscrits: number, joursService: number) => {
+    if (dpInscrits <= 0 || joursService <= 0) return null;
+    return (repas / (dpInscrits * joursService)) * 100;
+  };
+
   const submit = () => {
     if (!form || !form.mois) return;
     const cm = parseFloat(form.coutMatieres) || 0, cp = parseFloat(form.coutPersonnel) || 0, ce = parseFloat(form.coutEnergie) || 0;
-    const item: RestaurationMois = { id: form.id || crypto.randomUUID(), mois: form.mois, repas: parseInt(form.repas) || 0, coutMatieres: cm, coutPersonnel: cp, coutEnergie: ce, coutTotal: cm + cp + ce, tarif: parseFloat(form.tarif) || 3.80, frequentation: parseFloat(form.frequentation) || 0, impayes: parseFloat(form.impayes) || 0, bio: parseFloat(form.bio) || 0, durable: parseFloat(form.durable) || 0 };
+    const item: RestaurationMois = {
+      id: form.id || crypto.randomUUID(), mois: form.mois,
+      repas: parseInt(form.repas) || 0,
+      effectifTotal: parseInt(form.effectifTotal) || 0,
+      dpInscrits: parseInt(form.dpInscrits) || 0,
+      joursService: parseInt(form.joursService) || 0,
+      coutMatieres: cm, coutPersonnel: cp, coutEnergie: ce, coutTotal: cm + cp + ce,
+      tarif: parseFloat(form.tarif) || 3.80,
+      impayes: parseFloat(form.impayes) || 0,
+      bio: parseFloat(form.bio) || 0, durable: parseFloat(form.durable) || 0,
+    };
     if (form.id) save(items.map(i => i.id === form.id ? item : i));
     else save([item, ...items]);
     setForm(null);
