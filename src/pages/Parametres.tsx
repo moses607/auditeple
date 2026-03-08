@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { TeamMember, Etablissement, getSelectedEtablissement } from '@/lib/types';
 import { lookupUAI } from '@/lib/uai-lookup';
+import { getModules, saveModules, ModuleConfig, SECTIONS } from '@/lib/audit-modules';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2, MapPin } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2, MapPin, ClipboardList } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ParametresPage() {
@@ -17,6 +19,7 @@ export default function ParametresPage() {
   const [uaiInput, setUaiInput] = useState('');
   const [searching, setSearching] = useState(false);
   const [lookupError, setLookupError] = useState('');
+  const [modules, setModules] = useState<ModuleConfig[]>(() => getModules());
 
   const current = getSelectedEtablissement(params);
 
@@ -279,6 +282,66 @@ export default function ParametresPage() {
               <Plus className="h-4 w-4 mr-2" /> Ajouter
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Sélection des modules à auditer */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <ClipboardList className="h-5 w-5 text-primary" />
+            Modules à auditer
+            <Badge variant="secondary" className="ml-auto text-xs">
+              {modules.filter(m => m.enabled).length} / {modules.length} actifs
+            </Badge>
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Cochez les modules qui feront l'objet de l'audit pour l'établissement sélectionné. Seuls les modules cochés apparaîtront dans le PV d'audit.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex gap-2 mb-2">
+            <Button size="sm" variant="outline" onClick={() => {
+              const updated = modules.map(m => ({ ...m, enabled: true }));
+              setModules(updated); saveModules(updated);
+              toast.success('Tous les modules activés');
+            }}>Tout cocher</Button>
+            <Button size="sm" variant="outline" onClick={() => {
+              const updated = modules.map(m => ({ ...m, enabled: false }));
+              setModules(updated); saveModules(updated);
+              toast.success('Tous les modules désactivés');
+            }}>Tout décocher</Button>
+          </div>
+          {SECTIONS.filter(s => s !== 'AUDIT & RESTITUTION').map(section => {
+            const sectionModules = modules.filter(m => m.section === section);
+            if (sectionModules.length === 0) return null;
+            return (
+              <div key={section}>
+                <h4 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">{section}</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                  {sectionModules.map(mod => (
+                    <div
+                      key={mod.id}
+                      className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                        mod.enabled ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted/50'
+                      }`}
+                      onClick={() => {
+                        const updated = modules.map(m => m.id === mod.id ? { ...m, enabled: !m.enabled } : m);
+                        setModules(updated); saveModules(updated);
+                      }}
+                    >
+                      <Checkbox checked={mod.enabled} />
+                      <div>
+                        <p className="text-sm font-medium">{mod.label}</p>
+                        <p className="text-xs text-muted-foreground">{mod.section}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <Separator className="mt-3" />
+              </div>
+            );
+          })}
         </CardContent>
       </Card>
     </div>

@@ -22,7 +22,8 @@ function generateRecommandations(verifications: PVVerification[]): string {
 }
 
 // Modules auditables (ceux qui ont un collecteur)
-const AUDITABLE_MODULES = [
+// Modules auditables = ceux qui ont un collecteur ET sont activés dans les paramètres
+const COLLECTOR_MODULES = [
   'regies', 'stocks', 'rapprochement', 'verification',
   'droits-constates', 'voyages', 'restauration',
   'subventions', 'cartographie',
@@ -40,6 +41,10 @@ export default function PVAudit() {
   const save = (d: PVAuditItem[]) => { setItems(d); saveState('pv_audit', d); };
 
   const allModules = useMemo(() => getModules(), []);
+  const AUDITABLE_MODULES = useMemo(() => 
+    COLLECTOR_MODULES.filter(id => allModules.find(m => m.id === id)?.enabled),
+    [allModules]
+  );
 
   const toggleModule = (id: string) => {
     setSelectedModules(prev =>
