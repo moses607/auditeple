@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { TeamMember, Etablissement, getSelectedEtablissement } from '@/lib/types';
 import { lookupUAI } from '@/lib/uai-lookup';
+import { getModules, saveModules, ModuleConfig, SECTIONS } from '@/lib/audit-modules';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2, MapPin } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2, MapPin, ClipboardList } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ParametresPage() {
