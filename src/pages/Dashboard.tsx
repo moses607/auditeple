@@ -235,14 +235,19 @@ export default function Dashboard() {
                   <div className="space-y-1">
                     {sectionModules.map(mod => {
                       const Icon = ICON_MAP[mod.icon] || FileText;
+                      const modImage = MODULE_IMAGES[mod.id];
                       return (
                         <NavLink
                           key={mod.id}
                           to={mod.path}
-                          className="flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-muted transition-colors group/item"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition-colors group/item"
                           activeClassName="bg-primary/10"
                         >
-                          <Icon className={`h-4 w-4 ${config.color}`} />
+                          {modImage ? (
+                            <img src={modImage} alt="" className="h-8 w-8 object-contain rounded-md flex-shrink-0" />
+                          ) : (
+                            <Icon className={`h-5 w-5 ${config.color} flex-shrink-0`} />
+                          )}
                           <span className="text-sm font-medium flex-1 text-foreground">{mod.label}</span>
                           <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover/item:opacity-100 transition-opacity" />
                         </NavLink>
