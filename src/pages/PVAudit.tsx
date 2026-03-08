@@ -22,7 +22,8 @@ function generateRecommandations(verifications: PVVerification[]): string {
 }
 
 // Modules auditables (ceux qui ont un collecteur)
-const AUDITABLE_MODULES = [
+// Modules auditables = ceux qui ont un collecteur ET sont activés dans les paramètres
+const COLLECTOR_MODULES = [
   'regies', 'stocks', 'rapprochement', 'verification',
   'droits-constates', 'voyages', 'restauration',
   'subventions', 'cartographie',
