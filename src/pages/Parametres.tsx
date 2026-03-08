@@ -19,6 +19,7 @@ export default function ParametresPage() {
   const [uaiInput, setUaiInput] = useState('');
   const [searching, setSearching] = useState(false);
   const [lookupError, setLookupError] = useState('');
+  const [modules, setModules] = useState<ModuleConfig[]>(() => getModules());
 
   const current = getSelectedEtablissement(params);
 
