@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { GDPRSettings } from '@/components/GDPRSettings';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { TeamMember, Etablissement, getSelectedEtablissement } from '@/lib/types';
 import { lookupUAI } from '@/lib/uai-lookup';
