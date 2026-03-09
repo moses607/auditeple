@@ -345,6 +345,8 @@ export default function ParametresPage() {
           })}
         </CardContent>
       </Card>
+
+      <GDPRSettings />
     </div>
   );
 }
