@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { Loader2, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
+import { checkRateLimit, getRateLimitRemainingSeconds, emailSchema, passwordSchema, displayNameSchema } from '@/lib/security';
 
 export default function Auth() {
   const { user, loading } = useAuth();
@@ -18,6 +19,7 @@ export default function Auth() {
   const [displayName, setDisplayName] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   if (loading) {
     return (
@@ -29,8 +31,36 @@ export default function Auth() {
 
   if (user) return <Navigate to="/" replace />;
 
+  const validate = (): boolean => {
+    const errs: Record<string, string> = {};
+    const emailResult = emailSchema.safeParse(email);
+    if (!emailResult.success) errs.email = emailResult.error.errors[0].message;
+
+    if (mode !== 'forgot') {
+      const pwResult = passwordSchema.safeParse(password);
+      if (!pwResult.success) errs.password = pwResult.error.errors[0].message;
+    }
+
+    if (mode === 'signup') {
+      const nameResult = displayNameSchema.safeParse(displayName);
+      if (!nameResult.success) errs.displayName = nameResult.error.errors[0].message;
+    }
+
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!validate()) return;
+
+    const rateLimitKey = `auth_${mode}_${email}`;
+    if (!checkRateLimit(rateLimitKey, 5, 60_000)) {
+      const remaining = getRateLimitRemainingSeconds(rateLimitKey);
+      toast({ title: 'Trop de tentatives', description: `Réessayez dans ${remaining} secondes.`, variant: 'destructive' });
+      return;
+    }
+
     setSubmitting(true);
     try {
       if (mode === 'forgot') {
@@ -46,7 +76,7 @@ export default function Auth() {
           password,
           options: {
             emailRedirectTo: window.location.origin,
-            data: { full_name: displayName },
+            data: { full_name: displayName.trim() },
           },
         });
         if (error) throw error;
@@ -56,13 +86,21 @@ export default function Auth() {
         if (error) throw error;
       }
     } catch (err: any) {
-      toast({ title: 'Erreur', description: err.message, variant: 'destructive' });
+      // Generic error to prevent user enumeration
+      const safeMessage = mode === 'login'
+        ? 'Email ou mot de passe incorrect.'
+        : err.message;
+      toast({ title: 'Erreur', description: safeMessage, variant: 'destructive' });
     } finally {
       setSubmitting(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
+    if (!checkRateLimit('google_signin', 5, 60_000)) {
+      toast({ title: 'Trop de tentatives', description: 'Réessayez dans quelques instants.', variant: 'destructive' });
+      return;
+    }
     const { error } = await lovable.auth.signInWithOAuth('google', {
       redirect_uri: window.location.origin,
     });
@@ -113,33 +151,36 @@ export default function Auth() {
             </div>
           )}
 
-          <form onSubmit={handleEmailAuth} className="space-y-3">
+          <form onSubmit={handleEmailAuth} className="space-y-3" noValidate>
             {mode === 'signup' && (
               <div className="space-y-1.5">
                 <Label htmlFor="name" className="text-xs">Nom complet</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="name" placeholder="Jean Dupont" value={displayName} onChange={e => setDisplayName(e.target.value)} className="pl-9" required />
+                  <Input id="name" placeholder="Jean Dupont" value={displayName} onChange={e => setDisplayName(e.target.value)} className="pl-9" required autoComplete="name" maxLength={100} />
                 </div>
+                {errors.displayName && <p className="text-xs text-destructive">{errors.displayName}</p>}
               </div>
             )}
             <div className="space-y-1.5">
               <Label htmlFor="email" className="text-xs">Email</Label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input id="email" type="email" placeholder="vous@exemple.fr" value={email} onChange={e => setEmail(e.target.value)} className="pl-9" required />
+                <Input id="email" type="email" placeholder="vous@exemple.fr" value={email} onChange={e => setEmail(e.target.value)} className="pl-9" required autoComplete="email" maxLength={255} />
               </div>
+              {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
             </div>
             {mode !== 'forgot' && (
               <div className="space-y-1.5">
                 <Label htmlFor="password" className="text-xs">Mot de passe</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-9 pr-9" required minLength={6} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  <Input id="password" type={showPassword ? 'text' : 'password'} placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="pl-9 pr-9" required minLength={6} maxLength={128} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground" aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}>
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
+                {errors.password && <p className="text-xs text-destructive">{errors.password}</p>}
               </div>
             )}
 

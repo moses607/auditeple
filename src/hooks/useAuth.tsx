@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { startInactivityMonitor } from '@/lib/security';
+import { toast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   user: User | null;
@@ -21,6 +23,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const signOut = async () => {
+    await supabase.auth.signOut();
+  };
+
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
@@ -39,9 +45,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
+  // Session inactivity timeout — auto sign-out after 30 min of inactivity
+  useEffect(() => {
+    if (!user) return;
+
+    const cleanup = startInactivityMonitor(async () => {
+      toast({ title: 'Session expirée', description: 'Vous avez été déconnecté par inactivité.' });
+      await signOut();
+    });
+
+    return cleanup;
+  }, [user]);
 
   return (
     <AuthContext.Provider value={{ user, session, loading, signOut }}>
