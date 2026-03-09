@@ -39,7 +39,9 @@ import FondsSociaux from "./pages/FondsSociaux";
 import CommandePublique from "./pages/CommandePublique";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import NotFound from "./pages/NotFound";
+import { CookieConsent } from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
