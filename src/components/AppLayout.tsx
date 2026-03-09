@@ -69,6 +69,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <Button variant="ghost" size="icon" onClick={signOut} className="ml-2 text-muted-foreground hover:text-destructive" title="Déconnexion">
               <LogOut className="h-4 w-4" />
             </Button>
+          </header>
           <main className="flex-1 overflow-auto p-6 bg-background">
             {children}
           </main>
