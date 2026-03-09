@@ -114,7 +114,10 @@ export default function PVAudit() {
           <h1 className="text-2xl font-bold">Procès-Verbaux d'Audit</h1>
           <p className="text-xs text-muted-foreground mt-1">Réf. : CRC / DGFiP / Rectorat — PV contradictoire — Double signature — Anomalies auto-détectées</p>
         </div>
-        <Button onClick={() => setShowModuleSelector(true)}><Plus className="h-4 w-4 mr-2" /> Nouveau PV</Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowModuleSelector(true)} className="no-print"><Plus className="h-4 w-4 mr-2" /> Nouveau PV</Button>
+          <Button variant="outline" onClick={() => window.print()} className="print-trigger"><Printer className="h-4 w-4 mr-2" /> Imprimer</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
