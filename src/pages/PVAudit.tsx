@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Trash2, Search } from 'lucide-react';
+import { Plus, Trash2, Search, Printer } from 'lucide-react';
 import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate, getSelectedEtablissement } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { useAuditParams } from '@/hooks/useAuditStore';
@@ -114,7 +114,10 @@ export default function PVAudit() {
           <h1 className="text-2xl font-bold">Procès-Verbaux d'Audit</h1>
           <p className="text-xs text-muted-foreground mt-1">Réf. : CRC / DGFiP / Rectorat — PV contradictoire — Double signature — Anomalies auto-détectées</p>
         </div>
-        <Button onClick={() => setShowModuleSelector(true)}><Plus className="h-4 w-4 mr-2" /> Nouveau PV</Button>
+        <div className="flex gap-2">
+          <Button onClick={() => setShowModuleSelector(true)} className="no-print"><Plus className="h-4 w-4 mr-2" /> Nouveau PV</Button>
+          <Button variant="outline" onClick={() => window.print()} className="print-trigger"><Printer className="h-4 w-4 mr-2" /> Imprimer</Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
@@ -318,7 +321,8 @@ export default function PVAudit() {
                   <Badge className="ml-2" variant={p.phase === 'définitif' ? 'secondary' : 'default'}>{p.phase}</Badge>
                   <p className="text-xs text-muted-foreground">{fmtDate(p.date)} — {p.lieu} — Délai: {p.delai}</p>
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-1 no-print">
+                  <Button variant="ghost" size="icon" onClick={() => window.print()} title="Imprimer ce PV"><Printer className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="icon" onClick={() => setForm({ ...p })}><span className="text-xs">✎</span></Button>
                   <Button variant="ghost" size="icon" onClick={() => save(items.filter(i => i.id !== p.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                 </div>

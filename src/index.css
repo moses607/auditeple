@@ -160,3 +160,128 @@
     background: hsl(var(--card) / 0.7);
   }
 }
+
+/* ─── Print Styles ──────────────────────────────────────────── */
+@media print {
+  /* Hide non-printable UI elements */
+  nav,
+  aside,
+  header:has(button),
+  .sidebar,
+  [data-sidebar],
+  button,
+  .no-print,
+  .cookie-consent,
+  [role="dialog"],
+  [role="alertdialog"],
+  .toaster,
+  footer {
+    display: none !important;
+  }
+
+  /* Allow print buttons to hide themselves */
+  .print-trigger {
+    display: none !important;
+  }
+
+  /* Reset layout for print */
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+  }
+
+  #root {
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  main, [role="main"], .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  /* Cards print cleanly */
+  .card, [class*="Card"] {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    margin-bottom: 8pt !important;
+  }
+
+  /* Ensure text colors are readable */
+  * {
+    color: black !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+
+  /* Keep badge/status colors visible */
+  .badge, [class*="Badge"] {
+    border: 1px solid #666 !important;
+    padding: 1px 4px !important;
+    font-size: 9pt !important;
+  }
+
+  /* Destructive items keep visual emphasis */
+  .border-destructive, [class*="destructive"] {
+    border-color: #c00 !important;
+  }
+
+  .text-destructive {
+    color: #c00 !important;
+  }
+
+  .text-green-600, .border-green-500 {
+    color: #060 !important;
+    border-color: #060 !important;
+  }
+
+  /* Tables print well */
+  table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+  }
+
+  th, td {
+    border: 1px solid #ccc !important;
+    padding: 4px 6px !important;
+    font-size: 10pt !important;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 1.5cm;
+    size: A4;
+  }
+
+  /* Avoid breaking inside important sections */
+  .border, .rounded-lg, .p-3, .p-4 {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Show URLs for links */
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 9pt;
+    color: #666 !important;
+  }
+
+  a[href^="#"]::after,
+  a[href^="javascript"]::after {
+    content: "";
+  }
+
+  /* Textarea / input show as text in print */
+  input, textarea, select {
+    border: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+  }
+}
