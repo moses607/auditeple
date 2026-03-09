@@ -2,8 +2,10 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { getSelectedEtablissement } from '@/lib/types';
-import { Building2, MapPin } from 'lucide-react';
+import { Building2, MapPin, LogOut } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
+import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
@@ -14,6 +16,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const { params, update } = useAuditParams();
+  const { signOut } = useAuth();
   const current = getSelectedEtablissement(params);
   const hasEtabs = params.etablissements.length > 0;
 
@@ -63,6 +66,9 @@ export function AppLayout({ children }: AppLayoutProps) {
                 <span className="text-xs text-muted-foreground">Aucun établissement — Saisir un UAI</span>
               </NavLink>
             )}
+            <Button variant="ghost" size="icon" onClick={signOut} className="ml-2 text-muted-foreground hover:text-destructive" title="Déconnexion">
+              <LogOut className="h-4 w-4" />
+            </Button>
           </header>
           <main className="flex-1 overflow-auto p-6 bg-background">
             {children}
