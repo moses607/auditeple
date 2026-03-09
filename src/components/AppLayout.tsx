@@ -16,6 +16,7 @@ interface AppLayoutProps {
 
 export function AppLayout({ children }: AppLayoutProps) {
   const { params, update } = useAuditParams();
+  const { signOut } = useAuth();
   const current = getSelectedEtablissement(params);
   const hasEtabs = params.etablissements.length > 0;
 
