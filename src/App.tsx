@@ -39,7 +39,9 @@ import FondsSociaux from "./pages/FondsSociaux";
 import CommandePublique from "./pages/CommandePublique";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
+import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
 import NotFound from "./pages/NotFound";
+import { CookieConsent } from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
@@ -50,9 +52,11 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
+          <CookieConsent />
           <Routes>
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route path="*" element={
               <ProtectedRoute>
                 <AuditParamsProvider>
