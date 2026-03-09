@@ -164,6 +164,10 @@ export default function Auth() {
               <>Déjà un compte ?{' '}<button onClick={() => setMode('login')} className="text-primary hover:underline font-medium">Se connecter</button></>
             )}
           </p>
+          <p className="text-center text-[10px] text-muted-foreground/70 mt-2">
+            En vous connectant, vous acceptez notre{' '}
+            <Link to="/politique-confidentialite" className="text-primary/70 hover:underline">politique de confidentialité</Link>.
+          </p>
         </CardContent>
       </Card>
     </div>
