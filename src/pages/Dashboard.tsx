@@ -106,7 +106,7 @@ const SECTION_CONFIG: Record<string, { color: string; bgClass: string; image: st
 };
 
 export default function Dashboard() {
-  const modules = getModules();
+  const [modules] = useModules();
   const { params } = useAuditParams();
   const currentEtab = getSelectedEtablissement(params);
   const enabledModules = modules.filter(m => m.enabled && m.id !== 'parametres');
