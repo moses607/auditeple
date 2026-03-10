@@ -378,7 +378,7 @@ export default function PVAudit() {
                   ))}
                 </div>
               )}
-              <p className="text-xs text-muted-foreground mt-1">Signé par : {p.signataire1 || '—'} / {p.signataire2 || '—'}</p>
+              <p className="text-xs text-muted-foreground mt-1">Signé par : {p.signataire1 || '—'} (AC) / {(p as any).signataire3 || '—'} (SG) / {p.signataire2 || '—'} (Ordo.)</p>
             </CardContent>
           </Card>
         );
