@@ -468,7 +468,7 @@ export default function ParametresPage() {
           <div className="flex gap-2 mb-2">
             <Button size="sm" variant="outline" onClick={() => {
               const updated = modules.map(m => ({ ...m, enabled: true }));
-              setModules(updated); saveModules(updated);
+              updateModules(updated);
               toast.success('Tous les modules activés');
             }}>Tout cocher</Button>
             <Button size="sm" variant="outline" onClick={() => {
