@@ -473,7 +473,7 @@ export default function ParametresPage() {
             }}>Tout cocher</Button>
             <Button size="sm" variant="outline" onClick={() => {
               const updated = modules.map(m => ({ ...m, enabled: false }));
-              setModules(updated); saveModules(updated);
+              updateModules(updated);
               toast.success('Tous les modules désactivés');
             }}>Tout décocher</Button>
           </div>
