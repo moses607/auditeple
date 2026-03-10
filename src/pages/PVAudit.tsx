@@ -281,21 +281,48 @@ export default function PVAudit() {
             
             <Textarea value={form.conclusions} onChange={e => setForm({ ...form, conclusions: e.target.value })} rows={2} placeholder="Conclusions..." />
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Signataire — Agent comptable</Label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire1} onChange={e => setForm({ ...form, signataire1: e.target.value })}>
-                  <option value="">Sélectionner...</option>
-                  {params.agentComptable && <option value={params.agentComptable}>{params.agentComptable} (AC)</option>}
-                  {params.equipe.map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
-                </select>
+            {/* Bloc signatures */}
+            <div className="border-t pt-4 mt-4 space-y-3">
+              <h4 className="text-sm font-bold">Signatures</h4>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-bold">Agent comptable</Label>
+                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire1} onChange={e => setForm({ ...form, signataire1: e.target.value })}>
+                    <option value="">Sélectionner...</option>
+                    {params.agentComptable && <option value={params.agentComptable}>{params.agentComptable}</option>}
+                    {params.equipe.map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-bold">Secrétaire général</Label>
+                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire3 || ''} onChange={e => setForm({ ...form, signataire3: e.target.value })}>
+                    <option value="">Sélectionner...</option>
+                    {params.equipe.filter(m => m.fonction.toLowerCase().includes('secrétaire') || m.fonction.toLowerCase().includes('secretaire') || m.fonction.toLowerCase().includes('SG')).map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom}</option>)}
+                    {params.equipe.map(m => <option key={`all-${m.id}`} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-bold">Ordonnateur</Label>
+                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire2} onChange={e => setForm({ ...form, signataire2: e.target.value })}>
+                    <option value="">Sélectionner...</option>
+                    {params.ordonnateur && <option value={params.ordonnateur}>{params.ordonnateur}</option>}
+                  </select>
+                </div>
               </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Signataire — Ordonnateur</Label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire2} onChange={e => setForm({ ...form, signataire2: e.target.value })}>
-                  <option value="">Sélectionner...</option>
-                  {params.ordonnateur && <option value={params.ordonnateur}>{params.ordonnateur} (Ordonnateur)</option>}
-                </select>
+              {/* Zone de signature imprimable */}
+              <div className="hidden print:grid grid-cols-3 gap-6 pt-8 mt-4 border-t">
+                <div className="text-center space-y-12">
+                  <p className="text-xs font-bold">L'Agent comptable</p>
+                  <p className="text-xs">{form.signataire1 || '____________________'}</p>
+                </div>
+                <div className="text-center space-y-12">
+                  <p className="text-xs font-bold">Le Secrétaire général</p>
+                  <p className="text-xs">{form.signataire3 || '____________________'}</p>
+                </div>
+                <div className="text-center space-y-12">
+                  <p className="text-xs font-bold">L'Ordonnateur</p>
+                  <p className="text-xs">{form.signataire2 || '____________________'}</p>
+                </div>
               </div>
             </div>
 
