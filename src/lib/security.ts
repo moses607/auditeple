@@ -16,7 +16,11 @@ export const signupSchema = z.object({
   displayName: displayNameSchema,
 });
 
-// ─── Rate limiting (client-side) ────────────────────────────────
+// ─── Rate limiting (client-side, UX hint only) ─────────────────
+// NOTE: This is a UX convenience to deter casual repeated submissions.
+// It is NOT a security control — it resets on page refresh and does not
+// protect against programmatic brute-force attacks. Server-side rate
+// limiting (Supabase Auth built-in) is the actual security layer.
 const attempts = new Map<string, { count: number; resetAt: number }>();
 
 export function checkRateLimit(key: string, maxAttempts = 5, windowMs = 60_000): boolean {
