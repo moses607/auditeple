@@ -195,14 +195,29 @@ export default function PVAudit() {
 
       {form && (
         <Card className="border-destructive">
-          {/* Entête agence comptable */}
-          <CardHeader className="bg-muted/50 border-b">
-            <div className="text-center space-y-1">
-              <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Agence comptable</p>
-              <p className="font-bold text-lg">{currentEtab?.nom || 'Établissement'}</p>
+          {/* Entête officielle */}
+          <CardHeader className="border-b p-0">
+            <div className="flex justify-between items-start p-4 bg-muted/30 border-b">
+              <div className="text-xs text-muted-foreground">
+                <p className="font-bold uppercase">Académie {currentEtab?.academie ? `de ${currentEtab.academie}` : ''}</p>
+                <p>Direction des services départementaux</p>
+                <p>de l'Éducation nationale</p>
+              </div>
+              <div className="text-xs text-muted-foreground text-right">
+                <p className="font-bold">RÉPUBLIQUE FRANÇAISE</p>
+                <p>Liberté – Égalité – Fraternité</p>
+              </div>
+            </div>
+            <div className="text-center py-6 space-y-2">
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-[0.2em]">Agence comptable</p>
+              <p className="font-bold text-xl">{currentEtab?.nom || 'Établissement'}</p>
               {currentEtab?.uai && <p className="text-xs text-muted-foreground">UAI : {currentEtab.uai}</p>}
-              {currentEtab?.adresse && <p className="text-xs text-muted-foreground">{currentEtab.adresse} — {currentEtab.codePostal} {currentEtab.ville}</p>}
-              <p className="text-xs text-muted-foreground">Académie : {currentEtab?.academie || '—'}</p>
+              {currentEtab?.adresse && <p className="text-xs text-muted-foreground">{currentEtab.adresse}</p>}
+              {(currentEtab?.codePostal || currentEtab?.ville) && <p className="text-xs text-muted-foreground">{currentEtab.codePostal} {currentEtab.ville}</p>}
+              <div className="pt-4">
+                <p className="text-sm font-bold uppercase tracking-wider text-primary">Procès-Verbal d'Audit</p>
+                <p className="text-xs text-muted-foreground">Exercice {params.exercice || new Date().getFullYear()}</p>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4 pt-4">
