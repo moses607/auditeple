@@ -98,12 +98,8 @@ export function AppSidebar() {
         {SECTIONS.map(section => {
           const sectionModules = modules.filter(m => m.section === section);
           const isStructuralSection = section === 'AUDIT & RESTITUTION';
-          const visibleModules = editMode
-            ? sectionModules
-            : isStructuralSection
-              ? sectionModules // Always show structural modules
-              : sectionModules.filter(m => m.enabled);
-          if (visibleModules.length === 0 && !editMode) return null;
+          const visibleModules = sectionModules;
+          if (visibleModules.length === 0) return null;
           const dotColor = SECTION_DOT_COLORS[section] || 'bg-sidebar-primary';
 
           return (
