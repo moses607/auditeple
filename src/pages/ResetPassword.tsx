@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { Loader2, Lock } from 'lucide-react';
+import { passwordSchema } from '@/lib/security';
 
 export default function ResetPassword() {
   const navigate = useNavigate();
