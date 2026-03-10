@@ -1,5 +1,4 @@
-import { PVAuditItem, PVVerification, fmtDate, getSelectedEtablissement, AuditParams } from '@/lib/types';
-import { Badge } from '@/components/ui/badge';
+import { PVAuditItem, PVVerification, fmtDate, getSelectedEtablissement, getAgenceComptable, AuditParams } from '@/lib/types';
 
 interface PVPrintDocumentProps {
   pv: PVAuditItem;
@@ -9,10 +8,14 @@ interface PVPrintDocumentProps {
 
 export default function PVPrintDocument({ pv, params, moduleLabels }: PVPrintDocumentProps) {
   const currentEtab = getSelectedEtablissement(params);
+  const agenceComptable = getAgenceComptable(params);
   const anomalies = (pv.verifications || []).filter(v => v.status === 'anomalie');
   const conformes = (pv.verifications || []).filter(v => v.status === 'conforme');
   const nonVerifies = (pv.verifications || []).filter(v => v.status === 'non_verifie');
   const modulesAudites = (pv as any).modulesAudites || [];
+
+  // Use agence comptable for header, fallback to current établissement
+  const headerEtab = agenceComptable || currentEtab;
 
   return (
     <div className="pv-print-document hidden print:block" style={{ fontFamily: "'DM Sans', serif", color: '#000', background: '#fff' }}>
@@ -20,24 +23,26 @@ export default function PVPrintDocument({ pv, params, moduleLabels }: PVPrintDoc
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #1a365d', paddingBottom: '12px', marginBottom: '16px' }}>
         <div style={{ fontSize: '9pt', lineHeight: '1.5' }}>
           <p style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-            Académie {currentEtab?.academie ? `de ${currentEtab.academie}` : ''}
+            Agence comptable
           </p>
-          <p>Direction des services départementaux</p>
-          <p>de l'Éducation nationale</p>
-          <div style={{ marginTop: '8px' }}>
-            <p style={{ fontWeight: 700 }}>{currentEtab?.nom || 'Établissement'}</p>
-            {currentEtab?.uai && <p>UAI : {currentEtab.uai}</p>}
-            {currentEtab?.adresse && <p>{currentEtab.adresse}</p>}
-            {(currentEtab?.codePostal || currentEtab?.ville) && <p>{currentEtab.codePostal} {currentEtab.ville}</p>}
-          </div>
+          <p style={{ fontWeight: 700 }}>{headerEtab?.nom || 'Établissement'}</p>
+          {headerEtab?.uai && <p>UAI : {headerEtab.uai}</p>}
+          {headerEtab?.adresse && <p>{headerEtab.adresse}</p>}
+          {(headerEtab?.codePostal || headerEtab?.ville) && <p>{headerEtab.codePostal} {headerEtab.ville}</p>}
+          {headerEtab?.academie && <p style={{ marginTop: '4px' }}>Académie de {headerEtab.academie}</p>}
         </div>
         <div style={{ textAlign: 'right', fontSize: '9pt', lineHeight: '1.5' }}>
           <p style={{ fontWeight: 700, fontSize: '10pt' }}>RÉPUBLIQUE FRANÇAISE</p>
           <p style={{ fontStyle: 'italic' }}>Liberté – Égalité – Fraternité</p>
-          <div style={{ marginTop: '8px' }}>
-            <p style={{ fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.1em', fontSize: '8pt' }}>Agence comptable</p>
-            <p>{currentEtab?.nom || ''}</p>
-          </div>
+          {/* If audited établissement differs from agence comptable, show it */}
+          {agenceComptable && currentEtab && agenceComptable.id !== currentEtab.id && (
+            <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px solid #ccc' }}>
+              <p style={{ fontWeight: 600, fontSize: '8pt', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Établissement audité</p>
+              <p>{currentEtab.nom}</p>
+              {currentEtab.uai && <p>UAI : {currentEtab.uai}</p>}
+              {currentEtab.ville && <p>{currentEtab.codePostal} {currentEtab.ville}</p>}
+            </div>
+          )}
         </div>
       </div>
 
@@ -173,34 +178,42 @@ export default function PVPrintDocument({ pv, params, moduleLabels }: PVPrintDoc
         </div>
       )}
 
-      {/* ═══ PHASE CONTRADICTOIRE ═══ */}
-      {(pv.reponseOrdonnateur || pv.phase === 'contradictoire' || pv.phase === 'définitif') && (
-        <div style={{ marginBottom: '20px', padding: '10px', border: '2px dashed #1a365d', borderRadius: '4px' }}>
-          <h2 style={{ fontSize: '11pt', fontWeight: 700, textTransform: 'uppercase', marginBottom: '8px', fontFamily: "'Space Grotesk', serif" }}>
-            Phase contradictoire — Droit de réponse
-          </h2>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9pt' }}>
-            <tbody>
+      {/* ═══ PHASE CONTRADICTOIRE — TOUJOURS VISIBLE ═══ */}
+      <div style={{ marginBottom: '20px', padding: '12px', border: '2px solid #1a365d', borderRadius: '4px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
+        <h2 style={{ fontSize: '11pt', fontWeight: 700, textTransform: 'uppercase', marginBottom: '10px', fontFamily: "'Space Grotesk', serif", borderBottom: '2px solid #1a365d', paddingBottom: '4px' }}>
+          Phase contradictoire — Droit de réponse de l'ordonnateur
+        </h2>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '9pt' }}>
+          <tbody>
+            <tr>
+              <td style={{ border: '1px solid #999', padding: '5px 8px', fontWeight: 700, width: '30%', background: '#f5f5f5' }}>Phase actuelle</td>
+              <td style={{ border: '1px solid #999', padding: '5px 8px', textTransform: 'capitalize' }}>{pv.phase}</td>
+            </tr>
+            <tr>
+              <td style={{ border: '1px solid #999', padding: '5px 8px', fontWeight: 700, background: '#f5f5f5' }}>Délai de réponse accordé</td>
+              <td style={{ border: '1px solid #999', padding: '5px 8px' }}>{pv.delai}</td>
+            </tr>
+            {pv.dateReponse && (
               <tr>
-                <td style={{ border: '1px solid #999', padding: '5px 8px', fontWeight: 700, width: '30%', background: '#f5f5f5' }}>Phase actuelle</td>
-                <td style={{ border: '1px solid #999', padding: '5px 8px', textTransform: 'capitalize' }}>{pv.phase}</td>
+                <td style={{ border: '1px solid #999', padding: '5px 8px', fontWeight: 700, background: '#f5f5f5' }}>Date de réponse</td>
+                <td style={{ border: '1px solid #999', padding: '5px 8px' }}>{fmtDate(pv.dateReponse)}</td>
               </tr>
-              {pv.dateReponse && (
-                <tr>
-                  <td style={{ border: '1px solid #999', padding: '5px 8px', fontWeight: 700, background: '#f5f5f5' }}>Date de réponse</td>
-                  <td style={{ border: '1px solid #999', padding: '5px 8px' }}>{fmtDate(pv.dateReponse)}</td>
-                </tr>
-              )}
-              {pv.reponseOrdonnateur && (
-                <tr>
-                  <td style={{ border: '1px solid #999', padding: '5px 8px', fontWeight: 700, background: '#f5f5f5', verticalAlign: 'top' }}>Réponse de l'ordonnateur</td>
-                  <td style={{ border: '1px solid #999', padding: '5px 8px', whiteSpace: 'pre-wrap' }}>{pv.reponseOrdonnateur}</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      )}
+            )}
+            <tr>
+              <td style={{ border: '1px solid #999', padding: '5px 8px', fontWeight: 700, background: '#f5f5f5', verticalAlign: 'top' }}>Réponse de l'ordonnateur</td>
+              <td style={{ border: '1px solid #999', padding: '5px 8px', whiteSpace: 'pre-wrap', minHeight: '60px' }}>
+                {pv.reponseOrdonnateur || (
+                  <span style={{ fontStyle: 'italic', color: '#999' }}>
+                    {pv.phase === 'provisoire'
+                      ? 'En attente — L\'ordonnateur dispose d\'un délai de ' + pv.delai + ' pour formuler ses observations.'
+                      : 'Aucune réponse formulée.'}
+                  </span>
+                )}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
 
       {/* ═══ MENTION LÉGALE ═══ */}
       <div style={{ fontSize: '8pt', textAlign: 'center', margin: '20px 0 12px', color: '#666', fontStyle: 'italic' }}>
@@ -214,16 +227,34 @@ export default function PVPrintDocument({ pv, params, moduleLabels }: PVPrintDoc
           Fait à {currentEtab?.ville || '_______________'}, le {fmtDate(pv.date)}
         </p>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+          {/* Agent comptable */}
           <div style={{ textAlign: 'center', width: '30%' }}>
-            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '100px' }}>L'Agent comptable</p>
+            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '8px' }}>L'Agent comptable</p>
+            {(pv as any).signatureAC ? (
+              <img src={(pv as any).signatureAC} alt="Signature AC" style={{ maxWidth: '180px', maxHeight: '80px', margin: '0 auto 8px' }} />
+            ) : (
+              <div style={{ height: '80px' }} />
+            )}
             <p style={{ fontSize: '9pt' }}>{pv.signataire1 || '____________________'}</p>
           </div>
+          {/* Secrétaire général */}
           <div style={{ textAlign: 'center', width: '30%' }}>
-            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '100px' }}>Le Secrétaire général</p>
+            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '8px' }}>Le Secrétaire général</p>
+            {(pv as any).signatureSG ? (
+              <img src={(pv as any).signatureSG} alt="Signature SG" style={{ maxWidth: '180px', maxHeight: '80px', margin: '0 auto 8px' }} />
+            ) : (
+              <div style={{ height: '80px' }} />
+            )}
             <p style={{ fontSize: '9pt' }}>{(pv as any).signataire3 || '____________________'}</p>
           </div>
+          {/* Ordonnateur */}
           <div style={{ textAlign: 'center', width: '30%' }}>
-            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '100px' }}>L'Ordonnateur</p>
+            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '8px' }}>L'Ordonnateur</p>
+            {(pv as any).signatureOrdo ? (
+              <img src={(pv as any).signatureOrdo} alt="Signature Ordonnateur" style={{ maxWidth: '180px', maxHeight: '80px', margin: '0 auto 8px' }} />
+            ) : (
+              <div style={{ height: '80px' }} />
+            )}
             <p style={{ fontSize: '9pt' }}>{pv.signataire2 || '____________________'}</p>
           </div>
         </div>
