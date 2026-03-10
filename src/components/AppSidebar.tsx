@@ -13,7 +13,8 @@ import {
   SidebarGroupContent, SidebarMenu, SidebarMenuItem,
   SidebarMenuButton, SidebarHeader, SidebarFooter, useSidebar,
 } from '@/components/ui/sidebar';
-import { ModuleConfig, getModules, saveModules, SECTIONS } from '@/lib/audit-modules';
+import { ModuleConfig, saveModules, SECTIONS } from '@/lib/audit-modules';
+import { useModules } from '@/hooks/useModules';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
