@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Trash2, Search, Printer } from 'lucide-react';
+import SignaturePad from '@/components/SignaturePad';
 import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate, getSelectedEtablissement } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { useAuditParams } from '@/hooks/useAuditStore';
@@ -224,9 +225,9 @@ export default function PVAudit() {
           <CardHeader className="border-b p-0">
             <div className="flex justify-between items-start p-4 bg-muted/30 border-b">
               <div className="text-xs text-muted-foreground">
-                <p className="font-bold uppercase">Académie {currentEtab?.academie ? `de ${currentEtab.academie}` : ''}</p>
-                <p>Direction des services départementaux</p>
-                <p>de l'Éducation nationale</p>
+                <p className="font-bold uppercase">Agence comptable</p>
+                <p className="font-semibold">{currentEtab?.nom || ''}</p>
+                {currentEtab?.academie && <p>Académie de {currentEtab.academie}</p>}
               </div>
               <div className="text-xs text-muted-foreground text-right">
                 <p className="font-bold">RÉPUBLIQUE FRANÇAISE</p>
@@ -334,6 +335,14 @@ export default function PVAudit() {
                   </select>
                 </div>
               </div>
+
+              {/* Signature électronique */}
+              <div className="grid grid-cols-3 gap-3 mt-3">
+                <SignaturePad label="Signature Agent comptable" value={form.signatureAC || ''} onChange={v => setForm({ ...form, signatureAC: v })} />
+                <SignaturePad label="Signature Secrétaire général" value={form.signatureSG || ''} onChange={v => setForm({ ...form, signatureSG: v })} />
+                <SignaturePad label="Signature Ordonnateur" value={form.signatureOrdo || ''} onChange={v => setForm({ ...form, signatureOrdo: v })} />
+              </div>
+
               {/* Zone de signature imprimable */}
               <div className="hidden print:grid grid-cols-3 gap-6 pt-8 mt-4 border-t">
                 <div className="text-center space-y-12">
