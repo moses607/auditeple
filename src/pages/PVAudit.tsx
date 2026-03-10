@@ -123,9 +123,13 @@ export default function PVAudit() {
 
   const totalAnom = items.reduce((s, p) => s + (p.verifications || []).filter(v => v.status === 'anomalie').length, 0);
 
-  return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    return (
+    <>
+      {/* ═══ DOCUMENT D'IMPRESSION ═══ */}
+      {printingPV && <PVPrintDocument pv={printingPV} params={params} moduleLabels={moduleLabels} />}
+
+      <div className={`max-w-4xl mx-auto space-y-6 ${printingPV ? 'print:hidden' : ''}`}>
+      <div className="flex items-center justify-between no-print">
         <div>
           <h1 className="text-2xl font-bold">Procès-Verbaux d'Audit</h1>
           <p className="text-xs text-muted-foreground mt-1">Réf. : CRC / DGFiP / Rectorat — PV contradictoire — Double signature — Anomalies auto-détectées</p>
