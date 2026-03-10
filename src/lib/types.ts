@@ -18,6 +18,9 @@ export interface Etablissement {
   ville: string;
   academie: string;
   isAgenceComptable?: boolean;
+  ordonnateur?: string;
+  secretaireGeneral?: string;
+  historiqueOrdonnateurs?: { nom: string; dateFin: string; accreditationVerifiee: boolean }[];
 }
 
 // Helper to get the agence comptable from params
