@@ -262,13 +262,31 @@
     font-size: 10pt !important;
   }
 
-  /* Page margins */
+  /* Page margins — hide browser headers/footers */
   @page {
     margin: 1.5cm;
     size: A4;
   }
 
+  /* Title override to prevent URL/title in header */
+  title {
+    display: none;
+  }
+
   /* Avoid breaking inside important sections */
+  .pv-print-document table {
+    page-break-inside: auto !important;
+  }
+
+  .pv-print-document tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .pv-print-document > div {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
   .border, .rounded-lg, .p-3, .p-4 {
     break-inside: avoid;
     page-break-inside: avoid;

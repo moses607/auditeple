@@ -208,22 +208,22 @@ export default function PVPrintDocument({ pv, params, moduleLabels }: PVPrintDoc
         relatif à la gestion budgétaire et comptable publique et de l'instruction codificatrice M9.6.
       </div>
 
-      {/* ═══ SIGNATURES ═══ */}
-      <div style={{ borderTop: '2px solid #1a365d', paddingTop: '16px', marginTop: '16px' }}>
+      {/* ═══ SIGNATURES — toujours sur la même page ═══ */}
+      <div style={{ borderTop: '2px solid #1a365d', paddingTop: '16px', marginTop: '16px', pageBreakInside: 'avoid', breakInside: 'avoid' }}>
         <p style={{ fontSize: '9pt', marginBottom: '8px' }}>
           Fait à {currentEtab?.ville || '_______________'}, le {fmtDate(pv.date)}
         </p>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
           <div style={{ textAlign: 'center', width: '30%' }}>
-            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '60px' }}>L'Agent comptable</p>
+            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '100px' }}>L'Agent comptable</p>
             <p style={{ fontSize: '9pt' }}>{pv.signataire1 || '____________________'}</p>
           </div>
           <div style={{ textAlign: 'center', width: '30%' }}>
-            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '60px' }}>Le Secrétaire général</p>
+            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '100px' }}>Le Secrétaire général</p>
             <p style={{ fontSize: '9pt' }}>{(pv as any).signataire3 || '____________________'}</p>
           </div>
           <div style={{ textAlign: 'center', width: '30%' }}>
-            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '60px' }}>L'Ordonnateur</p>
+            <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '1px solid #000', paddingBottom: '4px', marginBottom: '100px' }}>L'Ordonnateur</p>
             <p style={{ fontSize: '9pt' }}>{pv.signataire2 || '____________________'}</p>
           </div>
         </div>
