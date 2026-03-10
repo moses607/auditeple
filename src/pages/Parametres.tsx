@@ -492,7 +492,7 @@ export default function ParametresPage() {
                       }`}
                       onClick={() => {
                         const updated = modules.map(m => m.id === mod.id ? { ...m, enabled: !m.enabled } : m);
-                        setModules(updated); saveModules(updated);
+                        updateModules(updated);
                       }}
                     >
                       <Checkbox checked={mod.enabled} />
