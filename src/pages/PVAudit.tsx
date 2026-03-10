@@ -225,9 +225,9 @@ export default function PVAudit() {
           <CardHeader className="border-b p-0">
             <div className="flex justify-between items-start p-4 bg-muted/30 border-b">
               <div className="text-xs text-muted-foreground">
-                <p className="font-bold uppercase">Académie {currentEtab?.academie ? `de ${currentEtab.academie}` : ''}</p>
-                <p>Direction des services départementaux</p>
-                <p>de l'Éducation nationale</p>
+                <p className="font-bold uppercase">Agence comptable</p>
+                <p className="font-semibold">{currentEtab?.nom || ''}</p>
+                {currentEtab?.academie && <p>Académie de {currentEtab.academie}</p>}
               </div>
               <div className="text-xs text-muted-foreground text-right">
                 <p className="font-bold">RÉPUBLIQUE FRANÇAISE</p>
