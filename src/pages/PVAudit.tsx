@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,7 @@ import { loadState, saveState } from '@/lib/store';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { getModules } from '@/lib/audit-modules';
 import { collectAllAnomalies, collectAnomaliesFlat, ModuleAnomalies } from '@/lib/anomaly-collector';
+import PVPrintDocument from '@/components/PVPrintDocument';
 
 // Auto-generate recommendations
 function generateRecommandations(verifications: PVVerification[]): string {
