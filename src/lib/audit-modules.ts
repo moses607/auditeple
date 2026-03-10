@@ -74,6 +74,27 @@ export function getModules(): ModuleConfig[] {
 
 export function saveModules(modules: ModuleConfig[]): void {
   saveState('modules_v2', modules);
+  // Notify listeners (sidebar, routes, etc.)
+  window.dispatchEvent(new CustomEvent('modules-changed'));
+}
+
+/** React hook to keep module list in sync across components */
+export function useModules(): [ModuleConfig[], (modules: ModuleConfig[]) => void] {
+  const { useState, useEffect, useCallback } = require('react');
+  const [modules, setModules] = useState<ModuleConfig[]>(() => getModules());
+
+  useEffect(() => {
+    const handler = () => setModules(getModules());
+    window.addEventListener('modules-changed', handler);
+    return () => window.removeEventListener('modules-changed', handler);
+  }, []);
+
+  const updateModules = useCallback((updated: ModuleConfig[]) => {
+    setModules(updated);
+    saveModules(updated);
+  }, []);
+
+  return [modules, updateModules];
 }
 
 export function toggleModule(id: string): ModuleConfig[] {
