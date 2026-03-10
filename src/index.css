@@ -179,7 +179,6 @@
     display: none !important;
   }
 
-  /* Allow print buttons to hide themselves */
   .print-trigger {
     display: none !important;
   }
@@ -205,6 +204,17 @@
     width: 100% !important;
   }
 
+  /* PV Print Document: override * color reset */
+  .pv-print-document {
+    display: block !important;
+  }
+
+  .pv-print-document * {
+    background: inherit !important;
+    color: inherit !important;
+    box-shadow: none !important;
+  }
+
   /* Cards print cleanly */
   .card, [class*="Card"] {
     border: 1px solid #ccc !important;
@@ -216,8 +226,6 @@
 
   /* Ensure text colors are readable */
   * {
-    color: black !important;
-    background: white !important;
     box-shadow: none !important;
   }
 
@@ -264,18 +272,6 @@
   .border, .rounded-lg, .p-3, .p-4 {
     break-inside: avoid;
     page-break-inside: avoid;
-  }
-
-  /* Show URLs for links */
-  a[href]::after {
-    content: " (" attr(href) ")";
-    font-size: 9pt;
-    color: #666 !important;
-  }
-
-  a[href^="#"]::after,
-  a[href^="javascript"]::after {
-    content: "";
   }
 
   /* Textarea / input show as text in print */

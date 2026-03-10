@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,6 +12,7 @@ import { loadState, saveState } from '@/lib/store';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { getModules } from '@/lib/audit-modules';
 import { collectAllAnomalies, collectAnomaliesFlat, ModuleAnomalies } from '@/lib/anomaly-collector';
+import PVPrintDocument from '@/components/PVPrintDocument';
 
 // Auto-generate recommendations
 function generateRecommandations(verifications: PVVerification[]): string {
@@ -37,6 +38,21 @@ export default function PVAudit() {
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
   const [previewAnomalies, setPreviewAnomalies] = useState<ModuleAnomalies[]>([]);
   const [showModuleSelector, setShowModuleSelector] = useState(false);
+  const [printingPV, setPrintingPV] = useState<PVAuditItem | null>(null);
+
+  const moduleLabels = useMemo(() => {
+    const map: Record<string, string> = {};
+    getModules().forEach(m => { map[m.id] = m.label; });
+    return map;
+  }, []);
+
+  const handlePrintPV = useCallback((pv: PVAuditItem) => {
+    setPrintingPV(pv);
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => setPrintingPV(null), 500);
+    }, 100);
+  }, []);
 
   const save = (d: PVAuditItem[]) => { setItems(d); saveState('pv_audit', d); };
 
@@ -107,9 +123,13 @@ export default function PVAudit() {
 
   const totalAnom = items.reduce((s, p) => s + (p.verifications || []).filter(v => v.status === 'anomalie').length, 0);
 
-  return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
+    return (
+    <>
+      {/* ═══ DOCUMENT D'IMPRESSION ═══ */}
+      {printingPV && <PVPrintDocument pv={printingPV} params={params} moduleLabels={moduleLabels} />}
+
+      <div className={`max-w-4xl mx-auto space-y-6 ${printingPV ? 'print:hidden' : ''}`}>
+      <div className="flex items-center justify-between no-print">
         <div>
           <h1 className="text-2xl font-bold">Procès-Verbaux d'Audit</h1>
           <p className="text-xs text-muted-foreground mt-1">Réf. : CRC / DGFiP / Rectorat — PV contradictoire — Double signature — Anomalies auto-détectées</p>
@@ -364,7 +384,7 @@ export default function PVAudit() {
                   <p className="text-xs text-muted-foreground">{fmtDate(p.date)} — {p.lieu} — Délai: {p.delai}</p>
                 </div>
                 <div className="flex gap-1 no-print">
-                  <Button variant="ghost" size="icon" onClick={() => window.print()} title="Imprimer ce PV"><Printer className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => handlePrintPV(p)} title="Imprimer ce PV"><Printer className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="icon" onClick={() => setForm({ ...p })}><span className="text-xs">✎</span></Button>
                   <Button variant="ghost" size="icon" onClick={() => save(items.filter(i => i.id !== p.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                 </div>
@@ -384,5 +404,6 @@ export default function PVAudit() {
         );
       })}
     </div>
+    </>
   );
 }
