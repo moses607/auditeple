@@ -5,6 +5,7 @@ export interface TeamMember {
   fonction: string;
   email: string;
   telephone: string;
+  isAuditeur?: boolean;
 }
 
 export interface Etablissement {
