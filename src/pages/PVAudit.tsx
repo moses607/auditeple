@@ -195,14 +195,29 @@ export default function PVAudit() {
 
       {form && (
         <Card className="border-destructive">
-          {/* Entête agence comptable */}
-          <CardHeader className="bg-muted/50 border-b">
-            <div className="text-center space-y-1">
-              <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Agence comptable</p>
-              <p className="font-bold text-lg">{currentEtab?.nom || 'Établissement'}</p>
+          {/* Entête officielle */}
+          <CardHeader className="border-b p-0">
+            <div className="flex justify-between items-start p-4 bg-muted/30 border-b">
+              <div className="text-xs text-muted-foreground">
+                <p className="font-bold uppercase">Académie {currentEtab?.academie ? `de ${currentEtab.academie}` : ''}</p>
+                <p>Direction des services départementaux</p>
+                <p>de l'Éducation nationale</p>
+              </div>
+              <div className="text-xs text-muted-foreground text-right">
+                <p className="font-bold">RÉPUBLIQUE FRANÇAISE</p>
+                <p>Liberté – Égalité – Fraternité</p>
+              </div>
+            </div>
+            <div className="text-center py-6 space-y-2">
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-[0.2em]">Agence comptable</p>
+              <p className="font-bold text-xl">{currentEtab?.nom || 'Établissement'}</p>
               {currentEtab?.uai && <p className="text-xs text-muted-foreground">UAI : {currentEtab.uai}</p>}
-              {currentEtab?.adresse && <p className="text-xs text-muted-foreground">{currentEtab.adresse} — {currentEtab.codePostal} {currentEtab.ville}</p>}
-              <p className="text-xs text-muted-foreground">Académie : {currentEtab?.academie || '—'}</p>
+              {currentEtab?.adresse && <p className="text-xs text-muted-foreground">{currentEtab.adresse}</p>}
+              {(currentEtab?.codePostal || currentEtab?.ville) && <p className="text-xs text-muted-foreground">{currentEtab.codePostal} {currentEtab.ville}</p>}
+              <div className="pt-4">
+                <p className="text-sm font-bold uppercase tracking-wider text-primary">Procès-Verbal d'Audit</p>
+                <p className="text-xs text-muted-foreground">Exercice {params.exercice || new Date().getFullYear()}</p>
+              </div>
             </div>
           </CardHeader>
           <CardContent className="space-y-4 pt-4">
@@ -266,21 +281,48 @@ export default function PVAudit() {
             
             <Textarea value={form.conclusions} onChange={e => setForm({ ...form, conclusions: e.target.value })} rows={2} placeholder="Conclusions..." />
 
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1">
-                <Label className="text-xs">Signataire — Agent comptable</Label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire1} onChange={e => setForm({ ...form, signataire1: e.target.value })}>
-                  <option value="">Sélectionner...</option>
-                  {params.agentComptable && <option value={params.agentComptable}>{params.agentComptable} (AC)</option>}
-                  {params.equipe.map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
-                </select>
+            {/* Bloc signatures */}
+            <div className="border-t pt-4 mt-4 space-y-3">
+              <h4 className="text-sm font-bold">Signatures</h4>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1">
+                  <Label className="text-xs font-bold">Agent comptable</Label>
+                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire1} onChange={e => setForm({ ...form, signataire1: e.target.value })}>
+                    <option value="">Sélectionner...</option>
+                    {params.agentComptable && <option value={params.agentComptable}>{params.agentComptable}</option>}
+                    {params.equipe.map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-bold">Secrétaire général</Label>
+                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire3 || ''} onChange={e => setForm({ ...form, signataire3: e.target.value })}>
+                    <option value="">Sélectionner...</option>
+                    {params.equipe.filter(m => m.fonction.toLowerCase().includes('secrétaire') || m.fonction.toLowerCase().includes('secretaire') || m.fonction.toLowerCase().includes('SG')).map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom}</option>)}
+                    {params.equipe.map(m => <option key={`all-${m.id}`} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
+                  </select>
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs font-bold">Ordonnateur</Label>
+                  <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire2} onChange={e => setForm({ ...form, signataire2: e.target.value })}>
+                    <option value="">Sélectionner...</option>
+                    {params.ordonnateur && <option value={params.ordonnateur}>{params.ordonnateur}</option>}
+                  </select>
+                </div>
               </div>
-              <div className="space-y-1">
-                <Label className="text-xs">Signataire — Ordonnateur</Label>
-                <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire2} onChange={e => setForm({ ...form, signataire2: e.target.value })}>
-                  <option value="">Sélectionner...</option>
-                  {params.ordonnateur && <option value={params.ordonnateur}>{params.ordonnateur} (Ordonnateur)</option>}
-                </select>
+              {/* Zone de signature imprimable */}
+              <div className="hidden print:grid grid-cols-3 gap-6 pt-8 mt-4 border-t">
+                <div className="text-center space-y-12">
+                  <p className="text-xs font-bold">L'Agent comptable</p>
+                  <p className="text-xs">{form.signataire1 || '____________________'}</p>
+                </div>
+                <div className="text-center space-y-12">
+                  <p className="text-xs font-bold">Le Secrétaire général</p>
+                  <p className="text-xs">{form.signataire3 || '____________________'}</p>
+                </div>
+                <div className="text-center space-y-12">
+                  <p className="text-xs font-bold">L'Ordonnateur</p>
+                  <p className="text-xs">{form.signataire2 || '____________________'}</p>
+                </div>
               </div>
             </div>
 
@@ -336,7 +378,7 @@ export default function PVAudit() {
                   ))}
                 </div>
               )}
-              <p className="text-xs text-muted-foreground mt-1">Signé par : {p.signataire1 || '—'} / {p.signataire2 || '—'}</p>
+              <p className="text-xs text-muted-foreground mt-1">Signé par : {p.signataire1 || '—'} (AC) / {(p as any).signataire3 || '—'} (SG) / {p.signataire2 || '—'} (Ordo.)</p>
             </CardContent>
           </Card>
         );
