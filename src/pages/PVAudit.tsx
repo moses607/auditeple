@@ -384,7 +384,7 @@ export default function PVAudit() {
                   <p className="text-xs text-muted-foreground">{fmtDate(p.date)} — {p.lieu} — Délai: {p.delai}</p>
                 </div>
                 <div className="flex gap-1 no-print">
-                  <Button variant="ghost" size="icon" onClick={() => window.print()} title="Imprimer ce PV"><Printer className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" onClick={() => handlePrintPV(p)} title="Imprimer ce PV"><Printer className="h-4 w-4" /></Button>
                   <Button variant="ghost" size="icon" onClick={() => setForm({ ...p })}><span className="text-xs">✎</span></Button>
                   <Button variant="ghost" size="icon" onClick={() => save(items.filter(i => i.id !== p.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
                 </div>
