@@ -39,7 +39,7 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const location = useLocation();
-  const [modules, setModules] = useState<ModuleConfig[]>(getModules);
+  const [modules, updateModules] = useModules();
   const [editMode, setEditMode] = useState(false);
 
   const toggleModule = (id: string) => {
