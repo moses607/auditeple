@@ -24,6 +24,11 @@ export default function ResetPassword() {
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    const pwResult = passwordSchema.safeParse(password);
+    if (!pwResult.success) {
+      toast({ title: 'Erreur', description: pwResult.error.errors[0].message, variant: 'destructive' });
+      return;
+    }
     setSubmitting(true);
     try {
       const { error } = await supabase.auth.updateUser({ password });

@@ -70,6 +70,10 @@ export function GDPRSettings() {
       // Delete profile (cascade will clean up)
       await supabase.from('profiles').delete().eq('user_id', user.id);
 
+      // Delete auth user via server-side function
+      const { error: fnError } = await supabase.functions.invoke('delete-account');
+      if (fnError) throw fnError;
+
       // Clear all local data
       const keysToRemove: string[] = [];
       for (let i = 0; i < localStorage.length; i++) {

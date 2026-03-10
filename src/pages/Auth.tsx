@@ -86,10 +86,13 @@ export default function Auth() {
         if (error) throw error;
       }
     } catch (err: any) {
-      // Generic error to prevent user enumeration
-      const safeMessage = mode === 'login'
-        ? 'Email ou mot de passe incorrect.'
-        : err.message;
+      // Generic errors for all modes to prevent user enumeration
+      const safeMessage =
+        mode === 'login'
+          ? 'Email ou mot de passe incorrect.'
+          : mode === 'signup'
+          ? 'Impossible de créer le compte. Vérifiez vos informations.'
+          : 'Une erreur est survenue. Vérifiez votre adresse email.';
       toast({ title: 'Erreur', description: safeMessage, variant: 'destructive' });
     } finally {
       setSubmitting(false);
