@@ -44,8 +44,7 @@ export function AppSidebar() {
 
   const toggleModule = (id: string) => {
     const updated = modules.map(m => m.id === id ? { ...m, enabled: !m.enabled } : m);
-    setModules(updated);
-    saveModules(updated);
+    updateModules(updated);
   };
 
   const enabledCount = modules.filter(m => m.enabled).length;
