@@ -171,6 +171,7 @@ export default function ParametresPage() {
             <div className="space-y-2">
               {params.etablissements.map(e => {
                 const isSelected = e.id === params.selectedEtablissementId;
+                const isAC = !!e.isAgenceComptable;
                 return (
                   <div
                     key={e.id}
@@ -194,6 +195,11 @@ export default function ParametresPage() {
                             Actif
                           </Badge>
                         )}
+                        {isAC && (
+                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500 text-amber-700">
+                            Agence comptable
+                          </Badge>
+                        )}
                       </div>
                       <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
                         <span className="font-mono">{e.uai}</span>
@@ -206,14 +212,33 @@ export default function ParametresPage() {
                         {e.academie && <span>Ac. {e.academie}</span>}
                       </div>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="shrink-0 text-destructive hover:text-destructive"
-                      onClick={(ev) => { ev.stopPropagation(); removeEtab(e.id); }}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex gap-1 shrink-0">
+                      <Button
+                        variant={isAC ? 'default' : 'outline'}
+                        size="sm"
+                        className={`text-[10px] h-7 ${isAC ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
+                        onClick={(ev) => {
+                          ev.stopPropagation();
+                          const updated = params.etablissements.map(et => ({
+                            ...et,
+                            isAgenceComptable: et.id === e.id ? !et.isAgenceComptable : false,
+                          }));
+                          update({ etablissements: updated });
+                          toast.success(isAC ? 'Statut agence comptable retiré' : `${e.nom} défini comme agence comptable`);
+                        }}
+                        title={isAC ? 'Retirer le statut agence comptable' : 'Définir comme agence comptable'}
+                      >
+                        {isAC ? '★ AC' : '☆ AC'}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="shrink-0 text-destructive hover:text-destructive"
+                        onClick={(ev) => { ev.stopPropagation(); removeEtab(e.id); }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 );
               })}
