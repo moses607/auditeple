@@ -27,6 +27,7 @@ export default function ParametresPage() {
   const [searching, setSearching] = useState(false);
   const [lookupError, setLookupError] = useState('');
   const [modules, updateModules] = useModules();
+  const [accreditationAlert, setAccreditationAlert] = useState<{ etabId: string; ancienOrdo: string; nouveauOrdo: string } | null>(null);
 
   const current = getSelectedEtablissement(params);
 
