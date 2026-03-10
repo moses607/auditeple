@@ -262,12 +262,12 @@ export default function Dashboard() {
       </div>
 
       {/* Team */}
-      {params.equipe.length > 0 && (
+      {params.equipe.filter(m => m.isAuditeur).length > 0 && (
         <Card className="shadow-card">
-          <CardHeader><CardTitle className="text-lg">Équipe d'audit</CardTitle></CardHeader>
+          <CardHeader><CardTitle className="text-lg">Auditeurs désignés</CardTitle></CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {params.equipe.map(m => (
+              {params.equipe.filter(m => m.isAuditeur).map(m => (
                 <Badge key={m.id} variant="secondary" className="text-xs px-3 py-1.5">
                   {m.prenom} {m.nom} — {m.fonction}
                 </Badge>

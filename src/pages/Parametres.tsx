@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { GDPRSettings } from '@/components/GDPRSettings';
 import { useAuditParams } from '@/hooks/useAuditStore';
-import { TeamMember, Etablissement, getSelectedEtablissement } from '@/lib/types';
+import { TeamMember, Etablissement, getSelectedEtablissement, getAgenceComptable } from '@/lib/types';
 import { lookupUAI } from '@/lib/uai-lookup';
 import { getModules, saveModules, ModuleConfig, SECTIONS } from '@/lib/audit-modules';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,7 +11,12 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2, MapPin, ClipboardList } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2, MapPin, ClipboardList, Users, ShieldAlert, UserCheck } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function ParametresPage() {
@@ -21,6 +26,7 @@ export default function ParametresPage() {
   const [searching, setSearching] = useState(false);
   const [lookupError, setLookupError] = useState('');
   const [modules, setModules] = useState<ModuleConfig[]>(() => getModules());
+  const [accreditationAlert, setAccreditationAlert] = useState<{ etabId: string; ancienOrdo: string; nouveauOrdo: string } | null>(null);
 
   const current = getSelectedEtablissement(params);
 
@@ -30,7 +36,6 @@ export default function ParametresPage() {
       setLookupError('Format UAI invalide. Attendu : 7 chiffres + 1 lettre (ex: 0131234A)');
       return;
     }
-    // Check if already registered
     if (params.etablissements.some(e => e.uai === code)) {
       setLookupError('Cet établissement est déjà enregistré dans le groupement.');
       return;
@@ -81,6 +86,36 @@ export default function ParametresPage() {
     update({ selectedEtablissementId: id });
   };
 
+  const updateEtabField = (id: string, field: keyof Etablissement, value: any) => {
+    const updated = params.etablissements.map(e =>
+      e.id === id ? { ...e, [field]: value } : e
+    );
+    update({ etablissements: updated });
+  };
+
+  const handleOrdonnateurChange = (etabId: string, newOrdo: string) => {
+    const etab = params.etablissements.find(e => e.id === etabId);
+    if (!etab) return;
+    const ancienOrdo = etab.ordonnateur || '';
+
+    if (ancienOrdo && ancienOrdo !== newOrdo && newOrdo.trim()) {
+      // Save old ordonnateur to history
+      const historique = [...(etab.historiqueOrdonnateurs || []), {
+        nom: ancienOrdo,
+        dateFin: new Date().toISOString().split('T')[0],
+        accreditationVerifiee: false,
+      }];
+      const updated = params.etablissements.map(e =>
+        e.id === etabId ? { ...e, ordonnateur: newOrdo, historiqueOrdonnateurs: historique } : e
+      );
+      update({ etablissements: updated });
+      // Show accreditation alert
+      setAccreditationAlert({ etabId, ancienOrdo, nouveauOrdo: newOrdo });
+    } else {
+      updateEtabField(etabId, 'ordonnateur', newOrdo);
+    }
+  };
+
   const addMember = () => {
     if (!newMember.nom || !newMember.prenom) {
       toast.error('Nom et prénom requis');
@@ -93,6 +128,7 @@ export default function ParametresPage() {
       fonction: newMember.fonction || '',
       email: newMember.email || '',
       telephone: newMember.telephone || '',
+      isAuditeur: false,
     };
     update({ equipe: [...params.equipe, member] });
     setNewMember({});
@@ -104,6 +140,15 @@ export default function ParametresPage() {
     toast.success('Membre supprimé');
   };
 
+  const toggleAuditeur = (id: string) => {
+    const updated = params.equipe.map(m =>
+      m.id === id ? { ...m, isAuditeur: !m.isAuditeur } : m
+    );
+    update({ equipe: updated });
+  };
+
+  const auditeurs = params.equipe.filter(m => m.isAuditeur);
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
@@ -112,6 +157,50 @@ export default function ParametresPage() {
           Enregistrez les établissements du groupement comptable puis sélectionnez celui sur lequel travailler.
         </p>
       </div>
+
+      {/* Alerte acccréditation */}
+      <AlertDialog open={!!accreditationAlert} onOpenChange={() => setAccreditationAlert(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <ShieldAlert className="h-5 w-5 text-amber-500" />
+              Changement d'ordonnateur détecté
+            </AlertDialogTitle>
+            <AlertDialogDescription className="space-y-2 text-left">
+              <p>
+                L'ordonnateur <strong>{accreditationAlert?.ancienOrdo}</strong> a été remplacé par <strong>{accreditationAlert?.nouveauOrdo}</strong>.
+              </p>
+              <p className="text-amber-600 font-semibold">
+                ⚠ Vérifiez que le nouvel ordonnateur a bien remis son accréditation auprès de l'agent comptable.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                En cas de changement de chef d'établissement (notamment en septembre), l'ordonnateur doit transmettre
+                une nouvelle accréditation pour habiliter les signatures et mandatements.
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Rappeler plus tard</AlertDialogCancel>
+            <AlertDialogAction onClick={() => {
+              // Mark accreditation as verified
+              const etabId = accreditationAlert?.etabId;
+              if (etabId) {
+                const etab = params.etablissements.find(e => e.id === etabId);
+                if (etab?.historiqueOrdonnateurs) {
+                  const hist = [...etab.historiqueOrdonnateurs];
+                  if (hist.length > 0) hist[hist.length - 1].accreditationVerifiee = true;
+                  updateEtabField(etabId, 'historiqueOrdonnateurs', hist);
+                }
+              }
+              toast.success('Accréditation vérifiée');
+              setAccreditationAlert(null);
+            }}>
+              <UserCheck className="h-4 w-4 mr-2" />
+              Accréditation vérifiée
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Ajout UAI */}
       <Card>
@@ -168,76 +257,97 @@ export default function ParametresPage() {
               Aucun établissement enregistré. Ajoutez-en un ci-dessus avec son code UAI.
             </div>
           ) : (
-            <div className="space-y-2">
+            <div className="space-y-3">
               {params.etablissements.map(e => {
                 const isSelected = e.id === params.selectedEtablissementId;
                 const isAC = !!e.isAgenceComptable;
                 return (
-                  <div
-                    key={e.id}
-                    className={`rounded-lg border-2 p-3 flex items-center gap-3 cursor-pointer transition-all ${
-                      isSelected
-                        ? 'border-primary bg-primary/5 shadow-sm'
-                        : 'border-border hover:border-primary/40 hover:bg-muted/50'
-                    }`}
-                    onClick={() => selectEtab(e.id)}
-                  >
-                    <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
-                      isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
-                    }`}>
-                      <Building2 className="h-4 w-4" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-sm text-foreground truncate">{e.nom}</span>
-                        {isSelected && (
-                          <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0">
-                            Actif
-                          </Badge>
-                        )}
-                        {isAC && (
-                          <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500 text-amber-700">
-                            Agence comptable
-                          </Badge>
-                        )}
+                  <div key={e.id} className={`rounded-lg border-2 p-3 transition-all ${
+                    isSelected
+                      ? 'border-primary bg-primary/5 shadow-sm'
+                      : 'border-border hover:border-primary/40 hover:bg-muted/50'
+                  }`}>
+                    {/* Ligne principale */}
+                    <div className="flex items-center gap-3 cursor-pointer" onClick={() => selectEtab(e.id)}>
+                      <div className={`h-8 w-8 rounded-full flex items-center justify-center shrink-0 ${
+                        isSelected ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+                      }`}>
+                        <Building2 className="h-4 w-4" />
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
-                        <span className="font-mono">{e.uai}</span>
-                        <span>{e.type}</span>
-                        {e.ville && (
-                          <span className="flex items-center gap-0.5">
-                            <MapPin className="h-3 w-3" />{e.ville}
-                          </span>
-                        )}
-                        {e.academie && <span>Ac. {e.academie}</span>}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-sm text-foreground truncate">{e.nom}</span>
+                          {isSelected && (
+                            <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0">Actif</Badge>
+                          )}
+                          {isAC && (
+                            <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-amber-500 text-amber-700">Agence comptable</Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-0.5">
+                          <span className="font-mono">{e.uai}</span>
+                          <span>{e.type}</span>
+                          {e.ville && <span className="flex items-center gap-0.5"><MapPin className="h-3 w-3" />{e.ville}</span>}
+                          {e.academie && <span>Ac. {e.academie}</span>}
+                        </div>
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button
+                          variant={isAC ? 'default' : 'outline'}
+                          size="sm"
+                          className={`text-[10px] h-7 ${isAC ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            const updated = params.etablissements.map(et => ({
+                              ...et,
+                              isAgenceComptable: et.id === e.id ? !et.isAgenceComptable : false,
+                            }));
+                            update({ etablissements: updated });
+                            toast.success(isAC ? 'Statut agence comptable retiré' : `${e.nom} défini comme agence comptable`);
+                          }}
+                          title={isAC ? 'Retirer le statut agence comptable' : 'Définir comme agence comptable'}
+                        >
+                          {isAC ? '★ AC' : '☆ AC'}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="shrink-0 text-destructive hover:text-destructive"
+                          onClick={(ev) => { ev.stopPropagation(); removeEtab(e.id); }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
-                    <div className="flex gap-1 shrink-0">
-                      <Button
-                        variant={isAC ? 'default' : 'outline'}
-                        size="sm"
-                        className={`text-[10px] h-7 ${isAC ? 'bg-amber-500 hover:bg-amber-600 text-white' : ''}`}
-                        onClick={(ev) => {
-                          ev.stopPropagation();
-                          const updated = params.etablissements.map(et => ({
-                            ...et,
-                            isAgenceComptable: et.id === e.id ? !et.isAgenceComptable : false,
-                          }));
-                          update({ etablissements: updated });
-                          toast.success(isAC ? 'Statut agence comptable retiré' : `${e.nom} défini comme agence comptable`);
-                        }}
-                        title={isAC ? 'Retirer le statut agence comptable' : 'Définir comme agence comptable'}
-                      >
-                        {isAC ? '★ AC' : '☆ AC'}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="shrink-0 text-destructive hover:text-destructive"
-                        onClick={(ev) => { ev.stopPropagation(); removeEtab(e.id); }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+
+                    {/* Ordonnateur / Secrétaire Général par établissement */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-3 pt-3 border-t border-border/50">
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Ordonnateur (chef d'établissement)</Label>
+                        <Input
+                          value={e.ordonnateur || ''}
+                          onChange={ev => updateEtabField(e.id, 'ordonnateur', ev.target.value)}
+                          onBlur={ev => {
+                            const newVal = ev.target.value.trim();
+                            const oldVal = params.etablissements.find(et => et.id === e.id)?.ordonnateur || '';
+                            // Check if value actually changed from a non-empty previous value
+                            if (oldVal && oldVal !== newVal && newVal) {
+                              handleOrdonnateurChange(e.id, newVal);
+                            }
+                          }}
+                          placeholder="Nom de l'ordonnateur"
+                          className="h-8 text-sm"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <Label className="text-xs text-muted-foreground">Secrétaire général</Label>
+                        <Input
+                          value={e.secretaireGeneral || ''}
+                          onChange={ev => updateEtabField(e.id, 'secretaireGeneral', ev.target.value)}
+                          placeholder="Nom du secrétaire général"
+                          className="h-8 text-sm"
+                        />
+                      </div>
                     </div>
                   </div>
                 );
@@ -258,10 +368,6 @@ export default function ParametresPage() {
             <Input value={params.agentComptable} onChange={e => update({ agentComptable: e.target.value })} />
           </div>
           <div className="space-y-2">
-            <Label>Ordonnateur</Label>
-            <Input value={params.ordonnateur} onChange={e => update({ ordonnateur: e.target.value })} />
-          </div>
-          <div className="space-y-2">
             <Label>Exercice</Label>
             <Input value={params.exercice} onChange={e => update({ exercice: e.target.value })} />
           </div>
@@ -276,19 +382,41 @@ export default function ParametresPage() {
         </CardContent>
       </Card>
 
-      {/* Équipe */}
+      {/* Équipe de l'agence comptable */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Équipe d'audit</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" />
+            Équipe de l'agence comptable
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Enregistrez les membres permanents de l'équipe, puis cochez ceux qui participent à l'audit en cours.
+          </p>
         </CardHeader>
         <CardContent className="space-y-4">
           {params.equipe.length > 0 && (
             <div className="space-y-2">
               {params.equipe.map(m => (
-                <div key={m.id} className="flex items-center gap-3 p-3 rounded-md bg-muted">
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">{m.prenom} {m.nom}</p>
-                    <p className="text-xs text-muted-foreground">{m.fonction} {m.email && `· ${m.email}`}</p>
+                <div key={m.id} className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                  m.isAuditeur ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
+                }`}>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <Switch
+                      checked={!!m.isAuditeur}
+                      onCheckedChange={() => toggleAuditeur(m.id)}
+                      aria-label="Participe à l'audit"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium">{m.prenom} {m.nom}</p>
+                      {m.isAuditeur && (
+                        <Badge className="bg-primary text-primary-foreground text-[10px] px-1.5 py-0">
+                          Auditeur
+                        </Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-muted-foreground">{m.fonction} {m.email && `· ${m.email}`} {m.telephone && `· ${m.telephone}`}</p>
                   </div>
                   <Button variant="ghost" size="icon" onClick={() => removeMember(m.id)}>
                     <Trash2 className="h-4 w-4 text-destructive" />
@@ -297,7 +425,17 @@ export default function ParametresPage() {
               ))}
             </div>
           )}
+
+          {auditeurs.length > 0 && (
+            <div className="flex items-center gap-2 p-2 rounded-md bg-primary/10 text-sm">
+              <CheckCircle2 className="h-4 w-4 text-primary" />
+              <span className="font-medium">{auditeurs.length} auditeur{auditeurs.length > 1 ? 's' : ''} désigné{auditeurs.length > 1 ? 's' : ''} :</span>
+              <span className="text-muted-foreground">{auditeurs.map(m => `${m.prenom} ${m.nom}`).join(', ')}</span>
+            </div>
+          )}
+
           <Separator />
+          <p className="text-xs font-semibold text-muted-foreground">Ajouter un membre à l'équipe</p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <Input placeholder="Nom" value={newMember.nom || ''} onChange={e => setNewMember(p => ({ ...p, nom: e.target.value }))} />
             <Input placeholder="Prénom" value={newMember.prenom || ''} onChange={e => setNewMember(p => ({ ...p, prenom: e.target.value }))} />
@@ -322,7 +460,7 @@ export default function ParametresPage() {
             </Badge>
           </CardTitle>
           <p className="text-sm text-muted-foreground">
-            Cochez les modules qui feront l'objet de l'audit pour l'établissement sélectionné. Seuls les modules cochés apparaîtront dans le PV d'audit.
+            Cochez les modules qui feront l'objet de l'audit pour l'établissement sélectionné.
           </p>
         </CardHeader>
         <CardContent className="space-y-4">

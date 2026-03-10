@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Plus, Trash2, Search, Printer } from 'lucide-react';
 import SignaturePad from '@/components/SignaturePad';
-import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate, getSelectedEtablissement } from '@/lib/types';
+import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate, getSelectedEtablissement, getAgenceComptable } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { getModules } from '@/lib/audit-modules';
@@ -97,7 +97,8 @@ export default function PVAudit() {
       recommandations: reco,
       conclusions: '',
       signataire1: params.agentComptable || '',
-      signataire2: params.ordonnateur || '',
+      signataire2: currentEtab?.ordonnateur || '',
+      signataire3: currentEtab?.secretaireGeneral || '',
       delai: '30 jours',
       phase: 'provisoire',
       reponseOrdonnateur: '',
@@ -316,14 +317,14 @@ export default function PVAudit() {
                   <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire1} onChange={e => setForm({ ...form, signataire1: e.target.value })}>
                     <option value="">Sélectionner...</option>
                     {params.agentComptable && <option value={params.agentComptable}>{params.agentComptable}</option>}
-                    {params.equipe.map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
+                    {params.equipe.filter(m => m.isAuditeur).map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
                   </select>
                 </div>
                 <div className="space-y-1">
                   <Label className="text-xs font-bold">Secrétaire général</Label>
                   <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire3 || ''} onChange={e => setForm({ ...form, signataire3: e.target.value })}>
                     <option value="">Sélectionner...</option>
-                    {params.equipe.filter(m => m.fonction.toLowerCase().includes('secrétaire') || m.fonction.toLowerCase().includes('secretaire') || m.fonction.toLowerCase().includes('SG')).map(m => <option key={m.id} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom}</option>)}
+                    {currentEtab?.secretaireGeneral && <option value={currentEtab.secretaireGeneral}>{currentEtab.secretaireGeneral}</option>}
                     {params.equipe.map(m => <option key={`all-${m.id}`} value={`${m.prenom} ${m.nom}`}>{m.prenom} {m.nom} — {m.fonction}</option>)}
                   </select>
                 </div>
@@ -331,7 +332,7 @@ export default function PVAudit() {
                   <Label className="text-xs font-bold">Ordonnateur</Label>
                   <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.signataire2} onChange={e => setForm({ ...form, signataire2: e.target.value })}>
                     <option value="">Sélectionner...</option>
-                    {params.ordonnateur && <option value={params.ordonnateur}>{params.ordonnateur}</option>}
+                    {currentEtab?.ordonnateur && <option value={currentEtab.ordonnateur}>{currentEtab.ordonnateur}</option>}
                   </select>
                 </div>
               </div>
