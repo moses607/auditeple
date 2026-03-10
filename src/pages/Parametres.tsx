@@ -3,7 +3,8 @@ import { GDPRSettings } from '@/components/GDPRSettings';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { TeamMember, Etablissement, getSelectedEtablissement, getAgenceComptable } from '@/lib/types';
 import { lookupUAI } from '@/lib/uai-lookup';
-import { getModules, saveModules, ModuleConfig, SECTIONS } from '@/lib/audit-modules';
+import { ModuleConfig, SECTIONS } from '@/lib/audit-modules';
+import { useModules } from '@/hooks/useModules';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -25,7 +26,7 @@ export default function ParametresPage() {
   const [uaiInput, setUaiInput] = useState('');
   const [searching, setSearching] = useState(false);
   const [lookupError, setLookupError] = useState('');
-  const [modules, setModules] = useState<ModuleConfig[]>(() => getModules());
+  const [modules, updateModules] = useModules();
   const [accreditationAlert, setAccreditationAlert] = useState<{ etabId: string; ancienOrdo: string; nouveauOrdo: string } | null>(null);
 
   const current = getSelectedEtablissement(params);
@@ -467,12 +468,12 @@ export default function ParametresPage() {
           <div className="flex gap-2 mb-2">
             <Button size="sm" variant="outline" onClick={() => {
               const updated = modules.map(m => ({ ...m, enabled: true }));
-              setModules(updated); saveModules(updated);
+              updateModules(updated);
               toast.success('Tous les modules activés');
             }}>Tout cocher</Button>
             <Button size="sm" variant="outline" onClick={() => {
               const updated = modules.map(m => ({ ...m, enabled: false }));
-              setModules(updated); saveModules(updated);
+              updateModules(updated);
               toast.success('Tous les modules désactivés');
             }}>Tout décocher</Button>
           </div>
@@ -491,7 +492,7 @@ export default function ParametresPage() {
                       }`}
                       onClick={() => {
                         const updated = modules.map(m => m.id === mod.id ? { ...m, enabled: !m.enabled } : m);
-                        setModules(updated); saveModules(updated);
+                        updateModules(updated);
                       }}
                     >
                       <Checkbox checked={mod.enabled} />

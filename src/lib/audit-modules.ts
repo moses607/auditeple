@@ -74,6 +74,7 @@ export function getModules(): ModuleConfig[] {
 
 export function saveModules(modules: ModuleConfig[]): void {
   saveState('modules_v2', modules);
+  window.dispatchEvent(new CustomEvent('modules-changed'));
 }
 
 export function toggleModule(id: string): ModuleConfig[] {

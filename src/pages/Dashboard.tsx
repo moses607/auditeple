@@ -1,4 +1,5 @@
-import { getModules, SECTIONS } from '@/lib/audit-modules';
+import { SECTIONS } from '@/lib/audit-modules';
+import { useModules } from '@/hooks/useModules';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -105,7 +106,7 @@ const SECTION_CONFIG: Record<string, { color: string; bgClass: string; image: st
 };
 
 export default function Dashboard() {
-  const modules = getModules();
+  const [modules] = useModules();
   const { params } = useAuditParams();
   const currentEtab = getSelectedEtablissement(params);
   const enabledModules = modules.filter(m => m.enabled && m.id !== 'parametres');

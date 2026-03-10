@@ -13,7 +13,8 @@ import {
   SidebarGroupContent, SidebarMenu, SidebarMenuItem,
   SidebarMenuButton, SidebarHeader, SidebarFooter, useSidebar,
 } from '@/components/ui/sidebar';
-import { ModuleConfig, getModules, saveModules, SECTIONS } from '@/lib/audit-modules';
+import { ModuleConfig, saveModules, SECTIONS } from '@/lib/audit-modules';
+import { useModules } from '@/hooks/useModules';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 
@@ -38,13 +39,12 @@ export function AppSidebar() {
   const { state } = useSidebar();
   const collapsed = state === 'collapsed';
   const location = useLocation();
-  const [modules, setModules] = useState<ModuleConfig[]>(getModules);
+  const [modules, updateModules] = useModules();
   const [editMode, setEditMode] = useState(false);
 
   const toggleModule = (id: string) => {
     const updated = modules.map(m => m.id === id ? { ...m, enabled: !m.enabled } : m);
-    setModules(updated);
-    saveModules(updated);
+    updateModules(updated);
   };
 
   const enabledCount = modules.filter(m => m.enabled).length;
@@ -98,7 +98,8 @@ export function AppSidebar() {
         {SECTIONS.map(section => {
           const sectionModules = modules.filter(m => m.section === section);
           const isStructuralSection = section === 'AUDIT & RESTITUTION';
-          const visibleModules = sectionModules;
+          // In edit mode show all, otherwise only enabled + structural
+          const visibleModules = editMode ? sectionModules : sectionModules.filter(m => m.enabled || isStructuralSection);
           if (visibleModules.length === 0) return null;
           const dotColor = SECTION_DOT_COLORS[section] || 'bg-sidebar-primary';
 

@@ -7,6 +7,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { AuditParamsProvider } from "@/contexts/AuditParamsContext";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { ModuleGuard } from "@/components/ModuleGuard";
 
 // Pages
 import Dashboard from "./pages/Dashboard";
@@ -45,6 +46,10 @@ import { CookieConsent } from "./components/CookieConsent";
 
 const queryClient = new QueryClient();
 
+const G = ({ id, children }: { id: string; children: React.ReactNode }) => (
+  <ModuleGuard moduleId={id}>{children}</ModuleGuard>
+);
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -64,29 +69,29 @@ const App = () => (
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
                       <Route path="/controle-caisse" element={<ControleCaisse />} />
-                      <Route path="/stocks" element={<Stocks />} />
-                      <Route path="/rapprochement" element={<RapprochementBancaire />} />
-                      <Route path="/regies" element={<Regies />} />
-                      <Route path="/verification" element={<Verification />} />
-                      <Route path="/ordonnateur" element={<Ordonnateur />} />
-                      <Route path="/droits-constates" element={<DroitsConstates />} />
-                      <Route path="/depenses" element={<Depenses />} />
-                      <Route path="/depenses/liquidation" element={<Depenses />} />
-                      <Route path="/depenses/pieces" element={<Depenses />} />
-                      <Route path="/voyages" element={<Voyages />} />
+                      <Route path="/stocks" element={<G id="stocks"><Stocks /></G>} />
+                      <Route path="/rapprochement" element={<G id="rapprochement"><RapprochementBancaire /></G>} />
+                      <Route path="/regies" element={<G id="regies"><Regies /></G>} />
+                      <Route path="/verification" element={<G id="verification"><Verification /></G>} />
+                      <Route path="/ordonnateur" element={<G id="ordonnateur"><Ordonnateur /></G>} />
+                      <Route path="/droits-constates" element={<G id="droits-constates"><DroitsConstates /></G>} />
+                      <Route path="/depenses" element={<G id="depenses"><Depenses /></G>} />
+                      <Route path="/depenses/liquidation" element={<G id="depenses"><Depenses /></G>} />
+                      <Route path="/depenses/pieces" element={<G id="depenses"><Depenses /></G>} />
+                      <Route path="/voyages" element={<G id="voyages"><Voyages /></G>} />
                       <Route path="/bourses" element={<Bourses />} />
                       <Route path="/fonds-sociaux" element={<FondsSociaux />} />
-                      <Route path="/restauration" element={<Restauration />} />
-                      <Route path="/analyse-financiere" element={<AnalyseFinanciere />} />
-                      <Route path="/fonds-roulement" element={<FondsRoulement />} />
-                      <Route path="/recouvrement" element={<Recouvrement />} />
-                      <Route path="/marches" element={<Marches />} />
-                      <Route path="/subventions" element={<Subventions />} />
-                      <Route path="/budgets-annexes" element={<BudgetsAnnexes />} />
-                      <Route path="/cartographie" element={<CartographieRisques />} />
-                      <Route path="/organigramme" element={<OrganigrammePage />} />
-                      <Route path="/plan-action" element={<PlanAction />} />
-                      <Route path="/plan-controle" element={<PlanControle />} />
+                      <Route path="/restauration" element={<G id="restauration"><Restauration /></G>} />
+                      <Route path="/analyse-financiere" element={<G id="analyse-financiere"><AnalyseFinanciere /></G>} />
+                      <Route path="/fonds-roulement" element={<G id="fonds-roulement"><FondsRoulement /></G>} />
+                      <Route path="/recouvrement" element={<G id="recouvrement"><Recouvrement /></G>} />
+                      <Route path="/marches" element={<G id="marches"><Marches /></G>} />
+                      <Route path="/subventions" element={<G id="subventions"><Subventions /></G>} />
+                      <Route path="/budgets-annexes" element={<G id="budgets-annexes"><BudgetsAnnexes /></G>} />
+                      <Route path="/cartographie" element={<G id="cartographie"><CartographieRisques /></G>} />
+                      <Route path="/organigramme" element={<G id="organigramme"><OrganigrammePage /></G>} />
+                      <Route path="/plan-action" element={<G id="plan-action"><PlanAction /></G>} />
+                      <Route path="/plan-controle" element={<G id="plan-controle"><PlanControle /></G>} />
                       <Route path="/pv-audit" element={<PVAudit />} />
                       <Route path="/annexe-comptable" element={<AnnexeComptable />} />
                       <Route path="/piste-audit" element={<PisteAudit />} />
