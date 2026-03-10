@@ -48,9 +48,14 @@ export default function PVAudit() {
 
   const handlePrintPV = useCallback((pv: PVAuditItem) => {
     setPrintingPV(pv);
+    const originalTitle = document.title;
+    document.title = `PV Audit — ${pv.type} — ${fmtDate(pv.date)}`;
     setTimeout(() => {
       window.print();
-      setTimeout(() => setPrintingPV(null), 500);
+      setTimeout(() => {
+        setPrintingPV(null);
+        document.title = originalTitle;
+      }, 500);
     }, 100);
   }, []);
 
