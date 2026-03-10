@@ -38,6 +38,21 @@ export default function PVAudit() {
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
   const [previewAnomalies, setPreviewAnomalies] = useState<ModuleAnomalies[]>([]);
   const [showModuleSelector, setShowModuleSelector] = useState(false);
+  const [printingPV, setPrintingPV] = useState<PVAuditItem | null>(null);
+
+  const moduleLabels = useMemo(() => {
+    const map: Record<string, string> = {};
+    getModules().forEach(m => { map[m.id] = m.label; });
+    return map;
+  }, []);
+
+  const handlePrintPV = useCallback((pv: PVAuditItem) => {
+    setPrintingPV(pv);
+    setTimeout(() => {
+      window.print();
+      setTimeout(() => setPrintingPV(null), 500);
+    }, 100);
+  }, []);
 
   const save = (d: PVAuditItem[]) => { setItems(d); saveState('pv_audit', d); };
 
