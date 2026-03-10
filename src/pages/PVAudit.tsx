@@ -334,6 +334,14 @@ export default function PVAudit() {
                   </select>
                 </div>
               </div>
+
+              {/* Signature électronique */}
+              <div className="grid grid-cols-3 gap-3 mt-3">
+                <SignaturePad label="Signature Agent comptable" value={form.signatureAC || ''} onChange={v => setForm({ ...form, signatureAC: v })} />
+                <SignaturePad label="Signature Secrétaire général" value={form.signatureSG || ''} onChange={v => setForm({ ...form, signatureSG: v })} />
+                <SignaturePad label="Signature Ordonnateur" value={form.signatureOrdo || ''} onChange={v => setForm({ ...form, signatureOrdo: v })} />
+              </div>
+
               {/* Zone de signature imprimable */}
               <div className="hidden print:grid grid-cols-3 gap-6 pt-8 mt-4 border-t">
                 <div className="text-center space-y-12">
