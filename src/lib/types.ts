@@ -16,6 +16,12 @@ export interface Etablissement {
   codePostal: string;
   ville: string;
   academie: string;
+  isAgenceComptable?: boolean;
+}
+
+// Helper to get the agence comptable from params
+export function getAgenceComptable(params: AuditParams): Etablissement | undefined {
+  return params.etablissements.find(e => e.isAgenceComptable);
 }
 
 export interface AuditParams {
