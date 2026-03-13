@@ -170,7 +170,7 @@ export default function Dashboard() {
           <div className="flex flex-wrap gap-3 mt-5">
             <div className="glass rounded-lg px-4 py-2 text-sm">
               <span className="text-primary-foreground/60">Modules actifs</span>
-              <span className="text-primary-foreground font-bold ml-2">{enabledModules.length}</span>
+              <span className="text-primary-foreground font-bold ml-2">{enabledOnly.length}</span>
             </div>
             <div className="glass rounded-lg px-4 py-2 text-sm">
               <span className="text-primary-foreground/60">Risques identifiés</span>
