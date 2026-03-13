@@ -79,8 +79,8 @@ const App = () => (
                       <Route path="/depenses/liquidation" element={<G id="depenses"><Depenses /></G>} />
                       <Route path="/depenses/pieces" element={<G id="depenses"><Depenses /></G>} />
                       <Route path="/voyages" element={<G id="voyages"><Voyages /></G>} />
-                      <Route path="/bourses" element={<Bourses />} />
-                      <Route path="/fonds-sociaux" element={<FondsSociaux />} />
+                      <Route path="/bourses" element={<G id="droits-constates"><Bourses /></G>} />
+                      <Route path="/fonds-sociaux" element={<G id="droits-constates"><FondsSociaux /></G>} />
                       <Route path="/restauration" element={<G id="restauration"><Restauration /></G>} />
                       <Route path="/analyse-financiere" element={<G id="analyse-financiere"><AnalyseFinanciere /></G>} />
                       <Route path="/fonds-roulement" element={<G id="fonds-roulement"><FondsRoulement /></G>} />
