@@ -224,28 +224,46 @@ export default function PVAudit() {
         <Card className="border-destructive">
           {/* Entête officielle */}
           <CardHeader className="border-b p-0">
-            <div className="flex justify-between items-start p-4 bg-muted/30 border-b">
-              <div className="text-xs text-muted-foreground">
-                <p className="font-bold uppercase">Agence comptable</p>
-                <p className="font-semibold">{currentEtab?.nom || ''}</p>
-                {currentEtab?.academie && <p>Académie de {currentEtab.academie}</p>}
-              </div>
-              <div className="text-xs text-muted-foreground text-right">
-                <p className="font-bold">RÉPUBLIQUE FRANÇAISE</p>
-                <p>Liberté – Égalité – Fraternité</p>
-              </div>
-            </div>
-            <div className="text-center py-6 space-y-2">
-              <p className="text-xs text-muted-foreground font-bold uppercase tracking-[0.2em]">Agence comptable</p>
-              <p className="font-bold text-xl">{currentEtab?.nom || 'Établissement'}</p>
-              {currentEtab?.uai && <p className="text-xs text-muted-foreground">UAI : {currentEtab.uai}</p>}
-              {currentEtab?.adresse && <p className="text-xs text-muted-foreground">{currentEtab.adresse}</p>}
-              {(currentEtab?.codePostal || currentEtab?.ville) && <p className="text-xs text-muted-foreground">{currentEtab.codePostal} {currentEtab.ville}</p>}
-              <div className="pt-4">
-                <p className="text-sm font-bold uppercase tracking-wider text-primary">Procès-Verbal d'Audit</p>
-                <p className="text-xs text-muted-foreground">Exercice {params.exercice || new Date().getFullYear()}</p>
-              </div>
-            </div>
+            {(() => {
+              const ac = getAgenceComptable(params);
+              const headerEtab = ac || currentEtab;
+              return (
+                <>
+                  <div className="flex justify-between items-start p-4 bg-muted/30 border-b">
+                    <div className="text-xs text-muted-foreground">
+                      <p className="font-bold uppercase">Agence comptable</p>
+                      <p className="font-semibold">{headerEtab?.nom || ''}</p>
+                      {headerEtab?.academie && <p>Académie de {headerEtab.academie}</p>}
+                    </div>
+                    <div className="text-xs text-muted-foreground text-right">
+                      <p className="font-bold">RÉPUBLIQUE FRANÇAISE</p>
+                      <p>Liberté – Égalité – Fraternité</p>
+                      {ac && currentEtab && ac.id !== currentEtab.id && (
+                        <div className="mt-2 pt-1 border-t border-border">
+                          <p className="font-semibold uppercase text-[10px]">Établissement audité</p>
+                          <p>{currentEtab.nom}</p>
+                          {currentEtab.uai && <p>UAI : {currentEtab.uai}</p>}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="text-center py-6 space-y-2">
+                    <p className="text-xs text-muted-foreground font-bold uppercase tracking-[0.2em]">Agence comptable</p>
+                    <p className="font-bold text-xl">{headerEtab?.nom || 'Établissement'}</p>
+                    {headerEtab?.uai && <p className="text-xs text-muted-foreground">UAI : {headerEtab.uai}</p>}
+                    {headerEtab?.adresse && <p className="text-xs text-muted-foreground">{headerEtab.adresse}</p>}
+                    {(headerEtab?.codePostal || headerEtab?.ville) && <p className="text-xs text-muted-foreground">{headerEtab.codePostal} {headerEtab.ville}</p>}
+                    {ac && currentEtab && ac.id !== currentEtab.id && (
+                      <p className="text-xs text-muted-foreground italic">Audit de : {currentEtab.nom} ({currentEtab.uai})</p>
+                    )}
+                    <div className="pt-4">
+                      <p className="text-sm font-bold uppercase tracking-wider text-primary">Procès-Verbal d'Audit</p>
+                      <p className="text-xs text-muted-foreground">Exercice {params.exercice || new Date().getFullYear()}</p>
+                    </div>
+                  </div>
+                </>
+              );
+            })()}
           </CardHeader>
           <CardContent className="space-y-4 pt-4">
             {/* Modules audités */}
