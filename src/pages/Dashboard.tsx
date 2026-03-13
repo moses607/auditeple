@@ -112,9 +112,8 @@ export default function Dashboard() {
   const currentEtab = getSelectedEtablissement(params);
   const allNonParam = modules.filter(m => m.id !== 'parametres');
   const enabledOnly = allNonParam.filter(m => m.enabled);
-  // If none selected, show all modules (full view)
-  const isFiltered = enabledOnly.length > 0 && enabledOnly.length < allNonParam.length;
-  const displayModules = isFiltered ? enabledOnly : allNonParam;
+  // Always display all modules; the "enabled" flag is audit scope only (visual indicator)
+  const displayModules = allNonParam;
 
   const handleReset = () => {
     updateModules(modules.map(m => ({ ...m, enabled: true })));
