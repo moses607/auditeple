@@ -229,7 +229,7 @@ export default function PVPrintDocument({ pv, params, moduleLabels }: PVPrintDoc
             { title: "L'Ordonnateur", sig: (pv as any).signatureOrdo, name: pv.signataire2 },
           ].map((s, i) => (
             <div key={i} style={{ textAlign: 'center', width: '30%' }}>
-              <p style={{ fontSize: '9pt', fontWeight: 700, borderBottom: '2px solid #1a365d', paddingBottom: '6px', marginBottom: '10px', color: '#1a365d', textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '0.05em' }}>
+              <p style={{ fontWeight: 700, borderBottom: '2px solid #1a365d', paddingBottom: '6px', marginBottom: '10px', color: '#1a365d', textTransform: 'uppercase', fontSize: '8pt', letterSpacing: '0.05em' }}>
                 {s.title}
               </p>
               {s.sig ? (
