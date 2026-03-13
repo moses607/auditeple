@@ -68,7 +68,7 @@ const App = () => (
                   <AppLayout>
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
-                      <Route path="/controle-caisse" element={<ControleCaisse />} />
+                      <Route path="/controle-caisse" element={<G id="regies"><ControleCaisse /></G>} />
                       <Route path="/stocks" element={<G id="stocks"><Stocks /></G>} />
                       <Route path="/rapprochement" element={<G id="rapprochement"><RapprochementBancaire /></G>} />
                       <Route path="/regies" element={<G id="regies"><Regies /></G>} />
