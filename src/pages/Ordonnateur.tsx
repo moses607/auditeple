@@ -69,7 +69,7 @@ const DEFAULT_DELEGATION: DelegationData = {
 };
 
 export default function OrdonnateurPage() {
-  const { params } = useAuditParams();
+  const { params } = useAuditParamsContext();
   const etab = getSelectedEtablissement(params);
 
   const [checks, setChecks] = useState<Record<string, boolean>>(() => loadState('ordonnateur_checks', {}));
