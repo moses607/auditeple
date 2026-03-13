@@ -228,16 +228,10 @@ export default function Dashboard() {
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">Modules d'audit</h2>
-          {isFiltered && (
-            <Button variant="outline" size="sm" onClick={handleReset} className="gap-2">
-              <RotateCcw className="h-4 w-4" />
-              Réinitialiser les filtres
-            </Button>
-          )}
         </div>
-        {isFiltered && (
+        {enabledOnly.length < allNonParam.length && (
           <p className="text-sm text-muted-foreground">
-            Affichage filtré : {enabledOnly.length} module{enabledOnly.length > 1 ? 's' : ''} sur {allNonParam.length}
+            Périmètre d'audit : {enabledOnly.length} module{enabledOnly.length > 1 ? 's' : ''} sélectionné{enabledOnly.length > 1 ? 's' : ''} sur {allNonParam.length}
           </p>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
