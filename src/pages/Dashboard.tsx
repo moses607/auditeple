@@ -256,7 +256,7 @@ export default function Dashboard() {
                         <NavLink
                           key={mod.id}
                           to={mod.path}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition-colors group/item"
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition-colors group/item ${!mod.enabled ? 'opacity-50' : ''}`}
                           activeClassName="bg-primary/10"
                         >
                           {modImage ? (
