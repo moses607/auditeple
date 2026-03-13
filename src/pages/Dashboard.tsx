@@ -11,8 +11,9 @@ import {
   Plane, FileText, Calculator, BookOpen, TrendingUp, ArrowRight,
   Landmark, Package, Scale, GraduationCap, Heart, UtensilsCrossed,
   AlertTriangle, Target, Building, Building2, Map, GitFork, ListChecks,
-  Calendar, ClipboardList, BarChart3, Shield, ChevronRight,
+  Calendar, ClipboardList, BarChart3, Shield, ChevronRight, RotateCcw,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 import heroImg from '@/assets/hero-audit.png';
