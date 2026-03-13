@@ -107,10 +107,18 @@ const SECTION_CONFIG: Record<string, { color: string; bgClass: string; image: st
 };
 
 export default function Dashboard() {
-  const [modules] = useModules();
+  const [modules, updateModules] = useModules();
   const { params } = useAuditParams();
   const currentEtab = getSelectedEtablissement(params);
-  const enabledModules = modules.filter(m => m.enabled && m.id !== 'parametres');
+  const allNonParam = modules.filter(m => m.id !== 'parametres');
+  const enabledOnly = allNonParam.filter(m => m.enabled);
+  // If none selected, show all modules (full view)
+  const isFiltered = enabledOnly.length > 0 && enabledOnly.length < allNonParam.length;
+  const displayModules = isFiltered ? enabledOnly : allNonParam;
+
+  const handleReset = () => {
+    updateModules(modules.map(m => ({ ...m, enabled: true })));
+  };
   const risques: CartoRisque[] = loadState('cartographie', []);
 
   const riskDistrib = risques.reduce((acc, r) => {
