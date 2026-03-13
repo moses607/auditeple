@@ -37,7 +37,7 @@ import PVAudit from "./pages/PVAudit";
 import PisteAudit from "./pages/PisteAudit";
 import Bourses from "./pages/Bourses";
 import FondsSociaux from "./pages/FondsSociaux";
-import CommandePublique from "./pages/CommandePublique";
+
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import PolitiqueConfidentialite from "./pages/PolitiqueConfidentialite";
@@ -68,7 +68,7 @@ const App = () => (
                   <AppLayout>
                     <Routes>
                       <Route path="/" element={<Dashboard />} />
-                      <Route path="/controle-caisse" element={<ControleCaisse />} />
+                      <Route path="/controle-caisse" element={<G id="regies"><ControleCaisse /></G>} />
                       <Route path="/stocks" element={<G id="stocks"><Stocks /></G>} />
                       <Route path="/rapprochement" element={<G id="rapprochement"><RapprochementBancaire /></G>} />
                       <Route path="/regies" element={<G id="regies"><Regies /></G>} />
@@ -79,8 +79,8 @@ const App = () => (
                       <Route path="/depenses/liquidation" element={<G id="depenses"><Depenses /></G>} />
                       <Route path="/depenses/pieces" element={<G id="depenses"><Depenses /></G>} />
                       <Route path="/voyages" element={<G id="voyages"><Voyages /></G>} />
-                      <Route path="/bourses" element={<Bourses />} />
-                      <Route path="/fonds-sociaux" element={<FondsSociaux />} />
+                      <Route path="/bourses" element={<G id="droits-constates"><Bourses /></G>} />
+                      <Route path="/fonds-sociaux" element={<G id="droits-constates"><FondsSociaux /></G>} />
                       <Route path="/restauration" element={<G id="restauration"><Restauration /></G>} />
                       <Route path="/analyse-financiere" element={<G id="analyse-financiere"><AnalyseFinanciere /></G>} />
                       <Route path="/fonds-roulement" element={<G id="fonds-roulement"><FondsRoulement /></G>} />
