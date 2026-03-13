@@ -11,8 +11,9 @@ import {
   Plane, FileText, Calculator, BookOpen, TrendingUp, ArrowRight,
   Landmark, Package, Scale, GraduationCap, Heart, UtensilsCrossed,
   AlertTriangle, Target, Building, Building2, Map, GitFork, ListChecks,
-  Calendar, ClipboardList, BarChart3, Shield, ChevronRight,
+  Calendar, ClipboardList, BarChart3, Shield, ChevronRight, RotateCcw,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 import heroImg from '@/assets/hero-audit.png';
@@ -106,10 +107,18 @@ const SECTION_CONFIG: Record<string, { color: string; bgClass: string; image: st
 };
 
 export default function Dashboard() {
-  const [modules] = useModules();
+  const [modules, updateModules] = useModules();
   const { params } = useAuditParams();
   const currentEtab = getSelectedEtablissement(params);
-  const enabledModules = modules.filter(m => m.enabled && m.id !== 'parametres');
+  const allNonParam = modules.filter(m => m.id !== 'parametres');
+  const enabledOnly = allNonParam.filter(m => m.enabled);
+  // If none selected, show all modules (full view)
+  const isFiltered = enabledOnly.length > 0 && enabledOnly.length < allNonParam.length;
+  const displayModules = isFiltered ? enabledOnly : allNonParam;
+
+  const handleReset = () => {
+    updateModules(modules.map(m => ({ ...m, enabled: true })));
+  };
   const risques: CartoRisque[] = loadState('cartographie', []);
 
   const riskDistrib = risques.reduce((acc, r) => {
@@ -161,7 +170,7 @@ export default function Dashboard() {
           <div className="flex flex-wrap gap-3 mt-5">
             <div className="glass rounded-lg px-4 py-2 text-sm">
               <span className="text-primary-foreground/60">Modules actifs</span>
-              <span className="text-primary-foreground font-bold ml-2">{enabledModules.length}</span>
+              <span className="text-primary-foreground font-bold ml-2">{enabledOnly.length}</span>
             </div>
             <div className="glass rounded-lg px-4 py-2 text-sm">
               <span className="text-primary-foreground/60">Risques identifiés</span>
@@ -218,10 +227,23 @@ export default function Dashboard() {
 
       {/* Section Cards with images */}
       <div className="space-y-5">
-        <h2 className="text-xl font-bold text-foreground">Modules d'audit</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold text-foreground">Modules d'audit</h2>
+          {isFiltered && (
+            <Button variant="outline" size="sm" onClick={handleReset} className="gap-2">
+              <RotateCcw className="h-4 w-4" />
+              Réinitialiser les filtres
+            </Button>
+          )}
+        </div>
+        {isFiltered && (
+          <p className="text-sm text-muted-foreground">
+            Affichage filtré : {enabledOnly.length} module{enabledOnly.length > 1 ? 's' : ''} sur {allNonParam.length}
+          </p>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {SECTIONS.map(section => {
-            const sectionModules = enabledModules.filter(m => m.section === section);
+            const sectionModules = displayModules.filter(m => m.section === section);
             if (sectionModules.length === 0) return null;
             const config = SECTION_CONFIG[section];
 
