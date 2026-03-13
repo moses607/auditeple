@@ -230,7 +230,7 @@ export default function Dashboard() {
         <h2 className="text-xl font-bold text-foreground">Modules d'audit</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           {SECTIONS.map(section => {
-            const sectionModules = enabledModules.filter(m => m.section === section);
+            const sectionModules = displayModules.filter(m => m.section === section);
             if (sectionModules.length === 0) return null;
             const config = SECTION_CONFIG[section];
 
