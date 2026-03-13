@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   Settings, ClipboardCheck, UserCheck, Receipt, CreditCard,
-  Plane, FileText, Calculator, BookOpen, TrendingUp, CheckSquare, Square,
+  Plane, FileText, Calculator, BookOpen, TrendingUp,
   Landmark, Package, Scale, GraduationCap, Heart, UtensilsCrossed,
   AlertTriangle, Target, Building, Building2, Map, GitFork, ListChecks,
-  Calendar, ClipboardList, BarChart3, Shield,
+  Calendar, ClipboardList, BarChart3, Shield, Pencil, Check,
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
@@ -13,10 +13,11 @@ import {
   SidebarGroupContent, SidebarMenu, SidebarMenuItem,
   SidebarMenuButton, SidebarHeader, SidebarFooter, useSidebar,
 } from '@/components/ui/sidebar';
-import { ModuleConfig, saveModules, SECTIONS } from '@/lib/audit-modules';
+import { SECTIONS } from '@/lib/audit-modules';
 import { useModules } from '@/hooks/useModules';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const ICON_MAP: Record<string, React.ElementType> = {
   Settings, ClipboardCheck, UserCheck, Receipt, CreditCard,
@@ -94,13 +95,10 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Module sections */}
+        {/* Module sections — always navigable */}
         {SECTIONS.map(section => {
           const sectionModules = modules.filter(m => m.section === section);
-          const isStructuralSection = section === 'AUDIT & RESTITUTION';
-          // In edit mode show all, otherwise only enabled + structural
-          const visibleModules = editMode ? sectionModules : sectionModules.filter(m => m.enabled || isStructuralSection);
-          if (visibleModules.length === 0) return null;
+          if (sectionModules.length === 0) return null;
           const dotColor = SECTION_DOT_COLORS[section] || 'bg-sidebar-primary';
 
           return (
@@ -115,29 +113,36 @@ export function AppSidebar() {
               </SidebarGroupLabel>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {visibleModules.map((mod) => {
+                  {sectionModules.map((mod) => {
                     const Icon = ICON_MAP[mod.icon] || FileText;
                     const isActive = location.pathname === mod.path ||
                       location.pathname.startsWith(mod.path + '/');
 
                     return (
                       <SidebarMenuItem key={mod.id}>
-                        <SidebarMenuButton
-                          asChild={!editMode}
-                          isActive={isActive && !editMode}
-                          className={cn(!mod.enabled && 'opacity-50')}
-                          onClick={editMode ? () => toggleModule(mod.id) : undefined}
-                        >
-                          {editMode ? (
-                            <div className="flex items-center gap-2 w-full cursor-pointer">
-                              {mod.enabled ? (
-                                <CheckSquare className="h-4 w-4 text-sidebar-primary" />
-                              ) : (
-                                <Square className="h-4 w-4" />
-                              )}
-                              {!collapsed && <span className="text-sm">{mod.label}</span>}
+                        <div className="flex items-center w-full">
+                          {/* Checkbox for audit selection — only in edit mode */}
+                          {editMode && !collapsed && (
+                            <div
+                              className="flex items-center pl-2 pr-0 shrink-0"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <Checkbox
+                                checked={mod.enabled}
+                                onCheckedChange={() => toggleModule(mod.id)}
+                                className="h-3.5 w-3.5"
+                              />
                             </div>
-                          ) : (
+                          )}
+                          {/* Navigation link — always clickable */}
+                          <SidebarMenuButton
+                            asChild
+                            isActive={isActive}
+                            className={cn(
+                              'flex-1',
+                              editMode && !mod.enabled && 'opacity-50',
+                            )}
+                          >
                             <NavLink
                               to={mod.path}
                               className="flex items-center gap-2"
@@ -145,9 +150,12 @@ export function AppSidebar() {
                             >
                               <Icon className="h-4 w-4" />
                               {!collapsed && <span>{mod.label}</span>}
+                              {!editMode && mod.enabled && (
+                                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary/60 shrink-0" />
+                              )}
                             </NavLink>
-                          )}
-                        </SidebarMenuButton>
+                          </SidebarMenuButton>
+                        </div>
                       </SidebarMenuItem>
                     );
                   })}
@@ -166,9 +174,24 @@ export function AppSidebar() {
             </Badge>
             <button
               onClick={() => setEditMode(!editMode)}
-              className="text-xs text-sidebar-primary hover:underline transition-colors"
+              className={cn(
+                "flex items-center gap-1 text-xs transition-colors",
+                editMode
+                  ? "text-primary font-medium"
+                  : "text-sidebar-primary hover:underline"
+              )}
             >
-              {editMode ? 'Terminé' : 'Sélectionner'}
+              {editMode ? (
+                <>
+                  <Check className="h-3 w-3" />
+                  Terminé
+                </>
+              ) : (
+                <>
+                  <Pencil className="h-3 w-3" />
+                  Périmètre audit
+                </>
+              )}
             </button>
           </div>
         )}
