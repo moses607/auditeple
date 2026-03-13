@@ -4,16 +4,16 @@ import { useAuditParams } from '@/hooks/useAuditStore';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { NavLink } from '@/components/NavLink';
-import { CartoRisque, getSelectedEtablissement } from '@/lib/types';
+import { CartoRisque, getSelectedEtablissement, getAgenceComptable } from '@/lib/types';
 import { loadState } from '@/lib/store';
 import {
   Settings, ClipboardCheck, UserCheck, Receipt, CreditCard,
-  Plane, FileText, Calculator, BookOpen, TrendingUp, ArrowRight,
+  Plane, FileText, Calculator, BookOpen, TrendingUp,
   Landmark, Package, Scale, GraduationCap, Heart, UtensilsCrossed,
   AlertTriangle, Target, Building, Building2, Map, GitFork, ListChecks,
-  Calendar, ClipboardList, BarChart3, Shield, ChevronRight, RotateCcw,
+  Calendar, ClipboardList, BarChart3, Shield, ChevronRight,
+  Users, Activity, ShieldCheck, TrendingDown,
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 import heroImg from '@/assets/hero-audit.png';
@@ -73,51 +73,76 @@ const MODULE_IMAGES: Record<string, string> = {
 
 const RISK_COLORS = ['hsl(0, 72%, 51%)', 'hsl(25, 95%, 53%)', 'hsl(45, 93%, 47%)', 'hsl(142, 71%, 45%)'];
 
-const SECTION_CONFIG: Record<string, { color: string; bgClass: string; image: string }> = {
+const SECTION_CONFIG: Record<string, { color: string; bgClass: string; image: string; borderColor: string }> = {
   'CONTRÔLES SUR PLACE': {
     color: 'text-section-controles',
-    bgClass: 'from-[hsl(210,85%,50%)] to-[hsl(210,85%,65%)]',
+    bgClass: 'from-[hsl(210,85%,50%)] to-[hsl(210,85%,62%)]',
+    borderColor: 'border-l-[hsl(210,85%,50%)]',
     image: sectionControles,
   },
   'VÉRIFICATION & ORDONNATEUR': {
     color: 'text-section-verification',
-    bgClass: 'from-[hsl(152,60%,40%)] to-[hsl(152,60%,55%)]',
+    bgClass: 'from-[hsl(152,60%,40%)] to-[hsl(152,60%,52%)]',
+    borderColor: 'border-l-[hsl(152,60%,40%)]',
     image: sectionVerification,
   },
   'GESTION COMPTABLE': {
     color: 'text-section-comptable',
-    bgClass: 'from-[hsl(270,55%,50%)] to-[hsl(270,55%,65%)]',
+    bgClass: 'from-[hsl(270,55%,50%)] to-[hsl(270,55%,62%)]',
+    borderColor: 'border-l-[hsl(270,55%,50%)]',
     image: sectionComptable,
   },
   'FINANCES & BUDGET': {
     color: 'text-section-finances',
-    bgClass: 'from-[hsl(38,92%,50%)] to-[hsl(38,92%,62%)]',
+    bgClass: 'from-[hsl(38,92%,50%)] to-[hsl(38,80%,58%)]',
+    borderColor: 'border-l-[hsl(38,92%,50%)]',
     image: sectionFinances,
   },
   'CONTRÔLE INTERNE': {
     color: 'text-section-controle-interne',
-    bgClass: 'from-[hsl(174,65%,40%)] to-[hsl(174,65%,55%)]',
+    bgClass: 'from-[hsl(174,65%,40%)] to-[hsl(174,65%,52%)]',
+    borderColor: 'border-l-[hsl(174,65%,40%)]',
     image: sectionControleInterne,
   },
   'AUDIT & RESTITUTION': {
     color: 'text-section-restitution',
-    bgClass: 'from-[hsl(220,72%,42%)] to-[hsl(220,72%,58%)]',
+    bgClass: 'from-[hsl(220,72%,42%)] to-[hsl(220,72%,56%)]',
+    borderColor: 'border-l-[hsl(220,72%,42%)]',
     image: sectionRestitution,
   },
 };
+
+function KpiCard({ icon: Icon, label, value, sublabel, delay }: {
+  icon: React.ElementType; label: string; value: string | number; sublabel?: string; delay: number;
+}) {
+  return (
+    <Card
+      className="shadow-card hover:shadow-card-hover transition-all duration-300 opacity-0 animate-fade-in"
+      style={{ animationDelay: `${delay}ms` }}
+    >
+      <CardContent className="p-4 flex items-center gap-3">
+        <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <Icon className="h-5 w-5 text-primary" />
+        </div>
+        <div className="min-w-0">
+          <p className="text-2xl font-bold text-foreground leading-none">{value}</p>
+          <p className="text-xs text-muted-foreground mt-0.5 truncate">{label}</p>
+          {sublabel && <p className="text-[10px] text-muted-foreground/70 truncate">{sublabel}</p>}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Dashboard() {
   const [modules, updateModules] = useModules();
   const { params } = useAuditParams();
   const currentEtab = getSelectedEtablissement(params);
+  const agence = getAgenceComptable(params);
   const allNonParam = modules.filter(m => m.id !== 'parametres');
   const enabledOnly = allNonParam.filter(m => m.enabled);
-  // Always display all modules; the "enabled" flag is audit scope only (visual indicator)
   const displayModules = allNonParam;
 
-  const handleReset = () => {
-    updateModules(modules.map(m => ({ ...m, enabled: true })));
-  };
   const risques: CartoRisque[] = loadState('cartographie', []);
 
   const riskDistrib = risques.reduce((acc, r) => {
@@ -134,6 +159,8 @@ export default function Dashboard() {
     { name: 'Faible', value: 0 },
   ]);
 
+  const criticalCount = riskDistrib[0].value + riskDistrib[1].value;
+
   const processByRisk = Object.entries(
     risques.reduce<Record<string, number>>((acc, r) => {
       acc[r.processus] = (acc[r.processus] || 0) + r.probabilite * r.impact * r.maitrise;
@@ -143,76 +170,92 @@ export default function Dashboard() {
     .sort((a, b) => b.score - a.score);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
-      {/* Hero Banner */}
-      <div className="relative rounded-2xl overflow-hidden gradient-hero p-8 md:p-10 shadow-elevated">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/40" />
+    <div className="max-w-7xl mx-auto space-y-6">
+      {/* ─── Hero Banner ─── */}
+      <div className="relative rounded-2xl overflow-hidden gradient-hero shadow-elevated opacity-0 animate-fade-in">
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/70 to-primary/30" />
         <div className="absolute right-0 top-0 bottom-0 w-1/2 hidden lg:block">
-          <img src={heroImg} alt="" className="h-full w-full object-cover object-left opacity-30 mix-blend-luminosity" />
+          <img src={heroImg} alt="" className="h-full w-full object-cover object-left opacity-20 mix-blend-luminosity" />
         </div>
-        <div className="relative z-10">
-          <h1 className="text-3xl md:text-4xl font-bold text-primary-foreground tracking-tight">
-            Tableau de bord
-          </h1>
-          {currentEtab ? (
-            <p className="text-primary-foreground/80 mt-2 text-sm md:text-base">
-              {currentEtab.nom} ({currentEtab.uai}) — Exercice {params.exercice}
-            </p>
-          ) : (
-            <p className="text-primary-foreground/80 mt-2 text-sm">
-              Commencez par renseigner les{' '}
-              <NavLink to="/parametres" className="underline text-primary-foreground hover:text-primary-foreground/90">
-                paramètres de l'audit
-              </NavLink>.
-            </p>
-          )}
-          <div className="flex flex-wrap gap-3 mt-5">
-            <div className="glass rounded-lg px-4 py-2 text-sm">
-              <span className="text-primary-foreground/60">Modules actifs</span>
-              <span className="text-primary-foreground font-bold ml-2">{enabledOnly.length}</span>
+        <div className="relative z-10 p-6 md:p-8">
+          <div className="flex items-start justify-between">
+            <div>
+              <p className="text-primary-foreground/60 text-xs font-semibold tracking-widest uppercase mb-1">
+                Tableau de bord
+              </p>
+              <h1 className="text-2xl md:text-3xl font-bold text-primary-foreground tracking-tight">
+                {agence ? agence.nom : 'Audit comptable EPLE'}
+              </h1>
+              {currentEtab && (
+                <p className="text-primary-foreground/70 mt-1 text-sm">
+                  {currentEtab.nom} ({currentEtab.uai}) — Exercice {params.exercice}
+                </p>
+              )}
+              {!currentEtab && (
+                <p className="text-primary-foreground/70 mt-1 text-sm">
+                  Commencez par renseigner les{' '}
+                  <NavLink to="/parametres" className="underline text-primary-foreground hover:text-primary-foreground/90">
+                    paramètres de l'audit
+                  </NavLink>.
+                </p>
+              )}
             </div>
-            <div className="glass rounded-lg px-4 py-2 text-sm">
-              <span className="text-primary-foreground/60">Risques identifiés</span>
-              <span className="text-primary-foreground font-bold ml-2">{risques.length}</span>
+            <div className="hidden md:flex items-center gap-2">
+              <Badge variant="outline" className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground text-xs">
+                <Shield className="h-3 w-3 mr-1" />
+                v59
+              </Badge>
             </div>
-            {params.equipe.length > 0 && (
-              <div className="glass rounded-lg px-4 py-2 text-sm">
-                <span className="text-primary-foreground/60">Équipe</span>
-                <span className="text-primary-foreground font-bold ml-2">{params.equipe.length} membre{params.equipe.length > 1 ? 's' : ''}</span>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
-      {/* Risk Charts */}
+      {/* ─── KPI Row ─── */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <KpiCard icon={Activity} label="Modules actifs" value={enabledOnly.length} sublabel={`sur ${allNonParam.length} disponibles`} delay={50} />
+        <KpiCard icon={AlertTriangle} label="Risques identifiés" value={risques.length} sublabel={criticalCount > 0 ? `${criticalCount} critique(s)` : undefined} delay={100} />
+        <KpiCard icon={Users} label="Auditeurs" value={params.equipe.filter(m => m.isAuditeur).length} sublabel={params.equipe.length > 0 ? `${params.equipe.length} dans l'équipe` : undefined} delay={150} />
+        <KpiCard icon={Building2} label="Établissements" value={params.etablissements.length} sublabel={currentEtab ? currentEtab.ville : undefined} delay={200} />
+      </div>
+
+      {/* ─── Risk Charts ─── */}
       {risques.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-300">
-            <CardHeader><CardTitle className="text-lg">Répartition des risques</CardTitle></CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 opacity-0 animate-fade-in" style={{ animationDelay: '250ms' }}>
+          <Card className="shadow-card hover:shadow-card-hover transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                Répartition des risques
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pb-4">
+              <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
-                  <Pie data={riskDistrib.filter(d => d.value > 0)} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, value }) => `${name}: ${value}`}>
+                  <Pie data={riskDistrib.filter(d => d.value > 0)} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={75} innerRadius={40} strokeWidth={2} label={({ name, value }) => `${name}: ${value}`}>
                     {riskDistrib.map((_, i) => <Cell key={i} fill={RISK_COLORS[i]} />)}
                   </Pie>
-                  <Tooltip />
-                  <Legend />
+                  <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px', border: '1px solid hsl(var(--border))' }} />
+                  <Legend wrapperStyle={{ fontSize: '11px' }} />
                 </PieChart>
               </ResponsiveContainer>
             </CardContent>
           </Card>
 
-          <Card className="shadow-card hover:shadow-card-hover transition-shadow duration-300">
-            <CardHeader><CardTitle className="text-lg">Score de risque par processus</CardTitle></CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={processByRisk} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={120} tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Bar dataKey="score" fill="hsl(var(--primary))" radius={[0, 4, 4, 0]}>
+          <Card className="shadow-card hover:shadow-card-hover transition-all duration-300">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                <TrendingDown className="h-4 w-4 text-destructive" />
+                Score de risque par processus
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pb-4">
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={processByRisk} layout="vertical" margin={{ left: 0, right: 16 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis type="number" tick={{ fontSize: 10 }} />
+                  <YAxis dataKey="name" type="category" width={110} tick={{ fontSize: 10 }} />
+                  <Tooltip contentStyle={{ borderRadius: '8px', fontSize: '12px', border: '1px solid hsl(var(--border))' }} />
+                  <Bar dataKey="score" radius={[0, 4, 4, 0]}>
                     {processByRisk.map((entry, i) => (
                       <Cell key={i} fill={entry.score >= 40 ? RISK_COLORS[0] : entry.score >= 20 ? RISK_COLORS[1] : 'hsl(var(--primary))'} />
                     ))}
@@ -224,31 +267,38 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Section Cards with images */}
-      <div className="space-y-5">
+      {/* ─── Module Sections ─── */}
+      <div className="space-y-4 opacity-0 animate-fade-in" style={{ animationDelay: '300ms' }}>
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-foreground">Modules d'audit</h2>
+          <h2 className="text-lg font-bold text-foreground">Modules d'audit</h2>
+          {enabledOnly.length < allNonParam.length && (
+            <Badge variant="secondary" className="text-[10px]">
+              {enabledOnly.length}/{allNonParam.length} dans le périmètre
+            </Badge>
+          )}
         </div>
-        {enabledOnly.length < allNonParam.length && (
-          <p className="text-sm text-muted-foreground">
-            Périmètre d'audit : {enabledOnly.length} module{enabledOnly.length > 1 ? 's' : ''} sélectionné{enabledOnly.length > 1 ? 's' : ''} sur {allNonParam.length}
-          </p>
-        )}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {SECTIONS.map(section => {
             const sectionModules = displayModules.filter(m => m.section === section);
             if (sectionModules.length === 0) return null;
             const config = SECTION_CONFIG[section];
+            const enabledInSection = sectionModules.filter(m => m.enabled).length;
 
             return (
-              <Card key={section} className="shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden group">
-                {/* Section header with gradient */}
-                <div className={`bg-gradient-to-r ${config.bgClass} p-4 flex items-center gap-3`}>
-                  <img src={config.image} alt="" className="h-10 w-10 object-contain rounded-lg bg-white/20 p-1" />
-                  <h3 className="text-sm font-bold text-white tracking-wide uppercase">{section}</h3>
+              <Card key={section} className="shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden group border-l-4" style={{ borderLeftColor: config.bgClass.includes('210') ? 'hsl(210,85%,50%)' : config.bgClass.includes('152') ? 'hsl(152,60%,40%)' : config.bgClass.includes('270') ? 'hsl(270,55%,50%)' : config.bgClass.includes('38') ? 'hsl(38,92%,50%)' : config.bgClass.includes('174') ? 'hsl(174,65%,40%)' : 'hsl(220,72%,42%)' }}>
+                {/* Section header */}
+                <div className={`bg-gradient-to-r ${config.bgClass} px-4 py-3 flex items-center gap-3`}>
+                  <img src={config.image} alt="" className="h-8 w-8 object-contain rounded-md bg-white/20 p-0.5" />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-xs font-bold text-white tracking-wider uppercase truncate">{section}</h3>
+                  </div>
+                  <Badge variant="secondary" className="bg-white/20 text-white border-0 text-[10px] shrink-0">
+                    {enabledInSection}/{sectionModules.length}
+                  </Badge>
                 </div>
-                <CardContent className="p-3">
-                  <div className="space-y-1">
+                <CardContent className="p-2">
+                  <div className="space-y-0.5">
                     {sectionModules.map(mod => {
                       const Icon = ICON_MAP[mod.icon] || FileText;
                       const modImage = MODULE_IMAGES[mod.id];
@@ -256,15 +306,18 @@ export default function Dashboard() {
                         <NavLink
                           key={mod.id}
                           to={mod.path}
-                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition-colors group/item ${!mod.enabled ? 'opacity-50' : ''}`}
-                          activeClassName="bg-primary/10"
+                          className={`flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-muted transition-colors group/item ${!mod.enabled ? 'opacity-40' : ''}`}
+                          activeClassName="bg-primary/8"
                         >
                           {modImage ? (
-                            <img src={modImage} alt="" className="h-8 w-8 object-contain rounded-md flex-shrink-0" />
+                            <img src={modImage} alt="" className="h-7 w-7 object-contain rounded flex-shrink-0" />
                           ) : (
-                            <Icon className={`h-5 w-5 ${config.color} flex-shrink-0`} />
+                            <Icon className={`h-4 w-4 ${config.color} flex-shrink-0`} />
                           )}
-                          <span className="text-sm font-medium flex-1 text-foreground">{mod.label}</span>
+                          <span className="text-sm font-medium flex-1 text-foreground truncate">{mod.label}</span>
+                          {mod.enabled && (
+                            <span className="h-1.5 w-1.5 rounded-full bg-success shrink-0" />
+                          )}
                           <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover/item:opacity-100 transition-opacity" />
                         </NavLink>
                       );
@@ -277,10 +330,15 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Team */}
+      {/* ─── Team ─── */}
       {params.equipe.filter(m => m.isAuditeur).length > 0 && (
-        <Card className="shadow-card">
-          <CardHeader><CardTitle className="text-lg">Auditeurs désignés</CardTitle></CardHeader>
+        <Card className="shadow-card opacity-0 animate-fade-in" style={{ animationDelay: '350ms' }}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold flex items-center gap-2">
+              <Users className="h-4 w-4 text-primary" />
+              Auditeurs désignés
+            </CardTitle>
+          </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
               {params.equipe.filter(m => m.isAuditeur).map(m => (

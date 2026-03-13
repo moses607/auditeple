@@ -25,11 +25,16 @@ export function AppLayout({ children }: AppLayoutProps) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-14 flex items-center border-b border-border bg-card/80 backdrop-blur-sm px-4 shrink-0 shadow-card">
+          <header className="h-14 flex items-center border-b border-border bg-card/90 backdrop-blur-md px-4 shrink-0 shadow-sm sticky top-0 z-30">
             <SidebarTrigger className="mr-4" />
-            <span className="text-sm font-semibold text-foreground flex-1 tracking-tight">
-              CIC Expert Pro
-            </span>
+            <div className="flex items-center gap-2 flex-1">
+              <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center">
+                <span className="text-[10px] font-bold text-primary-foreground">CIC</span>
+              </div>
+              <span className="text-sm font-semibold text-foreground tracking-tight hidden sm:inline">
+                CIC Expert Pro
+              </span>
+            </div>
             {hasEtabs ? (
               <div className="flex items-center gap-2">
                 <Select
