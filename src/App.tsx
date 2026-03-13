@@ -7,7 +7,6 @@ import { AppLayout } from "@/components/AppLayout";
 import { AuditParamsProvider } from "@/contexts/AuditParamsContext";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { ModuleGuard } from "@/components/ModuleGuard";
 
 // Pages
 import Dashboard from "./pages/Dashboard";
@@ -58,10 +57,6 @@ function ProtectedLayout() {
   );
 }
 
-function Guard({ id, children }: { id: string; children: React.ReactNode }) {
-  return <ModuleGuard moduleId={id}>{children}</ModuleGuard>;
-}
-
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
@@ -76,30 +71,30 @@ const App = () => (
             <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
             <Route element={<ProtectedLayout />}>
               <Route index element={<Dashboard />} />
-              <Route path="/controle-caisse" element={<Guard id="regies"><ControleCaisse /></Guard>} />
-              <Route path="/stocks" element={<Guard id="stocks"><Stocks /></Guard>} />
-              <Route path="/rapprochement" element={<Guard id="rapprochement"><RapprochementBancaire /></Guard>} />
-              <Route path="/regies" element={<Guard id="regies"><Regies /></Guard>} />
-              <Route path="/verification" element={<Guard id="verification"><Verification /></Guard>} />
-              <Route path="/ordonnateur" element={<Guard id="ordonnateur"><Ordonnateur /></Guard>} />
-              <Route path="/droits-constates" element={<Guard id="droits-constates"><DroitsConstates /></Guard>} />
-              <Route path="/depenses" element={<Guard id="depenses"><Depenses /></Guard>} />
-              <Route path="/depenses/liquidation" element={<Guard id="depenses"><Depenses /></Guard>} />
-              <Route path="/depenses/pieces" element={<Guard id="depenses"><Depenses /></Guard>} />
-              <Route path="/voyages" element={<Guard id="voyages"><Voyages /></Guard>} />
-              <Route path="/bourses" element={<Guard id="droits-constates"><Bourses /></Guard>} />
-              <Route path="/fonds-sociaux" element={<Guard id="droits-constates"><FondsSociaux /></Guard>} />
-              <Route path="/restauration" element={<Guard id="restauration"><Restauration /></Guard>} />
-              <Route path="/analyse-financiere" element={<Guard id="analyse-financiere"><AnalyseFinanciere /></Guard>} />
-              <Route path="/fonds-roulement" element={<Guard id="fonds-roulement"><FondsRoulement /></Guard>} />
-              <Route path="/recouvrement" element={<Guard id="recouvrement"><Recouvrement /></Guard>} />
-              <Route path="/marches" element={<Guard id="marches"><Marches /></Guard>} />
-              <Route path="/subventions" element={<Guard id="subventions"><Subventions /></Guard>} />
-              <Route path="/budgets-annexes" element={<Guard id="budgets-annexes"><BudgetsAnnexes /></Guard>} />
-              <Route path="/cartographie" element={<Guard id="cartographie"><CartographieRisques /></Guard>} />
-              <Route path="/organigramme" element={<Guard id="organigramme"><OrganigrammePage /></Guard>} />
-              <Route path="/plan-action" element={<Guard id="plan-action"><PlanAction /></Guard>} />
-              <Route path="/plan-controle" element={<Guard id="plan-controle"><PlanControle /></Guard>} />
+              <Route path="/controle-caisse" element={<ControleCaisse />} />
+              <Route path="/stocks" element={<Stocks />} />
+              <Route path="/rapprochement" element={<RapprochementBancaire />} />
+              <Route path="/regies" element={<Regies />} />
+              <Route path="/verification" element={<Verification />} />
+              <Route path="/ordonnateur" element={<Ordonnateur />} />
+              <Route path="/droits-constates" element={<DroitsConstates />} />
+              <Route path="/depenses" element={<Depenses />} />
+              <Route path="/depenses/liquidation" element={<Depenses />} />
+              <Route path="/depenses/pieces" element={<Depenses />} />
+              <Route path="/voyages" element={<Voyages />} />
+              <Route path="/bourses" element={<Bourses />} />
+              <Route path="/fonds-sociaux" element={<FondsSociaux />} />
+              <Route path="/restauration" element={<Restauration />} />
+              <Route path="/analyse-financiere" element={<AnalyseFinanciere />} />
+              <Route path="/fonds-roulement" element={<FondsRoulement />} />
+              <Route path="/recouvrement" element={<Recouvrement />} />
+              <Route path="/marches" element={<Marches />} />
+              <Route path="/subventions" element={<Subventions />} />
+              <Route path="/budgets-annexes" element={<BudgetsAnnexes />} />
+              <Route path="/cartographie" element={<CartographieRisques />} />
+              <Route path="/organigramme" element={<OrganigrammePage />} />
+              <Route path="/plan-action" element={<PlanAction />} />
+              <Route path="/plan-controle" element={<PlanControle />} />
               <Route path="/pv-audit" element={<PVAudit />} />
               <Route path="/annexe-comptable" element={<AnnexeComptable />} />
               <Route path="/piste-audit" element={<PisteAudit />} />

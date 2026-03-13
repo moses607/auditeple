@@ -112,9 +112,8 @@ export default function Dashboard() {
   const currentEtab = getSelectedEtablissement(params);
   const allNonParam = modules.filter(m => m.id !== 'parametres');
   const enabledOnly = allNonParam.filter(m => m.enabled);
-  // If none selected, show all modules (full view)
-  const isFiltered = enabledOnly.length > 0 && enabledOnly.length < allNonParam.length;
-  const displayModules = isFiltered ? enabledOnly : allNonParam;
+  // Always display all modules; the "enabled" flag is audit scope only (visual indicator)
+  const displayModules = allNonParam;
 
   const handleReset = () => {
     updateModules(modules.map(m => ({ ...m, enabled: true })));
@@ -229,16 +228,10 @@ export default function Dashboard() {
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold text-foreground">Modules d'audit</h2>
-          {isFiltered && (
-            <Button variant="outline" size="sm" onClick={handleReset} className="gap-2">
-              <RotateCcw className="h-4 w-4" />
-              Réinitialiser les filtres
-            </Button>
-          )}
         </div>
-        {isFiltered && (
+        {enabledOnly.length < allNonParam.length && (
           <p className="text-sm text-muted-foreground">
-            Affichage filtré : {enabledOnly.length} module{enabledOnly.length > 1 ? 's' : ''} sur {allNonParam.length}
+            Périmètre d'audit : {enabledOnly.length} module{enabledOnly.length > 1 ? 's' : ''} sélectionné{enabledOnly.length > 1 ? 's' : ''} sur {allNonParam.length}
           </p>
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -263,7 +256,7 @@ export default function Dashboard() {
                         <NavLink
                           key={mod.id}
                           to={mod.path}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition-colors group/item"
+                          className={`flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted transition-colors group/item ${!mod.enabled ? 'opacity-50' : ''}`}
                           activeClassName="bg-primary/10"
                         >
                           {modImage ? (
