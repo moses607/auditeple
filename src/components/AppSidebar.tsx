@@ -177,7 +177,7 @@ export function AppSidebar() {
               className={cn(
                 "flex items-center gap-1 text-xs transition-colors",
                 editMode
-                  ? "text-green-600 hover:text-green-700 font-medium"
+                  ? "text-primary font-medium"
                   : "text-sidebar-primary hover:underline"
               )}
             >
