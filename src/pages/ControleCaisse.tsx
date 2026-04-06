@@ -60,12 +60,12 @@ export default function ControleCaisse() {
           className="bg-white/20 hover:bg-white/30 text-white border-white/25"
           variant="outline"
           onClick={() => setForm({ date: new Date().toISOString().split('T')[0], regisseur: '', type: 'Avances restauration', plafond: '', theorique: '', reel: '', observations: '', journalCaisse: null, billetage: {} })}
-          completedChecks={(CONTROLES_CAISSE).filter(c => regChecks[c.id]).length}
-      totalChecks={(CONTROLES_CAISSE).length}
-    >
+        >
           <Plus className="h-4 w-4 mr-2" /> Nouveau contrôle
         </Button>
       }
+      completedChecks={(CONTROLES_CAISSE).filter(c => regChecks[c.id]).length}
+      totalChecks={(CONTROLES_CAISSE).length}
     >
       {/* ─── KPI ─── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
