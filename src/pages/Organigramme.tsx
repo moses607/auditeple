@@ -7,7 +7,7 @@ import { Plus, Trash2, Pencil } from 'lucide-react';
 import { EquipeMembre, FONCTIONS_COMPTABLES, TACHES_COMPTABLES } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_ORGANIGRAMME } from '@/lib/regulatory-data';
-import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 
 export default function OrganigrammePage() {
   const [items, setItems] = useState<EquipeMembre[]>(() => loadState('organigramme', []));
@@ -45,10 +45,9 @@ export default function OrganigrammePage() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{[...new Set(items.flatMap(x => x.taches || []))].length}</p><p className="text-xs text-muted-foreground mt-0.5">Tâches assignées</p></CardContent></Card>
       </div>
 
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ nom: '', fonction: 'Agent Comptable', telephone: '', email: '', taches: [] })}><Plus className="h-4 w-4 mr-2" /> Membre</Button>
       </div>
-
-      <div className="grid grid-cols-3 gap-3">
 
       {form && (
         <Card className="border-primary"><CardContent className="pt-6 space-y-3">
@@ -66,6 +65,7 @@ export default function OrganigrammePage() {
             <div className="flex flex-wrap gap-2 mt-2">
               {TACHES_COMPTABLES.map(t => (
                 <button key={t} onClick={() => setForm({ ...form, taches: form.taches.includes(t) ? form.taches.filter((x: string) => x !== t) : [...form.taches, t] })}
+                  className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${form.taches.includes(t) ? 'bg-primary text-primary-foreground border-primary' : 'bg-background border-border hover:border-primary'}`}>
                   {t}
                 </button>
               ))}
@@ -89,6 +89,7 @@ export default function OrganigrammePage() {
                 <Button variant="ghost" size="icon" onClick={() => setForm({ ...m })}><Pencil className="h-4 w-4" /></Button>
                 <Button variant="ghost" size="icon" onClick={() => save(items.filter(i => i.id !== m.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
               </div>
+            </div>
           </CardContent>
         </Card>
       ))}

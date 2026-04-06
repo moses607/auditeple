@@ -87,6 +87,7 @@ export default function Subventions() {
                 <option>En cours</option><option>Soldé</option><option>Sous-consommé</option>
               </select>
             </div>
+          </div>
           <div className="flex items-center gap-2"><Checkbox checked={form.conditionsEmploi} onCheckedChange={v => setForm({ ...form, conditionsEmploi: v })} /><Label className="text-xs">Conditions d'emploi</Label></div>
           <div className="space-y-1"><Label className="text-xs">Observations</Label><Textarea value={form.observations || ''} onChange={e => setForm({ ...form, observations: e.target.value })} rows={2} placeholder="Observations..." /></div>
           <div className="flex gap-2"><Button onClick={submit}>Valider</Button><Button variant="outline" onClick={() => setForm(null)}>Annuler</Button></div>
