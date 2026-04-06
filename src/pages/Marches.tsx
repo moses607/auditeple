@@ -76,12 +76,11 @@ export default function MarchesPage() {
         </Card>
       </ModuleSection>
 
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ objet: '', montant: '', typeMarche: 'Fournitures', dateNotification: '', observations: '' })}>
           <Plus className="h-4 w-4 mr-2" /> Ajouter un marché
         </Button>
       </div>
-
-      <div className="grid grid-cols-3 gap-3">
 
       {form && (
         <Card className="border-primary"><CardContent className="pt-6 space-y-3">
