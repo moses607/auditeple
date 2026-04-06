@@ -8,7 +8,7 @@ import { Plus, Trash2, Pencil } from 'lucide-react';
 import { CreanceItem, fmt, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_RECOUVREMENT } from '@/lib/regulatory-data';
-import { ModulePageLayout, AnomalyAlert } ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 
 export default function Recouvrement() {
   const [items, setItems] = useState<CreanceItem[]>(() => loadState('creances', []));

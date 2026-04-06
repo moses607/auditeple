@@ -9,7 +9,7 @@ import { StockItem, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 
 import { CONTROLES_STOCKS } from '@/lib/regulatory-data';
-import { ModulePageLayout, AnomalyAlert } ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 
 export default function Stocks() {
   const [items, setItems] = useState<StockItem[]>(() => loadState('stocks', []));

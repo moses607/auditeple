@@ -70,12 +70,11 @@ export default function PlanAction() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{actions.filter(x => x.statut === 'À lancer' || x.statut === 'Planifié').length}</p><p className="text-xs text-muted-foreground mt-0.5">À lancer</p></CardContent></Card>
       </div>
 
+      <div className="flex justify-end">
         <Button disabled={risques.length === 0} onClick={() => setForm({ risqueId: risques[0]?.id || '', recommandation: '', responsable: '', dateLimite: '', statut: 'À lancer', observations: '' })}>
           <Plus className="h-4 w-4 mr-2" /> Nouvelle action
         </Button>
       </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 
       {risques.length === 0 && <Card><CardContent className="py-12 text-center text-muted-foreground">Aucun risque dans la cartographie. Alimentez la cartographie des risques pour créer des actions.</CardContent></Card>}
 
@@ -95,6 +94,7 @@ export default function PlanAction() {
                 {['À lancer', 'Planifié', 'En cours', 'Réalisé'].map(o => <option key={o}>{o}</option>)}
               </select>
             </div>
+          </div>
           <div className="space-y-1"><Label className="text-xs">Recommandation / Action corrective</Label>
             <Textarea value={form.recommandation} onChange={e => setForm({ ...form, recommandation: e.target.value })} rows={3} placeholder="Décrire l'action corrective à mettre en œuvre pour traiter le risque..." />
           </div>
@@ -117,14 +117,17 @@ export default function PlanAction() {
                     {overdue && <Badge variant="destructive" className="text-[10px]">EN RETARD</Badge>}
                   </div>
                   <p className="font-bold mt-1">{a.recommandation || 'Recommandation à définir'}</p>
+                  <div className="flex gap-4 text-xs text-muted-foreground mt-1">
                     <span>Resp: <strong>{a.responsable || '—'}</strong></span>
                     <span>Échéance: <strong>{a.dateLimite || '—'}</strong></span>
                   </div>
+                </div>
                 <div className="flex items-center gap-2">
                   <Badge variant={a.statut === 'Réalisé' ? 'secondary' : a.statut === 'En cours' ? 'default' : 'outline'}>{a.statut}</Badge>
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...a })}><Pencil className="h-3 w-3" /></Button>
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(actions.filter(x => x.id !== a.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                 </div>
+              </div>
             </CardContent>
           </Card>
         );

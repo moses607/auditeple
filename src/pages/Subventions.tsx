@@ -61,10 +61,11 @@ export default function Subventions() {
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground mt-0.5">Subventions suivies</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(items.reduce((s,x) => s + (x.montantNotifie || x.montant || 0), 0))}</p><p className="text-xs text-muted-foreground mt-0.5">Total notifié</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{items.filter(x => x.emploiConforme || x.justifie).length}</p><p className="text-xs text-muted-foreground mt-0.5">Emploi justifié</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(items.reduce((s,x) => s + (x.notifie || 0), 0))}</p><p className="text-xs text-muted-foreground mt-0.5">Total notifié</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{items.filter(x => x.conditionsEmploi).length}</p><p className="text-xs text-muted-foreground mt-0.5">Emploi justifié</p></CardContent></Card>
       </div>
 
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ type: 'DGF État', programme: 'P141', notifie: '', recu: '', consomme: '', conditionsEmploi: false, statut: 'En cours', dateVersement: '', observations: '' })}><Plus className="h-4 w-4 mr-2" /> Ajouter</Button>
       </div>
 
@@ -86,6 +87,7 @@ export default function Subventions() {
                 <option>En cours</option><option>Soldé</option><option>Sous-consommé</option>
               </select>
             </div>
+          </div>
           <div className="flex items-center gap-2"><Checkbox checked={form.conditionsEmploi} onCheckedChange={v => setForm({ ...form, conditionsEmploi: v })} /><Label className="text-xs">Conditions d'emploi</Label></div>
           <div className="space-y-1"><Label className="text-xs">Observations</Label><Textarea value={form.observations || ''} onChange={e => setForm({ ...form, observations: e.target.value })} rows={2} placeholder="Observations..." /></div>
           <div className="flex gap-2"><Button onClick={submit}>Valider</Button><Button variant="outline" onClick={() => setForm(null)}>Annuler</Button></div>

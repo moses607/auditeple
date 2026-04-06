@@ -12,9 +12,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { loadState, saveState } from '@/lib/store';
 import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 import { fmt, getAgenceComptable } from '@/lib/types';
-import {
 import { CONTROLES_BUDGETS_ANNEXES } from '@/lib/regulatory-data';
-import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import {
   BudgetAnnexeRecord, Mouvement185, AuditItemBA,
   AUDIT_ITEMS_BA, defaultAuditItems, computeAuditScore,
 } from '@/lib/budgets-annexes-types';
@@ -46,6 +46,8 @@ export default function BudgetsAnnexes() {
   const [selectedBAId, setSelectedBAId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string>('all');
   const [filterEquilibre, setFilterEquilibre] = useState<string>('all');
+  const [regChecks, setRegChecks] = useState<Record<string, boolean>>(() => loadState('budgets_annexes_checks', {}));
+  const toggleRegCheck = (id: string) => { const u = { ...regChecks, [id]: !regChecks[id] }; setRegChecks(u); saveState('budgets_annexes_checks', u); };
 
   const persist = (d: BudgetAnnexeRecord[]) => { setRecords(d); saveBA(d); };
   const persistAudit = (d: AuditItemBA[]) => { setAuditItems(d); saveAuditItems(d); };

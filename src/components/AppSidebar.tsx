@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-  FileText, Shield, Pencil, Check,
+  FileText, Shield, Pencil, Check, BarChart3,
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {

@@ -62,9 +62,9 @@ export default function Restauration() {
   const saveTR = (d: TitreRecetteCuisine[]) => { setTitresRecettes(d); saveState('rest_titres_recettes', d); };
 
   // ═══ CONTRAT CUISINE LIVRÉE ═══
-  const [contrat, setContrat] = useState<ContratCuisine>(() => loadState('rest_contrat', {
   const [regChecks, setRegChecks] = useState<Record<string, boolean>>(() => loadState('restauration_checks', {}));
   const toggleRegCheck = (id: string) => { const u = { ...regChecks, [id]: !regChecks[id] }; setRegChecks(u); saveState('restauration_checks', u); };
+  const [contrat, setContrat] = useState<ContratCuisine>(() => loadState('rest_contrat', {
     existeContrat: false, referenceContrat: '', existeMarche: false, referenceMarche: '',
     prestataire: '', dateDebut: '', dateFin: '', montantAnnuel: 0, observations: '',
   }));

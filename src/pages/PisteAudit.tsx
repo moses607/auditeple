@@ -29,13 +29,8 @@ export default function PisteAudit() {
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground mt-0.5">Événements tracés</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{items.filter(x => x.type === 'anomalie').length}</p><p className="text-xs text-muted-foreground mt-0.5">Anomalies</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{items.filter(x => x.type === 'controle').length}</p><p className="text-xs text-muted-foreground mt-0.5">Contrôles</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{logs.length}</p><p className="text-xs text-muted-foreground mt-0.5">Événements tracés</p></CardContent></Card>
       </div>
-
-
-      <div className="grid grid-cols-2 gap-3">
 
       <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="Rechercher..." />
 

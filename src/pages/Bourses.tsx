@@ -8,7 +8,7 @@ import { Plus, Trash2, Pencil } from 'lucide-react';
 import { BoursierEleve, ECHELONS_BOURSES, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_BOURSES } from '@/lib/regulatory-data';
-import { ModulePageLayout } ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 
 export default function Bourses() {
   const [items, setItems] = useState<BoursierEleve[]>(() => loadState('bourses', []));
@@ -50,7 +50,7 @@ export default function Bourses() {
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground mt-0.5">Élèves boursiers</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(items.reduce((s,x) => s + (x.montant || 0), 0))}</p><p className="text-xs text-muted-foreground mt-0.5">Montant total</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(totAnn)}</p><p className="text-xs text-muted-foreground mt-0.5">Montant total annuel</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-primary">{[...new Set(items.map(x => x.echelon))].length}</p><p className="text-xs text-muted-foreground mt-0.5">Échelons représentés</p></CardContent></Card>
       </div>
 
@@ -72,10 +72,9 @@ export default function Bourses() {
         </Card>
       </ModuleSection>
 
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ nom: '', classe: '', echelon: '6', t1: '', t2: '', t3: '' })}><Plus className="h-4 w-4 mr-2" /> Nouvel élève</Button>
       </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 
       {form && (
         <Card className="border-primary">

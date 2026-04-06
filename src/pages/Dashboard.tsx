@@ -3,7 +3,6 @@ import { ICON_MAP } from '@/lib/icon-map';
 import { useAuditProgress } from '@/hooks/useAuditProgress';
 import { useModules } from '@/hooks/useModules';
 import { useAuditParams } from '@/hooks/useAuditStore';
-import { useAuditProgress } from '@/hooks/useAuditProgress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { NavLink } from '@/components/NavLink';

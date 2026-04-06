@@ -9,7 +9,7 @@ import { AlertTriangle, Plus, Trash2, Pencil } from 'lucide-react';
 import { MarchePublic, SEUILS_MARCHES, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_MARCHES } from '@/lib/regulatory-data';
-import { ModulePageLayout } ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 
 const NATURES = ['Fournitures', 'Services', 'Travaux', 'Fournitures et services', 'Prestations intellectuelles'];
 const PROCEDURES = ['Gré à gré (< 40 000 €)', 'MAPA simplifié', 'MAPA avec publicité', 'Appel d\'offres ouvert', 'Appel d\'offres restreint', 'Procédure négociée', 'Dialogue compétitif'];
@@ -52,10 +52,10 @@ export default function MarchesPage() {
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground mt-0.5">Marchés suivis</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(items.reduce((s,x) => s + (x.montant || 0), 0))}</p><p className="text-xs text-muted-foreground mt-0.5">Montant total</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{items.filter(x => (x.montant||0) >= 40000).length}</p><p className="text-xs text-muted-foreground mt-0.5">MAPA (&gt; 40K)</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{items.filter(x => (x.montant||0) >= 143000).length}</p><p className="text-xs text-muted-foreground mt-0.5">Procédure formalisée</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{marches.length}</p><p className="text-xs text-muted-foreground mt-0.5">Marchés suivis</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(totMontant)}</p><p className="text-xs text-muted-foreground mt-0.5">Montant total</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{marches.filter(x => (x.montant||0) >= 40000).length}</p><p className="text-xs text-muted-foreground mt-0.5">MAPA (&gt; 40K)</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{marches.filter(x => (x.montant||0) >= 143000).length}</p><p className="text-xs text-muted-foreground mt-0.5">Procédure formalisée</p></CardContent></Card>
       </div>
 
       {/* Contrôles réglementaires */}
@@ -76,12 +76,11 @@ export default function MarchesPage() {
         </Card>
       </ModuleSection>
 
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ objet: '', montant: '', typeMarche: 'Fournitures', dateNotification: '', observations: '' })}>
           <Plus className="h-4 w-4 mr-2" /> Ajouter un marché
         </Button>
       </div>
-
-      <div className="grid grid-cols-3 gap-3">
 
       {form && (
         <Card className="border-primary"><CardContent className="pt-6 space-y-3">
@@ -113,6 +112,7 @@ export default function MarchesPage() {
                   </div>
                 )}
                 {seuilProchain && montant > 0 && (
+                  <p className="text-xs text-muted-foreground">Prochain seuil : {seuilProchain.label}</p>
                 )}
               </>
             );
@@ -141,10 +141,12 @@ export default function MarchesPage() {
                     {seuilAtteint && <Badge variant="destructive">{seuilAtteint.label}</Badge>}
                   </div>
                   {seuilAtteint && <p className="text-xs text-destructive mt-1">{seuilAtteint.consigne}</p>}
+                </div>
                 <div className="flex gap-1">
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...marche, montant: String(marche.montant) })}><Pencil className="h-3 w-3" /></Button>
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => remove(marche.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                 </div>
+              </div>
             </CardContent>
           </Card>
         );

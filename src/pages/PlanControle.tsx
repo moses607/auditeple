@@ -75,15 +75,14 @@ export default function PlanControle() {
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground mt-0.5">Contrôles planifiés</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{items.filter(x => x.statut === 'Réalisé').length}</p><p className="text-xs text-muted-foreground mt-0.5">Réalisés</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{items.filter(x => x.statut === 'En cours').length}</p><p className="text-xs text-muted-foreground mt-0.5">En cours</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{items.filter(x => x.statut === 'En retard' || x.statut === 'À lancer').length}</p><p className="text-xs text-muted-foreground mt-0.5">À faire / En retard</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{pR}</p><p className="text-xs text-muted-foreground mt-0.5">Réalisés</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-primary">{pT - pR}</p><p className="text-xs text-muted-foreground mt-0.5">Restants</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{pT > 0 ? Math.round((pR / pT) * 100) : 0}%</p><p className="text-xs text-muted-foreground mt-0.5">Taux réalisation</p></CardContent></Card>
       </div>
 
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ type: TYPES_CONTROLE_M96[0].type, frequence: 'Trimestriel', risque: 'MOYEN', reference: TYPES_CONTROLE_M96[0].ref, dates: '', objectif: '' })}><Plus className="h-4 w-4 mr-2" /> Nouveau contrôle</Button>
       </div>
-
-      <div className="grid grid-cols-3 gap-3">
 
       {form && (
         <Card className="border-primary"><CardContent className="pt-6 space-y-3">
@@ -97,8 +96,6 @@ export default function PlanControle() {
                 {TYPES_CONTROLE_M96.map(t => <option key={t.type} value={t.type}>{t.type}</option>)}
               </select>
             </div>
-            <div className="space-y-1 md:col-span-2">
-              <Label className="text-xs">Référence M9-6 2026</Label>
             <div className="space-y-1"><Label className="text-xs">Fréquence</Label>
               <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.frequence} onChange={e => setForm({ ...form, frequence: e.target.value })}>
                 <option>Mensuel</option><option>Trimestriel</option><option>Semestriel</option><option>Annuel</option>
@@ -123,11 +120,15 @@ export default function PlanControle() {
         return (
           <Card key={p.id} className={retard > 0 ? 'border-destructive' : ''}>
             <CardContent className="pt-6">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
                   <Badge variant={p.risque === 'ÉLEVÉ' ? 'destructive' : p.risque === 'MOYEN' ? 'default' : 'secondary'} className="mr-2">{p.risque}</Badge>
                   <span className="font-bold">{p.type}</span>
+                </div>
                 <div className="flex items-center gap-2">
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== p.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                 </div>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {p.planning.map(d => {
                   const done = p.realises.includes(d);
