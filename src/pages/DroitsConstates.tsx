@@ -140,8 +140,7 @@ export default function DroitsConstatesPage() {
       totalChecks={(CONTROLES_DROITS_CONSTATES).length}
     >
       <div>
-          Droits de l'établissement (frais scolaires) et droits des élèves (bourses, fonds sociaux, primes).
-        </p>
+          <p className="text-sm text-muted-foreground">Droits de l'établissement (frais scolaires) et droits des élèves (bourses, fonds sociaux, primes).</p>
       </div>
 
       <Tabs defaultValue="frais" className="w-full">
