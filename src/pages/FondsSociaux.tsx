@@ -46,10 +46,9 @@ export default function FondsSociaux() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{items.filter(x => x.type === 'FSL').length}</p><p className="text-xs text-muted-foreground mt-0.5">Fonds social lycéen</p></CardContent></Card>
       </div>
 
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ type: 'FSL', nom: '', objet: '', montant: '', decision: 'Accordé', dateCommission: new Date().toISOString().split('T')[0] })}><Plus className="h-4 w-4 mr-2" /> Nouvelle aide</Button>
       </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 
       {form && (
         <Card className="border-primary">

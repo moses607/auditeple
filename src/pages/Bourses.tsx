@@ -72,10 +72,9 @@ export default function Bourses() {
         </Card>
       </ModuleSection>
 
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ nom: '', classe: '', echelon: '6', t1: '', t2: '', t3: '' })}><Plus className="h-4 w-4 mr-2" /> Nouvel élève</Button>
       </div>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
 
       {form && (
         <Card className="border-primary">

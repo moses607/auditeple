@@ -46,6 +46,8 @@ export default function BudgetsAnnexes() {
   const [selectedBAId, setSelectedBAId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string>('all');
   const [filterEquilibre, setFilterEquilibre] = useState<string>('all');
+  const [regChecks, setRegChecks] = useState<Record<string, boolean>>(() => loadState('budgets_annexes_checks', {}));
+  const toggleRegCheck = (id: string) => { const u = { ...regChecks, [id]: !regChecks[id] }; setRegChecks(u); saveState('budgets_annexes_checks', u); };
 
   const persist = (d: BudgetAnnexeRecord[]) => { setRecords(d); saveBA(d); };
   const persistAudit = (d: AuditItemBA[]) => { setAuditItems(d); saveAuditItems(d); };

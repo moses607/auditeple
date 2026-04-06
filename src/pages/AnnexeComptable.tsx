@@ -144,10 +144,12 @@ export default function AnnexeComptablePage() {
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{sections.length}</p><p className="text-xs text-muted-foreground mt-0.5">Sections de l'annexe</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{SECTIONS_ANNEXE.length}</p><p className="text-xs text-muted-foreground mt-0.5">Sections de l'annexe</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{exerciceN1}</p><p className="text-xs text-muted-foreground mt-0.5">Exercice</p></CardContent></Card>
       </div>
 
+      <div>
+        <p className="text-sm text-muted-foreground">
           Réf. : M9-6 — Modèle espaceple.org — Document rédigé pour l'exercice N-1 afin d'accompagner le compte financier soumis au conseil d'administration.
         </p>
       </div>

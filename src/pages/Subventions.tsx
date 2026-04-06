@@ -65,6 +65,7 @@ export default function Subventions() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{items.filter(x => x.emploiConforme || x.justifie).length}</p><p className="text-xs text-muted-foreground mt-0.5">Emploi justifié</p></CardContent></Card>
       </div>
 
+      <div className="flex justify-end">
         <Button onClick={() => setForm({ type: 'DGF État', programme: 'P141', notifie: '', recu: '', consomme: '', conditionsEmploi: false, statut: 'En cours', dateVersement: '', observations: '' })}><Plus className="h-4 w-4 mr-2" /> Ajouter</Button>
       </div>
 

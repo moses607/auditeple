@@ -140,10 +140,12 @@ export default function MarchesPage() {
                     {seuilAtteint && <Badge variant="destructive">{seuilAtteint.label}</Badge>}
                   </div>
                   {seuilAtteint && <p className="text-xs text-destructive mt-1">{seuilAtteint.consigne}</p>}
+                </div>
                 <div className="flex gap-1">
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...marche, montant: String(marche.montant) })}><Pencil className="h-3 w-3" /></Button>
                   <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => remove(marche.id)}><Trash2 className="h-3 w-3 text-destructive" /></Button>
                 </div>
+              </div>
             </CardContent>
           </Card>
         );

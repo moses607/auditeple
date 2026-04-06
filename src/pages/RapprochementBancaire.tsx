@@ -9,7 +9,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { RapprochementItem, fmt, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_RAPPROCHEMENT } from '@/lib/regulatory-data';
-import { ModulePageLayout, AnomalyAlert } ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 
 export default function RapprochementBancaire() {
   const [items, setItems] = useState<RapprochementItem[]>(() => loadState('rapprochement', []));
