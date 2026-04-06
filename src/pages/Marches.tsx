@@ -9,7 +9,7 @@ import { AlertTriangle, Plus, Trash2, Pencil } from 'lucide-react';
 import { MarchePublic, SEUILS_MARCHES, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_MARCHES } from '@/lib/regulatory-data';
-import { ModulePageLayout } ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 
 const NATURES = ['Fournitures', 'Services', 'Travaux', 'Fournitures et services', 'Prestations intellectuelles'];
 const PROCEDURES = ['Gré à gré (< 40 000 €)', 'MAPA simplifié', 'MAPA avec publicité', 'Appel d\'offres ouvert', 'Appel d\'offres restreint', 'Procédure négociée', 'Dialogue compétitif'];
