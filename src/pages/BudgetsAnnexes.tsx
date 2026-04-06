@@ -12,9 +12,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { loadState, saveState } from '@/lib/store';
 import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 import { fmt, getAgenceComptable } from '@/lib/types';
-import {
 import { CONTROLES_BUDGETS_ANNEXES } from '@/lib/regulatory-data';
-import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import {
   BudgetAnnexeRecord, Mouvement185, AuditItemBA,
   AUDIT_ITEMS_BA, defaultAuditItems, computeAuditScore,
 } from '@/lib/budgets-annexes-types';
