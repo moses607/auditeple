@@ -112,6 +112,7 @@ export default function MarchesPage() {
                   </div>
                 )}
                 {seuilProchain && montant > 0 && (
+                  <p className="text-xs text-muted-foreground">Prochain seuil : {seuilProchain.label}</p>
                 )}
               </>
             );
