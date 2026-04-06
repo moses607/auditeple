@@ -52,10 +52,10 @@ export default function MarchesPage() {
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground mt-0.5">Marchés suivis</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(items.reduce((s,x) => s + (x.montant || 0), 0))}</p><p className="text-xs text-muted-foreground mt-0.5">Montant total</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{items.filter(x => (x.montant||0) >= 40000).length}</p><p className="text-xs text-muted-foreground mt-0.5">MAPA (&gt; 40K)</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{items.filter(x => (x.montant||0) >= 143000).length}</p><p className="text-xs text-muted-foreground mt-0.5">Procédure formalisée</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{marches.length}</p><p className="text-xs text-muted-foreground mt-0.5">Marchés suivis</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(totMontant)}</p><p className="text-xs text-muted-foreground mt-0.5">Montant total</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{marches.filter(x => (x.montant||0) >= 40000).length}</p><p className="text-xs text-muted-foreground mt-0.5">MAPA (&gt; 40K)</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{marches.filter(x => (x.montant||0) >= 143000).length}</p><p className="text-xs text-muted-foreground mt-0.5">Procédure formalisée</p></CardContent></Card>
       </div>
 
       {/* Contrôles réglementaires */}

@@ -61,8 +61,8 @@ export default function Subventions() {
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground mt-0.5">Subventions suivies</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(items.reduce((s,x) => s + (x.montantNotifie || x.montant || 0), 0))}</p><p className="text-xs text-muted-foreground mt-0.5">Total notifié</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{items.filter(x => x.emploiConforme || x.justifie).length}</p><p className="text-xs text-muted-foreground mt-0.5">Emploi justifié</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(items.reduce((s,x) => s + (x.notifie || 0), 0))}</p><p className="text-xs text-muted-foreground mt-0.5">Total notifié</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{items.filter(x => x.conditionsEmploi).length}</p><p className="text-xs text-muted-foreground mt-0.5">Emploi justifié</p></CardContent></Card>
       </div>
 
       <div className="flex justify-end">
