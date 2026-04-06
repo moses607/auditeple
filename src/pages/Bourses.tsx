@@ -8,7 +8,7 @@ import { Plus, Trash2, Pencil } from 'lucide-react';
 import { BoursierEleve, ECHELONS_BOURSES, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_BOURSES } from '@/lib/regulatory-data';
-import { ModulePageLayout } ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 
 export default function Bourses() {
   const [items, setItems] = useState<BoursierEleve[]>(() => loadState('bourses', []));
