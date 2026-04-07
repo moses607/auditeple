@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
+import logoImg from '@/assets/logo-circle.png';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -117,11 +118,7 @@ export default function Auth() {
       <Card className="w-full max-w-md shadow-elevated border-border/50">
         <CardHeader className="text-center space-y-3 pb-2">
           <div className="flex justify-center">
-            <div className="h-14 w-14 rounded-xl bg-primary flex items-center justify-center shadow-lg">
-              <svg className="h-7 w-7 text-primary-foreground" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/>
-              </svg>
-            </div>
+            <img src={logoImg} alt="CIC Expert Pro" className="h-16 w-16 rounded-xl shadow-lg object-contain" />
           </div>
           <div>
             <CardTitle className="text-2xl font-bold tracking-tight text-foreground" style={{ fontFamily: "'Space Grotesk', sans-serif" }}>

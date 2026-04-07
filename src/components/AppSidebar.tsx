@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-  FileText, Shield, Pencil, Check, BarChart3,
+  FileText, Pencil, Check, BarChart3,
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
@@ -15,6 +15,7 @@ import { useModules } from '@/hooks/useModules';
 import { useAuditProgress } from '@/hooks/useAuditProgress';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import logoImg from '@/assets/logo-circle.png';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 
@@ -48,9 +49,7 @@ export function AppSidebar() {
         {!collapsed ? (
           <div className="px-3 py-4">
             <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
-                <Shield className="h-4 w-4 text-sidebar-primary-foreground" />
-              </div>
+              <img src={logoImg} alt="CIC Expert Pro" className="h-9 w-9 rounded-lg object-contain" />
               <div>
                 <h2 className="text-sm font-bold tracking-wide text-sidebar-primary-foreground">
                   CIC Expert Pro
@@ -63,9 +62,7 @@ export function AppSidebar() {
           </div>
         ) : (
           <div className="flex items-center justify-center py-3">
-            <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
-              <Shield className="h-4 w-4 text-sidebar-primary-foreground" />
-            </div>
+            <img src={logoImg} alt="CIC Expert Pro" className="h-8 w-8 rounded-lg object-contain" />
           </div>
         )}
       </SidebarHeader>

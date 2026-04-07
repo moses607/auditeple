@@ -7,6 +7,7 @@ import { NavLink } from '@/components/NavLink';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
+import logoImg from '@/assets/logo-circle.png';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
@@ -30,9 +31,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <header className="h-14 flex items-center border-b border-border bg-card/90 backdrop-blur-md px-4 shrink-0 shadow-sm sticky top-0 z-30">
             <SidebarTrigger className="mr-4" />
             <div className="flex items-center gap-2 flex-1">
-              <div className="h-7 w-7 rounded-md bg-primary flex items-center justify-center">
-                <span className="text-[10px] font-bold text-primary-foreground">CIC</span>
-              </div>
+              <img src={logoImg} alt="CIC Expert Pro" className="h-8 w-8 rounded-md object-contain" />
               <span className="text-sm font-semibold text-foreground tracking-tight hidden sm:inline">
                 CIC Expert Pro
               </span>
