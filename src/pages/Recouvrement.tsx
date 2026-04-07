@@ -87,7 +87,7 @@ export default function Recouvrement() {
 
       {form && (
         <Card className="border-primary"><CardContent className="pt-6 space-y-3">
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="space-y-1"><Label className="text-xs">Débiteur</Label><Input value={form.debiteur} onChange={e => setForm({ ...form, debiteur: e.target.value })} /></div>
             <div className="space-y-1"><Label className="text-xs">Nature</Label><Input value={form.nature} onChange={e => setForm({ ...form, nature: e.target.value })} placeholder="DP T1, Cantine..." /></div>
             <div className="space-y-1"><Label className="text-xs">Montant (€)</Label><Input type="number" value={form.montant} onChange={e => setForm({ ...form, montant: e.target.value })} /></div>
@@ -108,23 +108,48 @@ export default function Recouvrement() {
 
       {items.length === 0 && !form && <Card><CardContent className="py-12 text-center text-muted-foreground">Aucune créance.</CardContent></Card>}
       {items.length > 0 && (
-        <Card><CardContent className="pt-6 overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead><tr className="border-b text-xs text-muted-foreground"><th className="text-left p-2">Débiteur</th><th className="p-2">Nature</th><th className="text-right p-2">Montant</th><th className="p-2">Relances</th><th className="p-2">Statut</th><th></th></tr></thead>
-            <tbody>{items.map(x => (
-              <tr key={x.id} className={`border-b ${x.statut === 'Contentieux' ? 'bg-destructive/5' : ''}`}>
-                <td className="p-2 font-bold">{x.debiteur}</td><td className="p-2">{x.nature}</td>
-                <td className="p-2 text-right font-mono font-bold">{fmt(x.montant)}</td>
-                <td className="p-2 text-center">{x.relances}</td>
-                <td className="p-2"><Badge variant={x.statut === 'Contentieux' ? 'destructive' : 'default'}>{x.statut}</Badge></td>
-                <td className="p-2"><div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...x, montant: String(x.montant), relances: String(x.relances) })}><Pencil className="h-3 w-3" /></Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== x.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
-                </div></td>
-              </tr>
-            ))}</tbody>
-          </table>
-        </CardContent></Card>
+        <>
+          {/* Vue desktop */}
+          <Card className="shadow-card hidden md:block"><CardContent className="pt-6 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead><tr className="border-b text-xs text-muted-foreground"><th className="text-left p-2">Débiteur</th><th className="p-2">Nature</th><th className="text-right p-2">Montant</th><th className="p-2">Relances</th><th className="p-2">Statut</th><th></th></tr></thead>
+              <tbody>{items.map(x => (
+                <tr key={x.id} className={`border-b ${x.statut === 'Contentieux' ? 'bg-destructive/5' : ''}`}>
+                  <td className="p-2 font-bold">{x.debiteur}</td><td className="p-2">{x.nature}</td>
+                  <td className="p-2 text-right font-mono font-bold">{fmt(x.montant)}</td>
+                  <td className="p-2 text-center">{x.relances}</td>
+                  <td className="p-2"><Badge variant={x.statut === 'Contentieux' ? 'destructive' : 'default'}>{x.statut}</Badge></td>
+                  <td className="p-2"><div className="flex gap-1">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...x, montant: String(x.montant), relances: String(x.relances) })}><Pencil className="h-3 w-3" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== x.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                  </div></td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </CardContent></Card>
+          {/* Vue mobile */}
+          <div className="md:hidden space-y-2">
+            {items.map(x => (
+              <Card key={x.id} className={x.statut === 'Contentieux' ? 'border-destructive' : ''}>
+                <CardContent className="p-3 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-sm">{x.debiteur}</span>
+                    <Badge variant={x.statut === 'Contentieux' ? 'destructive' : 'default'} className="text-xs">{x.statut}</Badge>
+                  </div>
+                  <div className="grid grid-cols-2 gap-1 text-xs text-muted-foreground">
+                    <span>Nature : {x.nature}</span>
+                    <span>Relances : {x.relances}</span>
+                    <span className="font-mono font-bold text-foreground col-span-2">{fmt(x.montant)}</span>
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setForm({ ...x, montant: String(x.montant), relances: String(x.relances) })}><Pencil className="h-4 w-4" /></Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => save(items.filter(i => i.id !== x.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
       )}
     </ModulePageLayout>
   );

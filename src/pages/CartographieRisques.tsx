@@ -137,7 +137,7 @@ export default function CartographieRisques() {
       {form && (
         <Card className="border-primary shadow-card-hover">
           <CardContent className="pt-6 space-y-3">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div className="space-y-1">
                 <Label className="text-xs">Processus Cartop@le</Label>
                 <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.processus} onChange={e => setForm({ ...form, processus: e.target.value })}>
@@ -198,46 +198,81 @@ export default function CartographieRisques() {
       )}
 
       {sorted.length > 0 && (
-        <Card className="shadow-card">
-          <CardContent className="pt-6 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-xs text-muted-foreground">
-                  <th className="text-left p-2">Processus</th>
-                  <th className="text-left p-2">Risque</th>
-                  <th className="p-2">P</th><th className="p-2">I</th><th className="p-2">M</th>
-                  <th className="p-2">Note</th><th className="p-2">Criticité</th>
-                  <th className="text-left p-2">Action</th><th className="p-2">Statut</th><th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {sorted.map(r => {
-                  const n = r.probabilite * r.impact * r.maitrise;
-                  const rl = riskLevel(r);
-                  return (
-                    <tr key={r.id} className={`border-b transition-colors ${rl.bg}`}>
-                      <td className="p-2 font-bold text-xs">{r.processus}</td>
-                      <td className="p-2 max-w-[200px]">{r.risque}</td>
-                      <td className="p-2 text-center">{r.probabilite}</td>
-                      <td className="p-2 text-center">{r.impact}</td>
-                      <td className="p-2 text-center">{r.maitrise}</td>
-                      <td className="p-2 text-center font-mono font-bold text-lg">{n}</td>
-                      <td className="p-2"><Badge variant={rl.color}>{rl.label}</Badge></td>
-                      <td className="p-2 text-xs max-w-[180px]">{r.action}</td>
-                      <td className="p-2"><Badge variant={r.statut === 'Réalisé' ? 'secondary' : 'default'}>{r.statut}</Badge></td>
-                      <td className="p-2">
-                        <div className="flex gap-1">
+        <>
+          {/* Vue desktop */}
+          <Card className="shadow-card hidden md:block">
+            <CardContent className="pt-6 overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-xs text-muted-foreground">
+                    <th className="text-left p-2">Processus</th>
+                    <th className="text-left p-2">Risque</th>
+                    <th className="p-2">P</th><th className="p-2">I</th><th className="p-2">M</th>
+                    <th className="p-2">Note</th><th className="p-2">Criticité</th>
+                    <th className="text-left p-2">Action</th><th className="p-2">Statut</th><th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sorted.map(r => {
+                    const n = r.probabilite * r.impact * r.maitrise;
+                    const rl = riskLevel(r);
+                    return (
+                      <tr key={r.id} className={`border-b transition-colors ${rl.bg}`}>
+                        <td className="p-2 font-bold text-xs">{r.processus}</td>
+                        <td className="p-2 max-w-[200px]">{r.risque}</td>
+                        <td className="p-2 text-center">{r.probabilite}</td>
+                        <td className="p-2 text-center">{r.impact}</td>
+                        <td className="p-2 text-center">{r.maitrise}</td>
+                        <td className="p-2 text-center font-mono font-bold text-lg">{n}</td>
+                        <td className="p-2"><Badge variant={rl.color}>{rl.label}</Badge></td>
+                        <td className="p-2 text-xs max-w-[180px]">{r.action}</td>
+                        <td className="p-2"><Badge variant={r.statut === 'Réalisé' ? 'secondary' : 'default'}>{r.statut}</Badge></td>
+                        <td className="p-2"><div className="flex gap-1">
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...r, probabilite: String(r.probabilite), impact: String(r.impact), maitrise: String(r.maitrise) })}><Pencil className="h-3 w-3" /></Button>
                           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== r.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </CardContent>
-        </Card>
+                        </div></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+          {/* Vue mobile */}
+          <div className="md:hidden space-y-2">
+            {sorted.map(r => {
+              const n = r.probabilite * r.impact * r.maitrise;
+              const rl = riskLevel(r);
+              return (
+                <Card key={r.id} className={rl.label === 'CRITIQUE' ? 'border-destructive' : ''}>
+                  <CardContent className="p-3 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold text-muted-foreground">{r.processus}</span>
+                      <div className="flex items-center gap-1">
+                        <span className="font-mono font-bold text-lg">{n}</span>
+                        <Badge variant={rl.color} className="text-[10px]">{rl.label}</Badge>
+                      </div>
+                    </div>
+                    <p className="text-sm font-medium">{r.risque}</p>
+                    <div className="grid grid-cols-3 gap-1 text-xs text-center">
+                      <div className="bg-muted rounded p-1"><p className="text-muted-foreground">P</p><p className="font-bold">{r.probabilite}</p></div>
+                      <div className="bg-muted rounded p-1"><p className="text-muted-foreground">I</p><p className="font-bold">{r.impact}</p></div>
+                      <div className="bg-muted rounded p-1"><p className="text-muted-foreground">M</p><p className="font-bold">{r.maitrise}</p></div>
+                    </div>
+                    {r.action && <p className="text-xs text-muted-foreground">→ {r.action}</p>}
+                    <div className="flex items-center justify-between">
+                      <Badge variant={r.statut === 'Réalisé' ? 'secondary' : 'default'} className="text-[10px]">{r.statut}</Badge>
+                      <div className="flex gap-1">
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setForm({ ...r, probabilite: String(r.probabilite), impact: String(r.impact), maitrise: String(r.maitrise) })}><Pencil className="h-4 w-4" /></Button>
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => save(items.filter(i => i.id !== r.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </>
       )}
     </ModulePageLayout>
   );

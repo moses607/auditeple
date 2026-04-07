@@ -158,32 +158,44 @@ export default function PisteAudit() {
       )}
 
       {filtered.length > 0 && (
-        <Card>
-          <CardContent className="pt-6 overflow-x-auto">
+        <>
+          {/* Vue desktop */}
+          <Card className="hidden md:block"><CardContent className="pt-6 overflow-x-auto">
             <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b text-xs text-muted-foreground">
-                  <th className="text-left p-2">Date</th>
-                  <th className="text-left p-2">Auditeur</th>
-                  <th className="p-2">Action</th>
-                  <th className="text-left p-2">Module</th>
-                  <th className="text-left p-2">Détails</th>
+              <thead><tr className="border-b text-xs text-muted-foreground">
+                <th className="text-left p-2">Date</th>
+                <th className="text-left p-2">Auditeur</th>
+                <th className="p-2">Action</th>
+                <th className="text-left p-2">Module</th>
+                <th className="text-left p-2">Détails</th>
+              </tr></thead>
+              <tbody>{filtered.slice(0, 200).map(l => (
+                <tr key={l.id} className="border-b hover:bg-muted/30">
+                  <td className="p-2 font-mono text-xs whitespace-nowrap">{new Date(l.timestamp).toLocaleString('fr-FR')}</td>
+                  <td className="p-2 font-bold text-xs">{l.utilisateur}</td>
+                  <td className="p-2"><Badge variant={SEVERITY_COLORS[l.action] || 'secondary'} className="text-[10px]">{l.action}</Badge></td>
+                  <td className="p-2 text-xs text-muted-foreground">{l.module || '—'}</td>
+                  <td className="p-2 text-xs">{l.details}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {filtered.slice(0, 200).map(l => (
-                  <tr key={l.id} className="border-b">
-                    <td className="p-2 font-mono text-xs">{new Date(l.timestamp).toLocaleString('fr-FR')}</td>
-                    <td className="p-2 font-bold">{l.utilisateur}</td>
-                    <td className="p-2"><Badge variant={SEVERITY_COLORS[l.action] || 'secondary'}>{l.action}</Badge></td>
-                    <td className="p-2 text-xs">{l.module || '—'}</td>
-                    <td className="p-2 text-xs">{l.details}</td>
-                  </tr>
-                ))}
-              </tbody>
+              ))}</tbody>
             </table>
-          </CardContent>
-        </Card>
+          </CardContent></Card>
+          {/* Vue mobile */}
+          <div className="md:hidden space-y-2">
+            {filtered.slice(0, 100).map(l => (
+              <Card key={l.id}>
+                <CardContent className="p-3 space-y-1">
+                  <div className="flex items-center justify-between">
+                    <Badge variant={SEVERITY_COLORS[l.action] || 'secondary'} className="text-[10px]">{l.action}</Badge>
+                    <span className="text-[10px] text-muted-foreground font-mono">{new Date(l.timestamp).toLocaleDateString('fr-FR')}</span>
+                  </div>
+                  <p className="text-xs font-bold">{l.utilisateur} {l.module ? `· ${l.module}` : ''}</p>
+                  <p className="text-xs text-muted-foreground">{l.details}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </>
       )}
     </ModulePageLayout>
   );

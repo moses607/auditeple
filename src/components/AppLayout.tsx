@@ -93,7 +93,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           <main className="flex-1 overflow-auto p-4 md:p-6 bg-background pb-20 md:pb-6">
             {children}
           </main>
-          <footer className="min-h-[2rem] flex flex-wrap items-center justify-center border-t border-border bg-card/50 text-[10px] text-muted-foreground/50 shrink-0 px-4 gap-x-4 gap-y-1 py-1 no-print">
+          <footer className="min-h-[2rem] hidden md:flex flex-wrap items-center justify-center border-t border-border bg-card/50 text-[10px] text-muted-foreground/50 shrink-0 px-4 gap-x-4 gap-y-1 py-1 no-print">
             <span>CIC Expert Pro v8.0</span>
             <span>•</span>
             <span>M9-6 · GBCP · Code Éducation · Décrets 2025-1386/1383</span>
