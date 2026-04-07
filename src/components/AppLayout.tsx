@@ -82,12 +82,18 @@ export function AppLayout({ children }: AppLayoutProps) {
           <main className="flex-1 overflow-auto p-6 bg-background">
             {children}
           </main>
-          <footer className="h-8 flex items-center justify-center border-t border-border bg-card/50 text-[10px] text-muted-foreground/50 shrink-0 px-4 gap-4 no-print">
+          <footer className="min-h-[2rem] flex flex-wrap items-center justify-center border-t border-border bg-card/50 text-[10px] text-muted-foreground/50 shrink-0 px-4 gap-x-4 gap-y-1 py-1 no-print">
             <span>CIC Expert Pro v8.0</span>
             <span>•</span>
-            <span>M9-6 · GBCP · Code Éducation</span>
+            <span>M9-6 · GBCP · Code Éducation · Décrets 2025-1386/1383</span>
             <span>•</span>
             <span>Données locales — Compte Supabase</span>
+            <span>•</span>
+            <span>Outil d'aide à l'audit — ne se substitue pas aux textes officiels</span>
+            <span>•</span>
+            <NavLink to="/mentions-legales" className="hover:text-foreground underline">Mentions légales</NavLink>
+            <span>•</span>
+            <NavLink to="/politique-confidentialite" className="hover:text-foreground underline">Confidentialité</NavLink>
           </footer>
         </div>
       </div>
