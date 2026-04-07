@@ -50,7 +50,7 @@ export default function CartographieRisques() {
       description="Identification, cotation et traitement des risques comptables et financiers selon la méthodologie Cartop@le / ODICé."
       refs={[
         { code: 'Cartop@le', label: '11 processus CICF' },
-        { code: 'Décret 2012-1246', label: 'Art. 170-172 GBCP' },
+        { code: 'Décret 2012-1246 art. 170', label: 'CICF — Contrôle Interne Comptable et Financier' },
         { code: 'ODICé', label: 'Outil de diagnostic' },
       ]}
       headerActions={
