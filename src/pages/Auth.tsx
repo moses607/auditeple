@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { lovable } from '@/integrations/lovable/index';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -103,14 +104,11 @@ export default function Auth() {
       toast({ title: 'Trop de tentatives', description: 'Réessayez dans quelques instants.', variant: 'destructive' });
       return;
     }
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: window.location.origin,
-      },
+    const result = await lovable.auth.signInWithOAuth('google', {
+      redirect_uri: window.location.origin,
     });
-    if (error) {
-      toast({ title: 'Erreur', description: error.message, variant: 'destructive' });
+    if (result.error) {
+      toast({ title: 'Erreur', description: result.error instanceof Error ? result.error.message : String(result.error), variant: 'destructive' });
     }
   };
 
