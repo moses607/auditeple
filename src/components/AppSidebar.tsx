@@ -62,9 +62,7 @@ export function AppSidebar() {
           </div>
         ) : (
           <div className="flex items-center justify-center py-3">
-            <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
-              <Shield className="h-4 w-4 text-sidebar-primary-foreground" />
-            </div>
+            <img src={logoImg} alt="CIC Expert Pro" className="h-8 w-8 rounded-lg object-contain" />
           </div>
         )}
       </SidebarHeader>
