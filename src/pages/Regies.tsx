@@ -452,7 +452,7 @@ export default function RegiesPage() {
       </Tabs>
 
       {/* Contrôles réglementaires */}
-      <ModuleSection title="Contrôles réglementaires — Régies" description="Décret 2019-798 — Décret 2020-922 — M9-6 § 3.2" badge={`${(REGIES_REGLEMENTATION.controles_obligatoires).filter(c => regChecks[c.id]).length}/${(REGIES_REGLEMENTATION.controles_obligatoires).length}`}>
+      <ModuleSection title="Contrôles réglementaires — Régies" description="Décret 2019-798 — Décret 2020-128 — M9-6 § 3.2" badge={`${(REGIES_REGLEMENTATION.controles_obligatoires).filter(c => regChecks[c.id]).length}/${(REGIES_REGLEMENTATION.controles_obligatoires).length}`}>
         <Card className="shadow-card">
           <CardContent className="p-3 space-y-2">
             {REGIES_REGLEMENTATION.controles_obligatoires.map(item => (
