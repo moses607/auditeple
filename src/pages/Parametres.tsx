@@ -44,8 +44,8 @@ export default function ParametresPage() {
       setLookupError('Cet établissement est déjà enregistré dans le groupement.');
       return;
     }
-    if (params.etablissements.length >= 12) {
-      setLookupError('Limite atteinte : 12 établissements maximum par groupement comptable (EPLE, CFA, GRETA, budgets annexes).');
+    if (params.etablissements.length >= 20) {
+      setLookupError('Limite atteinte : 20 établissements maximum par groupement comptable (EPLE, CFA, GRETA, budgets annexes).');
       return;
     }
     setSearching(true);
@@ -166,7 +166,7 @@ export default function ParametresPage() {
       <div>
         <h1 className="text-2xl font-bold text-foreground">Paramètres & Groupement comptable</h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Importez jusqu'à 12 établissements (EPLE, CFA, GRETA, budgets annexes) par leur code UAI pour constituer votre groupement comptable.
+          Importez jusqu'à 20 établissements (EPLE, CFA, GRETA, budgets annexes) par leur code UAI pour constituer votre groupement comptable.
         </p>
       </div>
 
@@ -221,7 +221,7 @@ export default function ParametresPage() {
             <Building2 className="h-5 w-5 text-primary" />
             Ajouter un établissement au groupement
             <Badge variant="secondary" className="ml-auto text-xs">
-              {params.etablissements.length}/12
+              {params.etablissements.length}/20
             </Badge>
           </CardTitle>
         </CardHeader>
@@ -236,9 +236,9 @@ export default function ParametresPage() {
                 className="font-mono text-lg tracking-wider max-w-[200px]"
                 maxLength={8}
                 onKeyDown={e => e.key === 'Enter' && handleUAILookup()}
-                disabled={params.etablissements.length >= 12}
+                disabled={params.etablissements.length >= 20}
               />
-              <Button onClick={handleUAILookup} disabled={searching || params.etablissements.length >= 12} className="gap-2">
+              <Button onClick={handleUAILookup} disabled={searching || params.etablissements.length >= 20} className="gap-2">
                 {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
                 Rechercher &amp; Ajouter
               </Button>
