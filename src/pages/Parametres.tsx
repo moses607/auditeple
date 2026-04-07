@@ -44,8 +44,8 @@ export default function ParametresPage() {
       setLookupError('Cet établissement est déjà enregistré dans le groupement.');
       return;
     }
-    if (params.etablissements.length >= 12) {
-      setLookupError('Limite atteinte : 12 établissements maximum par groupement comptable (EPLE, CFA, GRETA, budgets annexes).');
+    if (params.etablissements.length >= 20) {
+      setLookupError('Limite atteinte : 20 établissements maximum par groupement comptable (EPLE, CFA, GRETA, budgets annexes).');
       return;
     }
     setSearching(true);
