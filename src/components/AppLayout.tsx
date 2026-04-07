@@ -87,7 +87,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <span>•</span>
             <span>M9-6 · GBCP · Code Éducation</span>
             <span>•</span>
-            <span>Données stockées localement</span>
+            <span>Données locales — Compte Supabase</span>
           </footer>
         </div>
       </div>
