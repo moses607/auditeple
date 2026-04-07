@@ -412,14 +412,14 @@ export const RGP_INFO = {
 // Seuils applicables aux EPLE (pouvoirs adjudicateurs hors État)
 // Décret 2025-1386 du 29/12/2025 — en vigueur depuis le 1er avril 2026 pour fournitures/services
 export const CONTROLES_MARCHES = [
-  { id: 'mp1', label: 'Respect du seuil de dispense : < 60 000 € HT (fournitures/services) ou < 100 000 € HT (travaux) — sans publicité ni mise en concurrence', ref: 'Art. R.2122-8 CCP — Décret 2025-1386 — Applicable au 1er avril 2026', severity: 'critique' as const },
-  { id: 'mp2', label: 'Publicité et mise en concurrence adaptées (MAPA) entre 60 000 € et 216 000 € HT — au moins 3 devis', ref: 'Art. R.2123-1 CCP — Seuils EPLE 2026', severity: 'majeur' as const },
-  { id: 'mp3', label: 'Procédure formalisée obligatoire pour les marchés ≥ 216 000 € HT fournitures/services (seuil UE EPLE 2026-2027)', ref: 'Art. R.2124-1 CCP — Règlement délégué UE — Décret 2025-1386', severity: 'critique' as const },
+  { id: 'mp1', label: 'Respect du seuil de dispense : < 60 000 € HT (fournitures/services) ou < 100 000 € HT (travaux) — Décret 2025-1386, en vigueur au 1er avril 2026', ref: 'Art. R.2122-8 CCP', severity: 'critique' as const },
+  { id: 'mp2', label: 'Publicité et mise en concurrence adaptées (MAPA) entre 60 000 € et 216 000 € HT — minimum 3 devis', ref: 'Art. R.2123-1 CCP — Seuils EPLE 2026', severity: 'majeur' as const },
+  { id: 'mp3', label: 'Procédure formalisée obligatoire pour les marchés ≥ 216 000 € HT fournitures/services (seuil UE EPLE 2026-2027)', ref: 'Art. R.2124-1 CCP — Décret 2025-1386', severity: 'critique' as const },
   { id: 'mp4', label: 'Publication au JOUE + BOAMP si seuil européen atteint (≥ 216 000 € HT ou ≥ 5 404 000 € HT travaux)', ref: 'Décrets 2025-1386/1383 — Seuils UE 2026-2027', severity: 'critique' as const },
-  { id: 'mp5', label: 'Transmission au contrôle de légalité si montant ≥ 216 000 € HT (seuil calé sur procédure formalisée EPLE 2026)', ref: 'Art. L.421-14 Code Éducation — Seuil révisé au 1er janvier 2026', severity: 'majeur' as const },
+  { id: 'mp5', label: 'Transmission au contrôle de légalité si montant ≥ 216 000 € HT', ref: 'Art. L.421-14 Code Éducation — Seuil révisé 2026', severity: 'majeur' as const },
   { id: 'mp6', label: 'Acte d\'engagement signé par l\'ordonnateur avant tout engagement de dépense', ref: 'CCP — Art. 8 GBCP', severity: 'critique' as const },
   { id: 'mp7', label: 'Rapport de présentation ou fiche de procédure pour tout marché ≥ 60 000 € HT', ref: 'Art. R.2184-1 CCP', severity: 'majeur' as const },
-  { id: 'mp8', label: 'Mise en concurrence effective (3 devis minimum entre 25 000 € et 60 000 € HT — bonne pratique)', ref: 'CCP — Principes fondamentaux égalité, transparence, libre accès', severity: 'majeur' as const },
+  { id: 'mp8', label: 'Mise en concurrence effective (3 devis minimum entre 25 000 € et 60 000 € HT — bonne pratique)', ref: 'CCP — Principes fondamentaux', severity: 'majeur' as const },
   { id: 'mp9', label: 'Vérification de la non-sous-traitance non déclarée', ref: 'Art. R.2193-1 CCP', severity: 'majeur' as const },
   { id: 'mp10', label: 'Avenant éventuel voté au CA si modification substantielle du marché', ref: 'Art. R.421-20 Code Éducation', severity: 'majeur' as const },
   { id: 'mp11', label: 'Délai de paiement respecté (30 jours maximum pour les EPLE)', ref: 'Art. L.2192-10 CCP', severity: 'majeur' as const },
