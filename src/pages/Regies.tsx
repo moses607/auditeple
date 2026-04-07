@@ -136,8 +136,8 @@ export default function RegiesPage() {
       description="Contrôle des régies d'avances et de recettes : acte constitutif, nomination, cautionnement, comptage de caisse, chèques en coffre, valeurs inactives et délai de versement au comptable."
       refs={[
         { code: 'Décret 2019-798', label: 'Régies de recettes et d\'avances' },
-        { code: 'Décret 2020-922', label: 'Modification des seuils' },
-        { code: 'Art. 18 GBCP', label: 'Contrôle inopiné' },
+        { code: 'Décret 2020-128', label: 'Modification du régime des régies' },
+        { code: 'Art. 18 Décret 2012-1246', label: 'Contrôle inopiné obligatoire' },
         { code: 'M9-6 § 3.2', label: 'Contrôle de la caisse' },
       ]}
       completedChecks={(REGIES_REGLEMENTATION.controles_obligatoires).filter(c => regChecks[c.id]).length}
