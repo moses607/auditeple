@@ -4,6 +4,7 @@ import { useAuditParams } from '@/hooks/useAuditStore';
 import { getSelectedEtablissement } from '@/lib/types';
 import { Building2, MapPin, LogOut, Moon, Sun } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
+import { RegulatoryUpdateBanner } from '@/components/RegulatoryUpdateBanner';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
@@ -79,6 +80,7 @@ export function AppLayout({ children }: AppLayoutProps) {
               <LogOut className="h-4 w-4" />
             </Button>
           </header>
+          <RegulatoryUpdateBanner />
           <main className="flex-1 overflow-auto p-6 bg-background">
             {children}
           </main>

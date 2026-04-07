@@ -41,6 +41,7 @@ const PVAudit = lazy(() => import("./pages/PVAudit"));
 const PisteAudit = lazy(() => import("./pages/PisteAudit"));
 const Bourses = lazy(() => import("./pages/Bourses"));
 const FondsSociaux = lazy(() => import("./pages/FondsSociaux"));
+const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
 
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
@@ -115,6 +116,7 @@ const App = () => (
                   <Route path="/pv-audit" element={<PVAudit />} />
                   <Route path="/annexe-comptable" element={<AnnexeComptable />} />
                   <Route path="/piste-audit" element={<PisteAudit />} />
+                  <Route path="/mentions-legales" element={<MentionsLegales />} />
                   <Route path="/parametres" element={<Parametres />} />
                   <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
                   <Route path="*" element={<NotFound />} />
