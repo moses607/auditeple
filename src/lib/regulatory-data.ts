@@ -173,7 +173,7 @@ export const VERIFICATION_QUOTIDIENNE = {
     { id: 'vq12', label: 'Régies d\'avances : solde dans les limites du plafond', ref: 'Art. 4 Décret 2019-798', severity: 'critique' as const },
     { id: 'vq13', label: 'Régies de recettes : versement au comptable dans le délai de 7 jours', ref: 'Art. 13 Décret 2019-798', severity: 'majeur' as const },
     { id: 'vq14', label: 'Actes constitutifs des régies à jour et conformes', ref: 'Art. 1 Décret 2019-798', severity: 'majeur' as const },
-    { id: 'vq15', label: 'Cautionnement des régisseurs vérifié', ref: 'Art. 9 Décret 2019-798', severity: 'majeur' as const },
+    { id: 'vq15', label: 'Suppléance des régisseurs : mandataire nommé en cas d\'absence du régisseur titulaire', ref: 'Art. 10 Décret 2019-798', severity: 'majeur' as const },
   ],
   recettes: [
     { id: 'vq16', label: 'État des créances à recouvrer (balance âgée)', ref: 'Art. 20 GBCP', severity: 'critique' as const },
