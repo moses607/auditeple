@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, Download } from 'lucide-react';
 import { CartoRisque, NIVEAUX_RISQUE } from '@/lib/types';
 import { CARTOPALE_PROCESSUS } from '@/lib/regulatory-data';
 import { loadState, saveState } from '@/lib/store';
@@ -50,20 +50,35 @@ export default function CartographieRisques() {
       description="Identification, cotation et traitement des risques comptables et financiers selon la méthodologie Cartop@le / ODICé."
       refs={[
         { code: 'Cartop@le', label: '11 processus CICF' },
-        { code: 'Décret 2012-1246', label: 'Art. 170-172 GBCP' },
+        { code: 'Décret 2012-1246 art. 170', label: 'CICF — Contrôle Interne Comptable et Financier' },
         { code: 'ODICé', label: 'Outil de diagnostic' },
       ]}
       headerActions={
-        <Button
-          className="bg-white/20 hover:bg-white/30 text-white border-white/25"
-          variant="outline"
-          onClick={() => setForm({
-            processus: PROCESSUS_LIST[0], risque: '', probabilite: '3', impact: '3', maitrise: '3',
-            action: '', responsable: '', echeance: 'Permanent', statut: 'À lancer',
-          })}
-        >
-          <Plus className="h-4 w-4 mr-2" /> Nouveau risque
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            className="bg-white/20 hover:bg-white/30 text-white border-white/25"
+            variant="outline"
+            onClick={() => setForm({
+              processus: PROCESSUS_LIST[0], risque: '', probabilite: '3', impact: '3', maitrise: '3',
+              action: '', responsable: '', echeance: 'Permanent', statut: 'À lancer',
+            })}
+          >
+            <Plus className="h-4 w-4 mr-2" /> Nouveau risque
+          </Button>
+          {items.length > 0 && (
+            <Button
+              className="bg-white/20 hover:bg-white/30 text-white border-white/25"
+              variant="outline"
+              onClick={() => {
+                const rows = [['Processus','Risque','P','I','M','Note','Action','Responsable','Échéance','Statut'], ...items.map(r => [r.processus, r.risque, r.probabilite, r.impact, r.maitrise, r.probabilite*r.impact*r.maitrise, r.action, r.responsable, r.echeance, r.statut])];
+                const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+                const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'})); a.download = `cartographie-risques-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" /> Export CSV
+            </Button>
+          )}
+        </div>
       }
     >
       {/* ─── KPI ─── */}

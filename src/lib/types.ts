@@ -303,6 +303,7 @@ export interface LogEntry {
   utilisateur: string;
   action: string;
   details: string;
+  module?: string;
 }
 
 // ═══ RÉGIES ═══
