@@ -2,11 +2,14 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout, AnomalyAlert, ModuleSection } from '@/components/ModulePageLayout';
 import { INDICATEURS_FINANCIERS_M96 } from '@/lib/regulatory-data';
+import { Upload } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function AnalyseFinanciere() {
   const [data, setData] = useState(() => loadState('analyse_fin_v2', {
@@ -91,6 +94,37 @@ export default function AnalyseFinanciere() {
                 <Label className="text-xs">BFR N-1 (€)</Label>
                 <Input type="number" value={data.bfrN1} onChange={e => update('bfrN1', e.target.value)} />
               </div>
+            </div>
+
+            {/* Import CSV Op@le */}
+            <div className="pt-3 border-t border-border space-y-2">
+              <p className="text-xs font-semibold text-foreground">Import depuis Op@le (CSV balance)</p>
+              <div className="flex items-center gap-2">
+                <label className="cursor-pointer">
+                  <input type="file" accept=".csv" className="hidden" onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const text = await file.text();
+                    const lines = text.split('\n').map(l => l.split(/[;,\t]/));
+                    let fdrVal = '', tresoVal = '';
+                    for (const cols of lines) {
+                      const compte = (cols[0] || '').replace(/"/g,'').trim().replace(/^C\//,'');
+                      const montant = (cols[cols.length - 1] || '').replace(/"/g,'').replace(',','.').trim();
+                      if (compte === '10' || compte === '1') fdrVal = montant;
+                      if (compte === '515') tresoVal = montant;
+                    }
+                    if (tresoVal) { update('treso', tresoVal); toast.success('Trésorerie importée depuis Op@le'); }
+                    if (fdrVal) { update('fdr', fdrVal); }
+                    e.target.value = '';
+                  }} />
+                  <Button type="button" variant="outline" size="sm" className="gap-2 text-xs pointer-events-none" tabIndex={-1}>
+                    <Upload className="h-3.5 w-3.5" />Importer balance Op@le (CSV)
+                  </Button>
+                </label>
+              </div>
+              <p className="text-[10px] text-muted-foreground">
+                Importe automatiquement les soldes des comptes 515 (trésorerie) et capitaux depuis la balance Op@le exportée en CSV.
+              </p>
             </div>
           </CardContent>
         </Card>
