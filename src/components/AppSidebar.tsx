@@ -49,9 +49,7 @@ export function AppSidebar() {
         {!collapsed ? (
           <div className="px-3 py-4">
             <div className="flex items-center gap-2.5">
-              <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
-                <Shield className="h-4 w-4 text-sidebar-primary-foreground" />
-              </div>
+              <img src={logoImg} alt="CIC Expert Pro" className="h-9 w-9 rounded-lg object-contain" />
               <div>
                 <h2 className="text-sm font-bold tracking-wide text-sidebar-primary-foreground">
                   CIC Expert Pro
