@@ -168,6 +168,10 @@ export const VERIFICATION_QUOTIDIENNE = {
     { id: 'vq9', label: 'Concordance entre Op@le et les pièces comptables', ref: 'M9-6 § 2.1', severity: 'majeur' as const },
     { id: 'vq10', label: 'Compte 472 « recettes à classer » : solde justifié', ref: 'M9-6 § 2.4.2', severity: 'majeur' as const },
     { id: 'vq11', label: 'Compte 515 « compte au Trésor » : concordance avec le relevé DFT', ref: 'M9-6 § 3.1', severity: 'critique' as const },
+    { id: 'vq12b', label: 'Compte C/471 « dépenses à régulariser » : solde justifié et apuré', ref: 'M9-6 § 2.4.1', severity: 'critique' as const },
+    { id: 'vq12c', label: 'Compte C/472 « recettes à classer » : soldé rapidement, aucun solde ancien non justifié', ref: 'M9-6 § 2.4.2', severity: 'critique' as const },
+    { id: 'vq12d', label: 'Compte C/473 « recettes perçues d\'avance » : suivi et justification par débiteur', ref: 'M9-6 § 2.4.3', severity: 'majeur' as const },
+    { id: 'vq12e', label: 'Comptes C/486 et C/487 « charges/produits constatés d\'avance » : rattachement correct à l\'exercice', ref: 'M9-6 § 2.4 — PCG art. 313-1', severity: 'majeur' as const },
   ],
   regies: [
     { id: 'vq12', label: 'Régies d\'avances : solde dans les limites du plafond', ref: 'Art. 4 Décret 2019-798', severity: 'critique' as const },

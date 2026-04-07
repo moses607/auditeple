@@ -125,7 +125,7 @@ export default function FondsRoulementPage() {
     <ModulePageLayout
       title="Fonds de roulement"
       section="FINANCES & BUDGET"
-      description="Suivi pluriannuel du fonds de roulement, calcul des jours de FDR (FDR/DRFN×365), analyse de la variation et projection. Seuil de vigilance : FDR inférieur à 30 jours de DRFN."
+      description="Analyse du fonds de roulement disponible selon la méthodologie IGAENR 2016-071 (rapport n°2016-071). Note méthodologique : cette page utilise le diviseur C/360 (charges décaissables annuelles / 360 jours) conformément au rapport IGAENR, ce qui est distinct de la méthode M9-6 § 4.5.3 utilisée dans le module Analyse financière (DRFN/365). Les deux méthodes coexistent légitimement : la première sert à évaluer le prélèvement sur FDR, la seconde à produire les indicateurs du compte financier."
       refs={[
         { code: "M9-6 § 4.5.3.1", label: "Fonds de roulement" },
         { code: "M9-6 § 4.5.3", label: "Indicateurs financiers" },
