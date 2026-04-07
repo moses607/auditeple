@@ -30,11 +30,12 @@ export default function AnalyseFinanciere() {
   const joursTreso = drfn > 0 ? Math.round(treso / drfn * 365) : null;
 
   // Variation FDR
-  const variationFDR = fdrN1 > 0 ? Math.round((fdr - fdrN1) / fdrN1 * 100) : null;
+  const variationFDR = fdrN1 !== 0 ? Math.round((fdr - fdrN1) / fdrN1 * 100) : null;
 
   // Vérification de la relation fondamentale
   const ecartRelation = Math.abs(fdr - bfr - treso);
-  const relationOK = fdr > 0 && ecartRelation < 1;
+  const hasAllThree = data.fdr !== '' && data.bfr !== '' && data.treso !== '';
+  const relationOK = !hasAllThree || ecartRelation < 1;
 
   const hasData = fdr !== 0 || bfr !== 0 || treso !== 0;
 
@@ -136,7 +137,7 @@ export default function AnalyseFinanciere() {
           {treso < 0 && (
             <AnomalyAlert title="Trésorerie nette négative" description="L'établissement est en situation de découvert comptable. Le FDR ne couvre pas le BFR." severity="error" />
           )}
-          {fdr > 0 && bfr !== 0 && treso !== 0 && !relationOK && (
+          {hasAllThree && !relationOK && (
             <AnomalyAlert title={`Incohérence : FDR − BFR ≠ Trésorerie (écart : ${fmt(ecartRelation)})`} description="Relation fondamentale M9-6 : Trésorerie = FDR − BFR. Vérifiez vos données." severity="warning" />
           )}
 
