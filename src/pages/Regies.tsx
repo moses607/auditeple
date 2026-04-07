@@ -63,7 +63,7 @@ export default function RegiesPage() {
   // ═══ NOMINATION RÉGISSEUR ═══
   const [nomination, setNomination] = useState<NominationRegisseur>(() => loadState('regies_nomination', {
     nom: '', prenom: '', fonction: '', dateNomination: '', referenceArrete: '',
-    cautionnement: false, montantCaution: 0, formationRegie: false, dateFormation: '', observations: '',
+    suppleant: '', dateSuppleance: '', formationRegie: false, dateFormation: '', observations: '',
   }));
 
   // ═══ DFT ═══
