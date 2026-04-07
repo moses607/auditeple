@@ -123,15 +123,15 @@ export const REGIES_REGLEMENTATION = {
     ref: 'Décret n°2019-798 du 26 juillet 2019',
     objet: 'Régies de recettes et d\'avances des organismes publics',
   },
-  // Décret n°2020-922 du 29 juillet 2020
+  // Décret n°2020-128 du 14 février 2020
   decret2020: {
-    ref: 'Décret n°2020-922 du 29 juillet 2020',
-    objet: 'Modification des seuils des régies',
+    ref: 'Décret n°2020-128 du 14 février 2020',
+    objet: 'Modification du régime des régies de recettes et d\'avances des organismes publics',
   },
   plafonds: {
-    avances_fonctionnement: { montant: 2_000, label: 'Plafond régie d\'avances — Fonctionnement', ref: 'Art. 4 Décret 2019-798' },
-    avances_restauration: { montant: 3_000, label: 'Plafond régie d\'avances — Restauration', ref: 'Art. 4 Décret 2019-798' },
-    recettes: { montant: 10_000, label: 'Plafond encaisse régie de recettes', ref: 'Art. 12 Décret 2019-798' },
+    avances_fonctionnement: { montant: 2_000, label: 'Plafond régie d\'avances — Fonctionnement', ref: 'Art. 4 Décrets 2019-798 et 2020-128' },
+    avances_restauration: { montant: 3_000, label: 'Plafond régie d\'avances — Restauration', ref: 'Art. 4 Décrets 2019-798 et 2020-128' },
+    recettes: { montant: 10_000, label: 'Plafond encaisse régie de recettes', ref: 'Art. 12 Décrets 2019-798 et 2020-128' },
     delai_versement: { jours: 7, label: 'Délai maximum de versement au comptable', ref: 'Art. 13 Décret 2019-798' },
   },
   controles_obligatoires: [
