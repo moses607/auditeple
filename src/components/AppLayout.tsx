@@ -12,6 +12,7 @@ import logoImg from '@/assets/logo-circle.png';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
+import { MobileBottomNav } from '@/components/MobileBottomNav';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -25,7 +26,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const hasEtabs = params.etablissements.length > 0;
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
@@ -38,7 +39,13 @@ export function AppLayout({ children }: AppLayoutProps) {
               </span>
             </div>
             {hasEtabs ? (
-              <div className="flex items-center gap-2">
+              <>
+                {current && (
+                  <span className="text-xs font-medium text-foreground truncate max-w-[120px] md:hidden">
+                    {current.nom}
+                  </span>
+                )}
+                <div className="hidden md:flex items-center gap-2">
                 <Select
                   value={params.selectedEtablissementId}
                   onValueChange={(id) => update({ selectedEtablissementId: id })}
@@ -66,7 +73,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                 <NavLink to="/parametres" className="text-xs text-primary hover:underline ml-1 font-medium">
                   Gérer
                 </NavLink>
-              </div>
+                </div>
+              </>
             ) : (
               <NavLink to="/parametres" className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-dashed border-muted-foreground/30 hover:border-primary/50 hover:bg-muted transition-colors">
                 <Building2 className="h-4 w-4 text-muted-foreground" />
@@ -82,7 +90,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </Button>
           </header>
           <RegulatoryUpdateBanner />
-          <main className="flex-1 overflow-auto p-6 bg-background">
+          <main className="flex-1 overflow-auto p-4 md:p-6 bg-background pb-20 md:pb-6">
             {children}
           </main>
           <footer className="min-h-[2rem] flex flex-wrap items-center justify-center border-t border-border bg-card/50 text-[10px] text-muted-foreground/50 shrink-0 px-4 gap-x-4 gap-y-1 py-1 no-print">
@@ -98,6 +106,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <span>•</span>
             <NavLink to="/politique-confidentialite" className="hover:text-foreground underline">Confidentialité</NavLink>
           </footer>
+          <MobileBottomNav />
         </div>
       </div>
     </SidebarProvider>
