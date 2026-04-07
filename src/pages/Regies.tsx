@@ -37,7 +37,7 @@ interface ActeConstitutif {
 
 interface NominationRegisseur {
   nom: string; prenom: string; fonction: string; dateNomination: string;
-  referenceArrete: string; cautionnement: boolean; montantCaution: number;
+  referenceArrete: string; suppleant: string; dateSuppleance: string;
   formationRegie: boolean; dateFormation: string; observations: string;
 }
 
@@ -63,7 +63,7 @@ export default function RegiesPage() {
   // ═══ NOMINATION RÉGISSEUR ═══
   const [nomination, setNomination] = useState<NominationRegisseur>(() => loadState('regies_nomination', {
     nom: '', prenom: '', fonction: '', dateNomination: '', referenceArrete: '',
-    cautionnement: false, montantCaution: 0, formationRegie: false, dateFormation: '', observations: '',
+    suppleant: '', dateSuppleance: '', formationRegie: false, dateFormation: '', observations: '',
   }));
 
   // ═══ DFT ═══
@@ -136,8 +136,8 @@ export default function RegiesPage() {
       description="Contrôle des régies d'avances et de recettes : acte constitutif, nomination, cautionnement, comptage de caisse, chèques en coffre, valeurs inactives et délai de versement au comptable."
       refs={[
         { code: 'Décret 2019-798', label: 'Régies de recettes et d\'avances' },
-        { code: 'Décret 2020-922', label: 'Modification des seuils' },
-        { code: 'Art. 18 GBCP', label: 'Contrôle inopiné' },
+        { code: 'Décret 2020-128', label: 'Modification du régime des régies' },
+        { code: 'Art. 18 Décret 2012-1246', label: 'Contrôle inopiné obligatoire' },
         { code: 'M9-6 § 3.2', label: 'Contrôle de la caisse' },
       ]}
       completedChecks={(REGIES_REGLEMENTATION.controles_obligatoires).filter(c => regChecks[c.id]).length}
@@ -414,17 +414,21 @@ export default function RegiesPage() {
                 <div className="space-y-1"><Label className="text-xs">Fonction</Label><Input value={nomination.fonction} onChange={e => updateNom('fonction', e.target.value)} placeholder="Ex: Secrétaire d'intendance" /></div>
                 <div className="space-y-1"><Label className="text-xs">Date de nomination</Label><Input type="date" value={nomination.dateNomination} onChange={e => updateNom('dateNomination', e.target.value)} /></div>
                 <div className="space-y-1"><Label className="text-xs">Référence arrêté</Label><Input value={nomination.referenceArrete} onChange={e => updateNom('referenceArrete', e.target.value)} /></div>
-                <div className="space-y-1"><Label className="text-xs">Montant cautionnement (€)</Label><Input type="number" value={nomination.montantCaution || ''} onChange={e => updateNom('montantCaution', parseFloat(e.target.value) || 0)} /></div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Suppléant désigné (Art. 10 Décret 2019-798)</Label>
+                  <Input value={nomination.suppleant} onChange={e => updateNom('suppleant', e.target.value)} placeholder="Nom et prénom du suppléant" />
+                </div>
+                <div className="space-y-1">
+                  <Label className="text-xs">Date de nomination du suppléant</Label>
+                  <Input type="date" value={nomination.dateSuppleance} onChange={e => updateNom('dateSuppleance', e.target.value)} />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className={`p-3 rounded-lg border ${nomination.cautionnement ? 'border-green-500 bg-green-50' : 'border-destructive bg-destructive/10'}`}>
-                  <p className="text-xs font-bold mb-2">Cautionnement</p>
-                  <div className="flex gap-2">
-                    <Button size="sm" variant={nomination.cautionnement ? 'default' : 'outline'} onClick={() => updateNom('cautionnement', true)}>✓ Oui</Button>
-                    <Button size="sm" variant={!nomination.cautionnement ? 'destructive' : 'outline'} onClick={() => updateNom('cautionnement', false)}>✗ Non</Button>
-                  </div>
-                  {!nomination.cautionnement && <p className="text-xs text-destructive mt-2 font-bold">⚠️ Le cautionnement est obligatoire pour tout régisseur.</p>}
+                <div className="p-3 rounded-lg border border-border bg-muted/30">
+                  <p className="text-xs font-bold mb-1">Suppléant</p>
+                  <p className="text-sm">{nomination.suppleant || '—'}</p>
+                  {nomination.dateSuppleance && <p className="text-xs text-muted-foreground mt-1">Nommé le {nomination.dateSuppleance}</p>}
                 </div>
 
                 <div className={`p-3 rounded-lg border ${nomination.formationRegie ? 'border-green-500 bg-green-50' : 'border-orange-400 bg-orange-50'}`}>
@@ -448,7 +452,7 @@ export default function RegiesPage() {
       </Tabs>
 
       {/* Contrôles réglementaires */}
-      <ModuleSection title="Contrôles réglementaires — Régies" description="Décret 2019-798 — Décret 2020-922 — M9-6 § 3.2" badge={`${(REGIES_REGLEMENTATION.controles_obligatoires).filter(c => regChecks[c.id]).length}/${(REGIES_REGLEMENTATION.controles_obligatoires).length}`}>
+      <ModuleSection title="Contrôles réglementaires — Régies" description="Décret 2019-798 — Décret 2020-128 — M9-6 § 3.2" badge={`${(REGIES_REGLEMENTATION.controles_obligatoires).filter(c => regChecks[c.id]).length}/${(REGIES_REGLEMENTATION.controles_obligatoires).length}`}>
         <Card className="shadow-card">
           <CardContent className="p-3 space-y-2">
             {REGIES_REGLEMENTATION.controles_obligatoires.map(item => (
