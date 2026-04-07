@@ -76,6 +76,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="ml-2 text-muted-foreground hover:text-foreground" title="Basculer le thème">
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
+            <span className="text-[10px] text-green-500 font-mono ml-2 hidden sm:inline">● Session active</span>
             <Button variant="ghost" size="icon" onClick={signOut} className="text-muted-foreground hover:text-destructive" title="Déconnexion">
               <LogOut className="h-4 w-4" />
             </Button>
