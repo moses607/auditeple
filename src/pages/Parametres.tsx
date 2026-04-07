@@ -17,7 +17,8 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2, MapPin, ClipboardList, Users, ShieldAlert, UserCheck } from 'lucide-react';
+import { Plus, Trash2, Search, CheckCircle2, Loader2, AlertCircle, Building2, MapPin, ClipboardList, Users, ShieldAlert, UserCheck, FileText } from 'lucide-react';
+import { DocumentUpload } from '@/components/DocumentUpload';
 import { toast } from 'sonner';
 import { downloadAuditData, importAuditData } from '@/lib/export';
 
@@ -567,6 +568,35 @@ export default function ParametresPage() {
       </Card>
 
       <GDPRSettings />
+
+      {/* Documents de référence */}
+      <Card className="shadow-card">
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <FileText className="h-5 w-5 text-primary" />
+            Documents de référence
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Joignez les documents officiels de l'agence comptable. Stockés localement dans le navigateur.
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-foreground">Convention d'agence comptable</p>
+            <DocumentUpload categorie="convention" label="Joindre la convention" />
+          </div>
+          <Separator />
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-foreground">Actes de nomination (régisseurs)</p>
+            <DocumentUpload categorie="nomination" label="Joindre un acte" />
+          </div>
+          <Separator />
+          <div className="space-y-2">
+            <p className="text-xs font-semibold text-foreground">Exports Op@le (balance, SDE, SDR)</p>
+            <DocumentUpload categorie="opale" label="Importer un export Op@le (CSV/Excel)" acceptedTypes=".csv,.xlsx,.xls" />
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Export / Import données */}
       <Card className="shadow-card">
