@@ -30,7 +30,7 @@ export default function AnalyseFinanciere() {
   const joursTreso = drfn > 0 ? Math.round(treso / drfn * 365) : null;
 
   // Variation FDR
-  const variationFDR = fdrN1 > 0 ? Math.round((fdr - fdrN1) / fdrN1 * 100) : null;
+  const variationFDR = fdrN1 !== 0 ? Math.round((fdr - fdrN1) / fdrN1 * 100) : null;
 
   // Vérification de la relation fondamentale
   const ecartRelation = Math.abs(fdr - bfr - treso);
