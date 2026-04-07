@@ -82,7 +82,7 @@ export default function CartographieRisques() {
       }
     >
       {/* ─── KPI ─── */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Card className="shadow-card"><CardContent className="p-4">
           <p className="text-2xl font-bold">{items.length}</p>
           <p className="text-xs text-muted-foreground">Risques identifiés</p>
@@ -98,6 +98,10 @@ export default function CartographieRisques() {
         <Card className="shadow-card"><CardContent className="p-4">
           <p className="text-2xl font-bold">{coveredProcessus.length}/11</p>
           <p className="text-xs text-muted-foreground">Processus couverts</p>
+        </CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4">
+          <p className="text-2xl font-bold text-primary">{items.filter(r => r.statut === 'À lancer').length}</p>
+          <p className="text-xs text-muted-foreground">Issus d'audit</p>
         </CardContent></Card>
       </div>
 

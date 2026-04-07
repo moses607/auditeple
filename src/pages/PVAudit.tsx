@@ -10,6 +10,7 @@ import { Plus, Trash2, Search, Printer } from 'lucide-react';
 import SignaturePad from '@/components/SignaturePad';
 import { PVAuditItem, PVVerification, TYPES_CONTROLE_PV, fmtDate, getSelectedEtablissement, getAgenceComptable } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
+import { toast } from 'sonner';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { getModules } from '@/lib/audit-modules';
 import { collectAllAnomalies, collectAnomaliesFlat, ModuleAnomalies } from '@/lib/anomaly-collector';
@@ -301,7 +302,7 @@ export default function PVAudit() {
               </div>
               <p className="text-xs text-muted-foreground">Les anomalies sont automatiquement collectées depuis les modules sélectionnés. Les cases non cochées dans chaque module constituent des anomalies.</p>
               {(form.verifications || []).map((v: PVVerification, i: number) => (
-                <div key={i} className={`p-3 rounded border ${v.status === 'anomalie' ? 'border-destructive bg-destructive/5' : v.status === 'conforme' ? 'border-green-500 bg-green-50' : 'border-border'}`}>
+                <div key={i} className={`p-3 rounded border ${v.status === 'anomalie' ? 'border-destructive bg-destructive/5' : v.status === 'conforme' ? 'border-green-500 bg-green-50' : v.status === 'hors_perimetre' ? 'border-muted bg-muted/30 opacity-50' : 'border-border'}`}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
                     <Input placeholder="Point de vérification" value={v.label} onChange={e => updateVerif(i, { label: e.target.value })} className="text-xs h-8" />
                     <Input placeholder="Réf. réglementaire" value={v.reference} onChange={e => updateVerif(i, { reference: e.target.value })} className="text-xs h-8" />
@@ -310,6 +311,7 @@ export default function PVAudit() {
                     <Button size="sm" variant={v.status === 'conforme' ? 'default' : 'outline'} onClick={() => updateVerif(i, { status: 'conforme' })} className="text-xs h-7">✓ Conforme</Button>
                     <Button size="sm" variant={v.status === 'anomalie' ? 'destructive' : 'outline'} onClick={() => updateVerif(i, { status: 'anomalie' })} className="text-xs h-7">⚠ Anomalie</Button>
                     <Button size="sm" variant="ghost" onClick={() => updateVerif(i, { status: 'non_verifie' })} className="text-xs h-7">— Non vérifié</Button>
+                    <Button size="sm" variant="ghost" onClick={() => updateVerif(i, { status: 'hors_perimetre' })} className="text-xs h-7 opacity-60">⊘ Hors périmètre</Button>
                   </div>
                   {v.status === 'anomalie' && <Textarea className="mt-2 text-xs" rows={2} value={v.observations} onChange={e => updateVerif(i, { observations: e.target.value })} placeholder="Détailler l'anomalie..." />}
                 </div>
@@ -319,6 +321,7 @@ export default function PVAudit() {
                   <span><strong className="text-green-600">{(form.verifications || []).filter((v: PVVerification) => v.status === 'conforme').length}</strong> conformes</span>
                   <span><strong className="text-destructive">{(form.verifications || []).filter((v: PVVerification) => v.status === 'anomalie').length}</strong> anomalies</span>
                   <span><strong className="text-muted-foreground">{(form.verifications || []).filter((v: PVVerification) => v.status === 'non_verifie').length}</strong> non vérifiés</span>
+                  <span><strong className="text-muted-foreground">{(form.verifications || []).filter((v: PVVerification) => v.status === 'hors_perimetre').length}</strong> hors périmètre</span>
                 </div>
               )}
             </div>
@@ -404,6 +407,44 @@ export default function PVAudit() {
               <Textarea value={form.reponseOrdonnateur} onChange={e => setForm({ ...form, reponseOrdonnateur: e.target.value })} rows={2} placeholder="Réponse de l'ordonnateur..." />
             </div>
 
+            {/* Lien Cartographie des risques */}
+            {(form.verifications || []).filter((v: PVVerification) => v.status === 'anomalie').length > 0 && (
+              <Card className="border-orange-500 bg-orange-50 dark:bg-orange-950/20">
+                <CardContent className="pt-4 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🗺</span>
+                    <p className="text-sm font-bold">Lien Cartographie des risques — {(form.verifications || []).filter((v: PVVerification) => v.status === 'anomalie').length} anomalie(s) détectée(s)</p>
+                  </div>
+                  <p className="text-xs text-muted-foreground">Les anomalies de ce PV peuvent être poussées vers la Cartographie des risques Cartop@le. Chaque anomalie créera un risque dans le processus correspondant avec une criticité MAJEURE.</p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      const anomalies = (form.verifications || []).filter((v: PVVerification) => v.status === 'anomalie');
+                      const existing: any[] = (() => { try { return JSON.parse(localStorage.getItem('cic_expert_cartographie') || '[]'); } catch { return []; } })();
+                      const newRisks = anomalies.map((v: PVVerification) => ({
+                        id: crypto.randomUUID(),
+                        processus: 'P4 — Dépenses / Charges',
+                        risque: v.label,
+                        probabilite: 3,
+                        impact: 4,
+                        maitrise: 4,
+                        action: v.observations || 'Régularisation à effectuer',
+                        responsable: form.signataire1 || '',
+                        echeance: 'Mensuel',
+                        statut: 'À lancer',
+                      }));
+                      localStorage.setItem('cic_expert_cartographie', JSON.stringify([...existing, ...newRisks]));
+                      window.dispatchEvent(new Event('storage'));
+                      toast.success(`${newRisks.length} risque(s) créé(s) dans la Cartographie`, { description: 'Consultez le module Cartographie des risques pour les affiner.' });
+                    }}
+                  >
+                    Créer {(form.verifications || []).filter((v: PVVerification) => v.status === 'anomalie').length} risque(s) dans la Cartographie
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="flex gap-2"><Button onClick={submit}>Enregistrer</Button><Button variant="outline" onClick={() => setForm(null)}>Annuler</Button></div>
           </CardContent>
         </Card>
@@ -429,7 +470,14 @@ export default function PVAudit() {
                 </div>
               </div>
               <p className="text-sm"><strong>Objet:</strong> {p.objet}</p>
-              {anom > 0 && <p className="text-xs text-destructive font-bold mt-1">{anom} anomalie(s)</p>}
+              {anom > 0 && (
+                <p className="text-xs text-destructive font-bold mt-1">
+                  {anom} anomalie(s)
+                  {(p.verifications || []).filter(v => v.status === 'hors_perimetre').length > 0 && (
+                    <span className="text-muted-foreground font-normal"> · {(p.verifications || []).filter(v => v.status === 'hors_perimetre').length} hors périmètre</span>
+                  )}
+                </p>
+              )}
               {(p as any).modulesAudites && (
                 <div className="flex flex-wrap gap-1 mt-1">
                   {(p as any).modulesAudites.map((id: string) => (

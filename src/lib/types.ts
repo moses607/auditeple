@@ -273,7 +273,7 @@ export interface PVVerification {
   label: string;
   reference: string;
   criticite: string;
-  status: 'conforme' | 'anomalie' | 'non_verifie';
+  status: 'conforme' | 'anomalie' | 'non_verifie' | 'hors_perimetre';
   observations: string;
 }
 
