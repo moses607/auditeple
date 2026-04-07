@@ -23,6 +23,15 @@ export interface UAIResult {
   longitude?: number;
 }
 
+// Helper: detect type from UAI code prefix or name
+function detectType(nom: string, existingType?: string): string {
+  if (existingType && existingType.trim()) return existingType;
+  const upper = (nom || '').toUpperCase();
+  if (upper.includes('GRETA')) return 'GRETA';
+  if (upper.includes('CFA')) return 'CFA';
+  return '';
+}
+
 // ─── API v2.1 (preferred — exact match) ────────────────────────
 async function lookupV21(code: string): Promise<UAIResult | null> {
   const url = `https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-annuaire-education/records?where=identifiant_de_l_etablissement%3D%22${code}%22&limit=1`;
@@ -30,14 +39,13 @@ async function lookupV21(code: string): Promise<UAIResult | null> {
   if (!res.ok) return null;
   const data = await res.json();
 
-  // v2.1 returns { results: [...] }
   if (!data.results || data.results.length === 0) return null;
   const f = data.results[0];
 
   return {
     uai: f.identifiant_de_l_etablissement || code,
-    nom: f.nom_etablissement || f.appellation_officielle || '',
-    type: f.type_etablissement || '',
+    nom: f.nom_etablissement || f.appellation_officielle || code,
+    type: detectType(f.nom_etablissement || f.appellation_officielle || '', f.type_etablissement),
     adresse: f.adresse_1 || '',
     codePostal: f.code_postal || '',
     ville: f.nom_commune || '',
@@ -59,14 +67,13 @@ async function lookupV1(code: string): Promise<UAIResult | null> {
 
   const f = data.records[0].fields;
 
-  // Verify the result matches the exact UAI (v1 search is fuzzy)
   const resultUAI = (f.identifiant_de_l_etablissement || '').toUpperCase();
   if (resultUAI !== code) return null;
 
   return {
     uai: resultUAI,
-    nom: f.nom_etablissement || '',
-    type: f.type_etablissement || '',
+    nom: f.nom_etablissement || f.appellation_officielle || code,
+    type: detectType(f.nom_etablissement || '', f.type_etablissement),
     adresse: f.adresse_1 || '',
     codePostal: f.code_postal || '',
     ville: f.nom_commune || '',
@@ -81,7 +88,6 @@ async function lookupCFA(code: string): Promise<UAIResult | null> {
   const url = `https://data.education.gouv.fr/api/explore/v2.1/catalog/datasets/fr-en-inserjeunes-cfa/records?where=uai%3D%22${code}%22&limit=1`;
   const res = await fetch(url);
   if (!res.ok) {
-    // Fallback to v1.0 for CFA
     return lookupCFAv1(code);
   }
   const data = await res.json();
@@ -90,13 +96,14 @@ async function lookupCFA(code: string): Promise<UAIResult | null> {
   }
 
   const f = data.results[0];
+  const nom = f.libelle || f.nom_etablissement || '';
   return {
     uai: f.uai || code,
-    nom: f.libelle || f.nom_etablissement || '',
-    type: 'CFA',
+    nom: nom || `CFA ${code}`,
+    type: detectType(nom, 'CFA'),
     adresse: '',
     codePostal: '',
-    ville: f.commune || '',
+    ville: f.commune || f.libelle_commune || '',
     academie: f.region || f.academie || '',
   };
 }
@@ -112,13 +119,14 @@ async function lookupCFAv1(code: string): Promise<UAIResult | null> {
   const resultUAI = (f.uai || '').toUpperCase();
   if (resultUAI !== code) return null;
 
+  const nom = f.libelle || f.nom_etablissement || '';
   return {
     uai: resultUAI,
-    nom: f.libelle || '',
-    type: 'CFA',
+    nom: nom || `CFA ${code}`,
+    type: detectType(nom, 'CFA'),
     adresse: '',
     codePostal: '',
-    ville: '',
+    ville: f.commune || '',
     academie: f.region || '',
   };
 }
@@ -132,10 +140,11 @@ async function lookupGeoloc(code: string): Promise<UAIResult | null> {
   if (!data.results || data.results.length === 0) return null;
 
   const f = data.results[0];
+  const nom = f.appellation_officielle || f.denomination_principale || '';
   return {
     uai: f.code_uai || code,
-    nom: f.appellation_officielle || f.denomination_principale || '',
-    type: f.nature_uai_libe || '',
+    nom: nom || `Établissement ${code}`,
+    type: detectType(nom, f.nature_uai_libe),
     adresse: f.adresse_uai || '',
     codePostal: f.code_postal_uai || '',
     ville: f.libelle_commune || '',
@@ -175,7 +184,6 @@ export async function lookupUAI(uai: string): Promise<UAIResult | null> {
 }
 
 // ─── Manual entry helper ───────────────────────────────────────
-// When API fails, allow manual entry with UAI code validation
 export function createManualEtablissement(uai: string, nom: string, type: string, ville: string): UAIResult {
   return {
     uai: uai.trim().toUpperCase(),
