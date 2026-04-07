@@ -82,7 +82,7 @@ export default function RapprochementBancaire() {
       {form && (
         <Card className="border-primary">
           <CardContent className="pt-6 space-y-3">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
               <div className="space-y-1"><Label className="text-xs">Date</Label><Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} /></div>
               <div className="space-y-1"><Label className="text-xs">Solde DFT (€)</Label><Input type="number" value={form.dft} onChange={e => setForm({ ...form, dft: e.target.value })} /></div>
               <div className="space-y-1"><Label className="text-xs">Solde comptabilité (€)</Label><Input type="number" value={form.compta} onChange={e => setForm({ ...form, compta: e.target.value })} /></div>
