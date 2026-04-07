@@ -6,7 +6,7 @@
  * - Décret 2012-1246 du 7 novembre 2012 (GBCP)
  * - Code de l'Éducation (articles R.421-*)
  * - Décret n°2019-798 du 26 juillet 2019 (régies de recettes et d'avances)
- * - Décret n°2020-922 du 29 juillet 2020 (seuils des régies)
+ * - Décret n°2020-128 du 14 février 2020 (Modification du régime des régies de recettes et d'avances des organismes publics)
  * - Circulaire du 16 juillet 2024 (voyages scolaires)
  * - Décrets n°2025-1386 et 2025-1383 (seuils commande publique 2026)
  * - Ordonnance n°2022-408 du 21 mars 2022 (RGP - remplace RPP)
