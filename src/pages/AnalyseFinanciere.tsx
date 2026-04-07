@@ -34,7 +34,8 @@ export default function AnalyseFinanciere() {
 
   // Vérification de la relation fondamentale
   const ecartRelation = Math.abs(fdr - bfr - treso);
-  const relationOK = fdr > 0 && ecartRelation < 1;
+  const hasAllThree = data.fdr !== '' && data.bfr !== '' && data.treso !== '';
+  const relationOK = !hasAllThree || ecartRelation < 1;
 
   const hasData = fdr !== 0 || bfr !== 0 || treso !== 0;
 
