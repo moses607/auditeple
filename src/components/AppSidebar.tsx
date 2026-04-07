@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
-  FileText, Shield, Pencil, Check, BarChart3,
+  FileText, Pencil, Check, BarChart3,
 } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
@@ -15,6 +15,7 @@ import { useModules } from '@/hooks/useModules';
 import { useAuditProgress } from '@/hooks/useAuditProgress';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import logoImg from '@/assets/logo-circle.png';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
 
