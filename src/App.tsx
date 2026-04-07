@@ -87,7 +87,7 @@ const App = () => (
               <Routes>
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
-                <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
+                
                 <Route element={<ProtectedLayout />}>
                   <Route index element={<Dashboard />} />
                   <Route path="/controle-caisse" element={<ControleCaisse />} />
@@ -116,6 +116,7 @@ const App = () => (
                   <Route path="/annexe-comptable" element={<AnnexeComptable />} />
                   <Route path="/piste-audit" element={<PisteAudit />} />
                   <Route path="/parametres" element={<Parametres />} />
+                  <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>
