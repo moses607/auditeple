@@ -83,11 +83,11 @@ export function AppLayout({ children }: AppLayoutProps) {
             {children}
           </main>
           <footer className="h-8 flex items-center justify-center border-t border-border bg-card/50 text-[10px] text-muted-foreground/50 shrink-0 px-4 gap-4 no-print">
-            <span>CIC Expert Pro v7.0</span>
+            <span>CIC Expert Pro v8.0</span>
             <span>•</span>
             <span>M9-6 · GBCP · Code Éducation</span>
             <span>•</span>
-            <span>Données stockées localement</span>
+            <span>Données locales — Compte Supabase</span>
           </footer>
         </div>
       </div>
