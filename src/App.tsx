@@ -116,6 +116,7 @@ const App = () => (
                   <Route path="/annexe-comptable" element={<AnnexeComptable />} />
                   <Route path="/piste-audit" element={<PisteAudit />} />
                   <Route path="/parametres" element={<Parametres />} />
+                  <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>
