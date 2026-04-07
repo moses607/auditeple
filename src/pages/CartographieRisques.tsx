@@ -54,16 +54,31 @@ export default function CartographieRisques() {
         { code: 'ODICé', label: 'Outil de diagnostic' },
       ]}
       headerActions={
-        <Button
-          className="bg-white/20 hover:bg-white/30 text-white border-white/25"
-          variant="outline"
-          onClick={() => setForm({
-            processus: PROCESSUS_LIST[0], risque: '', probabilite: '3', impact: '3', maitrise: '3',
-            action: '', responsable: '', echeance: 'Permanent', statut: 'À lancer',
-          })}
-        >
-          <Plus className="h-4 w-4 mr-2" /> Nouveau risque
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            className="bg-white/20 hover:bg-white/30 text-white border-white/25"
+            variant="outline"
+            onClick={() => setForm({
+              processus: PROCESSUS_LIST[0], risque: '', probabilite: '3', impact: '3', maitrise: '3',
+              action: '', responsable: '', echeance: 'Permanent', statut: 'À lancer',
+            })}
+          >
+            <Plus className="h-4 w-4 mr-2" /> Nouveau risque
+          </Button>
+          {items.length > 0 && (
+            <Button
+              className="bg-white/20 hover:bg-white/30 text-white border-white/25"
+              variant="outline"
+              onClick={() => {
+                const rows = [['Processus','Risque','P','I','M','Note','Action','Responsable','Échéance','Statut'], ...items.map(r => [r.processus, r.risque, r.probabilite, r.impact, r.maitrise, r.probabilite*r.impact*r.maitrise, r.action, r.responsable, r.echeance, r.statut])];
+                const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(';')).join('\n');
+                const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'})); a.download = `cartographie-risques-${new Date().toISOString().slice(0,10)}.csv`; a.click();
+              }}
+            >
+              <Download className="h-4 w-4 mr-2" /> Export CSV
+            </Button>
+          )}
+        </div>
       }
     >
       {/* ─── KPI ─── */}
