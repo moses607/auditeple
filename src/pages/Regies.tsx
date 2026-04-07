@@ -37,7 +37,7 @@ interface ActeConstitutif {
 
 interface NominationRegisseur {
   nom: string; prenom: string; fonction: string; dateNomination: string;
-  referenceArrete: string; cautionnement: boolean; montantCaution: number;
+  referenceArrete: string; suppleant: string; dateSuppleance: string;
   formationRegie: boolean; dateFormation: string; observations: string;
 }
 
