@@ -136,7 +136,16 @@ export default function BudgetsAnnexes() {
     const sc = computeAuditScore(items);
     const epleSupport = params.etablissements.find(e => e.id === selectedBA.epleSupportId);
 
-    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Rapport Audit BA – ${selectedBA.nom}</title>
+    // HTML escape helper to prevent XSS injection from user-controlled fields
+    const esc = (s: unknown): string =>
+      String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+
+    w.document.write(`<!DOCTYPE html><html><head><meta charset="utf-8"><title>Rapport Audit BA – ${esc(selectedBA.nom)}</title>
     <style>
       @page { size: A4; margin: 20mm; }
       body { font-family: Georgia, 'Times New Roman', serif; font-size: 11pt; color: #1a1a2e; line-height: 1.5; }
@@ -159,17 +168,17 @@ export default function BudgetsAnnexes() {
     </style></head><body>
     <h1>RAPPORT D'AUDIT – BUDGET ANNEXE</h1>
     <div class="header-block"><table>
-      <tr><td><strong>Budget annexe :</strong></td><td>${selectedBA.nom} (${selectedBA.type})</td></tr>
-      <tr><td><strong>EPLE support :</strong></td><td>${epleSupport?.nom || '—'} (UAI ${epleSupport?.uai || '—'})</td></tr>
-      ${agence ? `<tr><td><strong>Agence comptable :</strong></td><td>${agence.nom}</td></tr>` : ''}
-      <tr><td><strong>Exercice :</strong></td><td>${selectedBA.exercice}</td></tr>
-      <tr><td><strong>Date création BA :</strong></td><td>${selectedBA.dateCreation}</td></tr>
-      <tr><td><strong>Budget :</strong></td><td>${fmt(selectedBA.budget)}</td></tr>
-      <tr><td><strong>Résultat net :</strong></td><td>${fmt(selectedBA.resultatNet)}</td></tr>
+      <tr><td><strong>Budget annexe :</strong></td><td>${esc(selectedBA.nom)} (${esc(selectedBA.type)})</td></tr>
+      <tr><td><strong>EPLE support :</strong></td><td>${esc(epleSupport?.nom || '—')} (UAI ${esc(epleSupport?.uai || '—')})</td></tr>
+      ${agence ? `<tr><td><strong>Agence comptable :</strong></td><td>${esc(agence.nom)}</td></tr>` : ''}
+      <tr><td><strong>Exercice :</strong></td><td>${esc(selectedBA.exercice)}</td></tr>
+      <tr><td><strong>Date création BA :</strong></td><td>${esc(selectedBA.dateCreation)}</td></tr>
+      <tr><td><strong>Budget :</strong></td><td>${esc(fmt(selectedBA.budget))}</td></tr>
+      <tr><td><strong>Résultat net :</strong></td><td>${esc(fmt(selectedBA.resultatNet))}</td></tr>
     </table></div>
-    <div class="score-block score-${sc.label}">
-      <strong>SCORING GLOBAL : ${sc.score}% — ${sc.label.toUpperCase()}</strong><br/>
-      <span style="font-size:10pt">${sc.detail}</span>
+    <div class="score-block score-${esc(sc.label)}">
+      <strong>SCORING GLOBAL : ${esc(sc.score)}% — ${esc(sc.label.toUpperCase())}</strong><br/>
+      <span style="font-size:10pt">${esc(sc.detail)}</span>
     </div>
     <h2>I. DÉTAIL DES CONTRÔLES</h2>
     <table class="audit">
@@ -178,12 +187,12 @@ export default function BudgetsAnnexes() {
       ${items.map((it, i) => {
         const def = AUDIT_ITEMS_BA[i];
         return `<tr>
-          <td><strong>${def.index}</strong></td>
-          <td><strong>${def.label}</strong><br/><span class="ref">${def.reference}</span></td>
-          <td>${it.existant || '<em>Non renseigné</em>'}<br/>${it.montantExistant ? `Montant: ${fmt(it.montantExistant)}` : ''}</td>
-          <td>${it.attendu}<br/>${it.montantAttendu ? `Attendu: ${fmt(it.montantAttendu)}` : ''}</td>
-          <td>${it.ecart || '—'}</td>
-          <td class="conforme-${it.conforme || 'non'}">${it.conforme === 'oui' ? '✓ CONFORME' : it.conforme === 'non' ? '✗ NON CONFORME' : it.conforme === 'partiel' ? '⚠ PARTIEL' : 'Non vérifié'}<br/><span style="font-size:9pt;color:#333;font-weight:normal">${it.commentaire || ''}</span></td>
+          <td><strong>${esc(def.index)}</strong></td>
+          <td><strong>${esc(def.label)}</strong><br/><span class="ref">${esc(def.reference)}</span></td>
+          <td>${it.existant ? esc(it.existant) : '<em>Non renseigné</em>'}<br/>${it.montantExistant ? `Montant: ${esc(fmt(it.montantExistant))}` : ''}</td>
+          <td>${esc(it.attendu)}<br/>${it.montantAttendu ? `Attendu: ${esc(fmt(it.montantAttendu))}` : ''}</td>
+          <td>${it.ecart ? esc(it.ecart) : '—'}</td>
+          <td class="conforme-${esc(it.conforme || 'non')}">${it.conforme === 'oui' ? '✓ CONFORME' : it.conforme === 'non' ? '✗ NON CONFORME' : it.conforme === 'partiel' ? '⚠ PARTIEL' : 'Non vérifié'}<br/><span style="font-size:9pt;color:#333;font-weight:normal">${esc(it.commentaire || '')}</span></td>
         </tr>`;
       }).join('')}
       </tbody>
@@ -193,11 +202,11 @@ export default function BudgetsAnnexes() {
     <table class="audit">
       <thead><tr><th>Date</th><th>Libellé</th><th>Débit</th><th>Crédit</th></tr></thead>
       <tbody>
-      ${selectedBA.mouvements185.map(m => `<tr><td>${m.date}</td><td>${m.libelle}</td><td>${fmt(m.debit)}</td><td>${fmt(m.credit)}</td></tr>`).join('')}
+      ${selectedBA.mouvements185.map(m => `<tr><td>${esc(m.date)}</td><td>${esc(m.libelle)}</td><td>${esc(fmt(m.debit))}</td><td>${esc(fmt(m.credit))}</td></tr>`).join('')}
       <tr style="font-weight:bold;background:#f0f4f8">
         <td colspan="2">TOTAL</td>
-        <td>${fmt(selectedBA.mouvements185.reduce((s, m) => s + m.debit, 0))}</td>
-        <td>${fmt(selectedBA.mouvements185.reduce((s, m) => s + m.credit, 0))}</td>
+        <td>${esc(fmt(selectedBA.mouvements185.reduce((s, m) => s + m.debit, 0)))}</td>
+        <td>${esc(fmt(selectedBA.mouvements185.reduce((s, m) => s + m.credit, 0)))}</td>
       </tr>
       </tbody>
     </table>
