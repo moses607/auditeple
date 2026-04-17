@@ -4,7 +4,38 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout, ModuleSection, ComplianceCheck, AnomalyAlert } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+import { RegRefBadge } from '@/components/RegRefBadge';
 import { VERIFICATION_QUOTIDIENNE } from '@/lib/regulatory-data';
+
+/* ═══ Les 5 motifs légaux de suspension de paiement (Art. 38 GBCP) ═══ */
+const MOTIFS_SUSPENSION_PAIEMENT = [
+  {
+    id: 'm1', titre: '1 — Qualité de l\'ordonnateur ou du délégataire',
+    detail: 'L\'acte d\'ordonnancement n\'émane pas d\'une autorité régulièrement habilitée (défaut de délégation, délégation expirée, signature non conforme à l\'accréditation déposée).',
+    indice: 'Vérifier l\'accréditation de l\'ordonnateur et la chaîne des délégations.',
+  },
+  {
+    id: 'm2', titre: '2 — Disponibilité des crédits',
+    detail: 'L\'imputation budgétaire est inexistante, le crédit est insuffisant, ou la dépense excède le plafond autorisé par le budget voté.',
+    indice: 'Contrôler la cohérence imputation/budget et la consommation actuelle des crédits.',
+  },
+  {
+    id: 'm3', titre: '3 — Exacte imputation comptable',
+    detail: 'Le compte d\'imputation choisi ne correspond pas à la nature économique de la dépense au sens de la M9-6 (ex. fonctionnement vs investissement).',
+    indice: 'Croiser libellé du marché / nature de la PJ / nomenclature M9-6.',
+  },
+  {
+    id: 'm4', titre: '4 — Validité de la créance (service fait + PJ)',
+    detail: 'Service fait non attesté, pièces justificatives manquantes ou non conformes à l\'arrêté du 25/07/2013 (devis, BC, BL, facture, certif. service fait...), liquidation arithmétiquement erronée.',
+    indice: 'Vérifier la liste des PJ obligatoires selon la nature de la dépense.',
+  },
+  {
+    id: 'm5', titre: '5 — Caractère libératoire du paiement',
+    detail: 'Le RIB du créancier ne correspond pas à l\'identité légale du fournisseur, le mode de règlement ne libère pas la dette (paiement à un tiers non mandaté), opposition reçue.',
+    indice: 'Vérifier RIB ↔ raison sociale ↔ SIRET sur l\'extrait Kbis ou via INSEE.',
+  },
+] as const;
 
 const CATEGORIES = [
   { key: 'caisse_tresorerie', title: 'Caisse et trésorerie', icon: '🏦' },
