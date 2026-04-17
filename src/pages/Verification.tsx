@@ -125,6 +125,23 @@ export default function VerificationPage() {
         />
       )}
 
+      {/* ═══ Les 5 motifs légaux de suspension de paiement (Art. 38 GBCP) ═══ */}
+      <ModuleSection
+        title="🛑 Les 5 motifs légaux de suspension de paiement"
+        description="Article 38 du décret GBCP 2012-1246 — l'agent comptable DOIT suspendre le paiement dès qu'un seul de ces motifs est constaté."
+        badge="Art. 38 GBCP"
+      >
+        <div className="space-y-2">
+          {MOTIFS_SUSPENSION_PAIEMENT.map(m => (
+            <ControlAlert key={m.id} level="info"
+              title={m.titre}
+              description={m.detail}
+              refKey="gbcp-38"
+              action={m.indice} />
+          ))}
+        </div>
+      </ModuleSection>
+
       {/* ─── Check sections ─── */}
       {CATEGORIES.map(cat => {
         const items = VERIFICATION_QUOTIDIENNE[cat.key as keyof typeof VERIFICATION_QUOTIDIENNE];
