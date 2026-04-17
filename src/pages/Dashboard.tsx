@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { CalendrierAlertesWidget } from '@/components/CalendrierAlertesWidget';
+import { CockpitIntelligent } from '@/components/CockpitIntelligent';
 
 import heroImg from '@/assets/hero-audit.png';
 import sectionControles from '@/assets/section-controles.png';
@@ -201,6 +202,9 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* ─── 🚀 COCKPIT INTELLIGENT — Score conformité + Top alertes cross-modules ─── */}
+      <CockpitIntelligent />
 
       {/* ─── KPI Row ─── */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
