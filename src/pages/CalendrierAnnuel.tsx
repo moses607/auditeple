@@ -252,22 +252,44 @@ export default function CalendrierAnnuel() {
         </div>
       </Card>
 
+      {/* ─── Note autonomie AC ─── */}
+      <Card className="p-3 border-primary/30 bg-primary/5">
+        <p className="text-sm text-foreground/80">
+          <strong className="text-primary">Votre calendrier, votre méthode.</strong> Chaque agent comptable
+          construit son propre calendrier en piochant dans la bibliothèque réglementaire ({ACTIVITES_MODELES.length} activités
+          pré-rédigées) et en y ajoutant ses activités personnalisées propres à son groupement (audits planifiés,
+          réunions internes, échéances locales…). Modifiez librement titres, dates, références et établissements concernés.
+        </p>
+      </Card>
+
       {/* ─── Actions ─── */}
       <div className="flex flex-wrap gap-2 items-center">
         {activites.length === 0 ? (
-          <Button onClick={initFromLibrary} className="gap-1.5">
-            <Plus className="h-4 w-4" /> Initialiser avec la bibliothèque ({ACTIVITES_MODELES.length} activités)
-          </Button>
+          <>
+            <Button onClick={initFromLibrary} className="gap-1.5">
+              <Plus className="h-4 w-4" /> Initialiser avec la bibliothèque ({ACTIVITES_MODELES.length} activités)
+            </Button>
+            <Button onClick={addBlank} variant="outline" className="gap-1.5">
+              <Plus className="h-4 w-4" /> Démarrer vide (activités personnalisées)
+            </Button>
+          </>
         ) : (
           <>
             <Dialog open={showLibrary} onOpenChange={setShowLibrary}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-1.5">
-                  <Plus className="h-4 w-4" /> Ajouter depuis la bibliothèque
+                  <Plus className="h-4 w-4" /> Bibliothèque ({ACTIVITES_MODELES.length})
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader><DialogTitle>Bibliothèque d'activités réglementaires</DialogTitle></DialogHeader>
+                <DialogHeader>
+                  <DialogTitle>Bibliothèque d'activités réglementaires</DialogTitle>
+                </DialogHeader>
+                <div className="flex justify-end mb-2">
+                  <Button size="sm" variant="secondary" onClick={addAllFromLibrary} className="gap-1.5">
+                    <Plus className="h-3.5 w-3.5" /> Tout ajouter (manquantes)
+                  </Button>
+                </div>
                 <div className="space-y-2">
                   {ACTIVITES_MODELES.map(m => {
                     const alreadyAdded = activites.some(a => a.modeleId === m.id);
@@ -296,6 +318,9 @@ export default function CalendrierAnnuel() {
             </Dialog>
             <Button onClick={addBlank} variant="outline" size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> Activité personnalisée
+            </Button>
+            <Button onClick={clearAll} variant="ghost" size="sm" className="gap-1.5 text-destructive hover:text-destructive ml-auto">
+              <Trash2 className="h-4 w-4" /> Tout vider
             </Button>
           </>
         )}
