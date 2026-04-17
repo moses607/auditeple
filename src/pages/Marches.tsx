@@ -55,6 +55,29 @@ export default function MarchesPage() {
   const remove = (id: string) => save(marches.filter(m => m.id !== id));
   const totMontant = marches.reduce((s, m) => s + m.montant, 0);
 
+  /* ═══ Détection auto saucissonnage : regroupe les marchés similaires (objet + nature) ═══ */
+  const clustersSaucissonnage = useMemo<ClusterSaucissonnage[]>(() => {
+    const visited = new Set<string>();
+    const clusters: ClusterSaucissonnage[] = [];
+    for (const m of marches) {
+      if (visited.has(m.id)) continue;
+      const groupe = marches.filter(x =>
+        x.typeMarche === m.typeMarche &&
+        (x.id === m.id || similarite(x.objet, m.objet) >= 0.5)
+      );
+      if (groupe.length < 2) continue;
+      const total = groupe.reduce((s, g) => s + (g.montant || 0), 0);
+      groupe.forEach(g => visited.add(g.id));
+      if (total >= SEUIL_CUMUL_SUSPECT) {
+        clusters.push({
+          motCle: m.objet.slice(0, 40), nature: m.typeMarche,
+          total, nb: groupe.length, ids: groupe.map(g => g.id),
+        });
+      }
+    }
+    return clusters.sort((a, b) => b.total - a.total);
+  }, [marches]);
+
   return (
     <ModulePageLayout
       title="Commande et marchés publics"
