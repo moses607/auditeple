@@ -44,6 +44,8 @@ interface NominationRegisseur {
   nom: string; prenom: string; fonction: string; dateNomination: string;
   referenceArrete: string; suppleant: string; dateSuppleance: string;
   formationRegie: boolean; dateFormation: string; observations: string;
+  cautionnementMontant: number; cautionnementSouscrit: boolean;
+  irMontantAnnuel: number; irVersee: boolean;
 }
 
 export default function RegiesPage() {
@@ -69,6 +71,8 @@ export default function RegiesPage() {
   const [nomination, setNomination] = useState<NominationRegisseur>(() => loadState('regies_nomination', {
     nom: '', prenom: '', fonction: '', dateNomination: '', referenceArrete: '',
     suppleant: '', dateSuppleance: '', formationRegie: false, dateFormation: '', observations: '',
+    cautionnementMontant: 0, cautionnementSouscrit: false,
+    irMontantAnnuel: 0, irVersee: false,
   }));
 
   // ═══ DFT ═══
