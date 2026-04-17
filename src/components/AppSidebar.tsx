@@ -154,7 +154,12 @@ export function AppSidebar() {
                             >
                               <Icon className="h-4 w-4" />
                               {!collapsed && <span>{mod.label}</span>}
-                              {!editMode && mod.enabled && (
+                              {!collapsed && mod.id === 'calendrier-annuel' && calendrierAlertes > 0 && (
+                                <Badge variant="destructive" className="ml-auto h-4 min-w-4 px-1 text-[9px] font-bold tabular-nums shrink-0">
+                                  {calendrierAlertes}
+                                </Badge>
+                              )}
+                              {!editMode && mod.enabled && !(mod.id === 'calendrier-annuel' && calendrierAlertes > 0) && (
                                 <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary/60 shrink-0" />
                               )}
                             </NavLink>
