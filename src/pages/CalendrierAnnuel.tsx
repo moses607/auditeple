@@ -97,12 +97,31 @@ export default function CalendrierAnnuel() {
     const id = `custom-${Date.now()}`;
     setActivites(prev => [...prev, {
       id, titre: 'Nouvelle activité', categorie: 'Pilotage / Conseil AC',
-      periodicite: 'annuelle', moisDebut: 1, description: '',
+      periodicite: 'annuelle', moisDebut: new Date().getMonth() + 1, description: '',
       responsable: 'AC', criticite: 'moyenne',
       etablissementsIds: etablissementsRattaches.map(e => e.id),
       tousEtablissements: true,
     }]);
     setEditingId(id);
+    toast.success('Activité personnalisée créée — éditez-la');
+  };
+
+  const addAllFromLibrary = () => {
+    const allIds = etablissementsRattaches.map(e => e.id);
+    const existingModeleIds = new Set(activites.map(a => a.modeleId).filter(Boolean));
+    const toAdd = ACTIVITES_MODELES.filter(m => !existingModeleIds.has(m.id));
+    if (toAdd.length === 0) {
+      toast.info('Toutes les activités de la bibliothèque sont déjà ajoutées');
+      return;
+    }
+    setActivites(prev => [...prev, ...toAdd.map(m => buildFromModele(m, allIds))]);
+    toast.success(`${toAdd.length} activité(s) ajoutée(s)`);
+  };
+
+  const clearAll = () => {
+    if (!confirm('Vider tout le calendrier ? Cette action est irréversible.')) return;
+    setActivites([]);
+    toast.success('Calendrier vidé');
   };
 
   // Filtrage
