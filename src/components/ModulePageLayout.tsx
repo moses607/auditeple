@@ -2,6 +2,7 @@ import { ReactNode, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Shield, BookOpen, Scale, AlertTriangle } from 'lucide-react';
+import { RegRefBadge } from '@/components/RegRefBadge';
 
 // ─── Section identity ──────────────────────────────────────────
 const SECTION_STYLES: Record<string, { gradient: string; accent: string; icon: typeof Shield }> = {
@@ -14,8 +15,12 @@ const SECTION_STYLES: Record<string, { gradient: string; accent: string; icon: t
 };
 
 interface RegulatoryRef {
-  code: string;   // ex: "M9-6 § 3.2.1"
-  label: string;  // ex: "Vérification de la caisse"
+  /** Clé du moteur réglementaire pour popover riche (ex: "gbcp-19") */
+  refKey?: string;
+  /** Code affiché si pas de refKey (ex: "M9-6 § 3.2") */
+  code?: string;
+  /** Libellé court affiché à côté du code */
+  label?: string;
 }
 
 interface ModulePageLayoutProps {
@@ -75,11 +80,13 @@ export function ModulePageLayout({
             {refs.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-3">
                 {refs.map((r, i) => (
-                  <Badge key={i} variant="outline" className="bg-white/15 border-white/25 text-white text-[10px] font-medium hover:bg-white/25 transition-colors rounded-[20px]">
-                    <BookOpen className="h-2.5 w-2.5 mr-1 opacity-70" />
-                    {r.code}
-                    {r.label && <span className="ml-1 opacity-70">— {r.label}</span>}
-                  </Badge>
+                  <RegRefBadge
+                    key={i}
+                    refKey={r.refKey}
+                    code={r.code}
+                    label={r.label}
+                    variant="header"
+                  />
                 ))}
               </div>
             )}
