@@ -163,6 +163,43 @@
   .safe-area-inset-bottom {
     padding-bottom: env(safe-area-inset-bottom, 0px);
   }
+
+  /* ─── Animations Cockpit ─── */
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+}
+
+/* ─── Mode Présentation (touche P) — pour démo académique ─── */
+.presentation-mode {
+  font-size: 17px;
+}
+.presentation-mode body {
+  font-size: 17px;
+}
+.presentation-mode [data-sidebar="sidebar"],
+.presentation-mode .no-print-presentation {
+  display: none !important;
+}
+.presentation-mode main {
+  padding: 2rem 3rem !important;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.presentation-mode h1, .presentation-mode h2, .presentation-mode h3 {
+  letter-spacing: -0.025em;
+}
+.presentation-mode .text-xs { font-size: 0.875rem !important; }
+.presentation-mode .text-sm { font-size: 1rem !important; }
+.presentation-mode .text-\[10px\],
+.presentation-mode .text-\[11px\] { font-size: 0.8125rem !important; }
+.presentation-mode .shadow-card,
+.presentation-mode .shadow-card-hover {
+  box-shadow: 0 8px 24px -8px hsl(var(--primary) / 0.18) !important;
 }
 
 /* ─── Print Styles ──────────────────────────────────────────── */

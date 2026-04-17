@@ -12,6 +12,9 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { PageLoader } from "@/components/PageLoader";
 import { CookieConsent } from "./components/CookieConsent";
 import { ThemeProvider } from "next-themes";
+import { AssistantIA } from "@/components/AssistantIA";
+import { CommandPalette } from "@/components/CommandPalette";
+import { PresentationModeToggle } from "@/components/PresentationModeToggle";
 
 // ─── Lazy-loaded pages ──────────────────────────────────────────
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -69,6 +72,9 @@ function ProtectedLayout() {
             <Outlet />
           </Suspense>
         </AppLayout>
+        <AssistantIA />
+        <CommandPalette />
+        <PresentationModeToggle />
       </AuditParamsProvider>
     </ProtectedRoute>
   );
