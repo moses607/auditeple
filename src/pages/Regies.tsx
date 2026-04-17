@@ -409,7 +409,19 @@ export default function RegiesPage() {
               <div className="space-y-1"><Label className="text-xs">Objet de la régie</Label><Textarea value={acte.objetRegie} onChange={e => updateActe('objetRegie', e.target.value)} rows={2} placeholder="Ex: Menues dépenses de fonctionnement..." /></div>
               <div className="space-y-1"><Label className="text-xs">Observations</Label><Textarea value={acte.observations} onChange={e => updateActe('observations', e.target.value)} rows={3} /></div>
 
-              {!acte.dateCreation && <div className="p-3 border border-destructive bg-destructive/10 rounded-lg"><p className="text-sm text-destructive font-bold">⚠️ ANOMALIE — L'acte constitutif de la régie n'est pas renseigné. Vérifiez son existence.</p></div>}
+              {!acte.dateCreation && (
+                <ControlAlert level="critique" title="Acte constitutif manquant"
+                  description="L'acte constitutif de la régie n'est pas renseigné. Sa production est obligatoire avant tout fonctionnement."
+                  refKey="reg-acte-constitutif" action="Récupérer l'arrêté du chef d'établissement et saisir la date de création." />
+              )}
+
+              {/* Alerte cautionnement automatique selon plafond */}
+              {acte.montantPlafond > SEUIL_CAUTIONNEMENT && (
+                <ControlAlert level="alerte" title={`Cautionnement obligatoire (plafond ${fmt(acte.montantPlafond)} > ${SEUIL_CAUTIONNEMENT} €)`}
+                  description="Au-delà de 1 220 € de plafond, le régisseur doit obligatoirement souscrire un cautionnement (caution mutuelle ou personnelle) avant son entrée en fonction."
+                  refKey="arrete-cautionnement"
+                  action="Vérifier l'attestation de cautionnement dans l'onglet Nomination, et que son montant est cohérent avec le barème de l'arrêté du 28/05/1993." />
+              )}
             </CardContent>
           </Card>
         </TabsContent>
@@ -454,9 +466,60 @@ export default function RegiesPage() {
                 </div>
               </div>
 
+              {/* ═══ Cautionnement & IR (Sprint 3) ═══ */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className={`p-3 rounded-lg border ${acte.montantPlafond > SEUIL_CAUTIONNEMENT && !nomination.cautionnementSouscrit ? 'border-destructive bg-destructive/10' : 'border-border bg-muted/30'}`}>
+                  <p className="text-xs font-bold mb-2">Cautionnement {acte.montantPlafond > SEUIL_CAUTIONNEMENT && <span className="text-destructive">(obligatoire)</span>}</p>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Button size="sm" variant={nomination.cautionnementSouscrit ? 'default' : 'outline'} onClick={() => updateNom('cautionnementSouscrit', true)}>✓ Souscrit</Button>
+                      <Button size="sm" variant={!nomination.cautionnementSouscrit ? 'secondary' : 'outline'} onClick={() => updateNom('cautionnementSouscrit', false)}>✗ Non souscrit</Button>
+                    </div>
+                    {nomination.cautionnementSouscrit && (
+                      <div className="space-y-1"><Label className="text-xs">Montant du cautionnement (€)</Label>
+                        <Input type="number" value={nomination.cautionnementMontant || ''} onChange={e => updateNom('cautionnementMontant', parseFloat(e.target.value) || 0)} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="p-3 rounded-lg border border-border bg-muted/30">
+                  <p className="text-xs font-bold mb-2">Indemnité de responsabilité (IR)</p>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Button size="sm" variant={nomination.irVersee ? 'default' : 'outline'} onClick={() => updateNom('irVersee', true)}>✓ Versée</Button>
+                      <Button size="sm" variant={!nomination.irVersee ? 'secondary' : 'outline'} onClick={() => updateNom('irVersee', false)}>✗ Non versée</Button>
+                    </div>
+                    <div className="space-y-1"><Label className="text-xs">Montant annuel IR (€)</Label>
+                      <Input type="number" value={nomination.irMontantAnnuel || ''} onChange={e => updateNom('irMontantAnnuel', parseFloat(e.target.value) || 0)} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Alertes croisées plafond ↔ cautionnement / IR */}
+              {acte.montantPlafond > SEUIL_CAUTIONNEMENT && !nomination.cautionnementSouscrit && (
+                <ControlAlert level="critique"
+                  title="Cautionnement absent — manquement réglementaire majeur"
+                  description={`Le plafond de la régie (${fmt(acte.montantPlafond)}) excède 1 220 € : le régisseur DOIT avoir souscrit un cautionnement avant prise de fonction. Sa responsabilité personnelle et pécuniaire (RPP) est engagée sans filet.`}
+                  refKey="arrete-cautionnement"
+                  action="Suspendre le fonctionnement de la régie ou faire produire l'attestation de cautionnement sous 8 jours." />
+              )}
+              {acte.montantPlafond > SEUIL_IR_REGISSEUR && !nomination.irVersee && (
+                <ControlAlert level="alerte"
+                  title="Indemnité de responsabilité (IR) non versée"
+                  description="Au-delà de 1 220 € de plafond de régie, le régisseur a droit à une indemnité de responsabilité annuelle calculée selon le barème de l'arrêté du 28/05/1993."
+                  refKey="arrete-ir-regisseur"
+                  action="Vérifier la mise en paiement de l'IR par l'ordonnateur et son rattachement au bon exercice." />
+              )}
+
               <div className="space-y-1"><Label className="text-xs">Observations</Label><Textarea value={nomination.observations} onChange={e => updateNom('observations', e.target.value)} rows={3} /></div>
 
-              {!nomination.dateNomination && <div className="p-3 border border-destructive bg-destructive/10 rounded-lg"><p className="text-sm text-destructive font-bold">⚠️ ANOMALIE — L'acte de nomination du régisseur n'est pas renseigné.</p></div>}
+              {!nomination.dateNomination && (
+                <ControlAlert level="critique" title="Acte de nomination manquant"
+                  description="Aucun acte de nomination du régisseur n'est renseigné — le régisseur ne peut pas légalement exercer."
+                  refKey="reg-nomination" action="Récupérer l'arrêté de nomination signé conjointement par l'ordonnateur et l'agent comptable." />
+              )}
             </CardContent>
           </Card>
         </TabsContent>
