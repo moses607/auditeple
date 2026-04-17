@@ -103,6 +103,22 @@ export default function MarchesPage() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{marches.filter(x => (x.montant||0) >= 143000).length}</p><p className="text-xs text-muted-foreground mt-0.5">Procédure formalisée</p></CardContent></Card>
       </div>
 
+      {/* ═══ ALERTE SAUCISSONNAGE AUTO ═══ */}
+      {clustersSaucissonnage.length > 0 && (
+        <div className="space-y-2">
+          {clustersSaucissonnage.map((c, idx) => (
+            <ControlAlert key={idx}
+              level={c.total >= SEUIL_FORMALISE ? 'critique' : 'alerte'}
+              title={`Risque de fractionnement détecté — « ${c.motCle}… »`}
+              description={`${c.nb} marchés similaires de nature « ${c.nature} » totalisent ${fmt(c.total)}. ${c.total >= SEUIL_FORMALISE ? 'Le cumul dépasse le seuil de procédure formalisée (143 000 € HT) : passation séparée potentiellement irrégulière.' : 'Le cumul dépasse le seuil de dispense (40 000 € HT) sans publicité : à justifier ou regrouper.'}`}
+              refKey="ccp-saucissonnage"
+              action={c.total >= SEUIL_FORMALISE
+                ? 'Réinterroger la computation des seuils (besoin homogène) et engager une procédure formalisée pour le besoin global.'
+                : 'Vérifier la computation des seuils par familles homogènes (CCP art. R.2121-1) ou regrouper en MAPA avec publicité.'} />
+          ))}
+        </div>
+      )}
+
       {/* Contrôles réglementaires */}
       <ModuleSection title="Contrôles commande publique" description="CCP — Décrets 2025-1386/1383 — Seuils 2026" badge={`${(CONTROLES_MARCHES).filter(c => regChecks[c.id]).length}/${(CONTROLES_MARCHES).length}`}>
         <Card className="shadow-card">
