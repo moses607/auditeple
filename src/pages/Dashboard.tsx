@@ -13,6 +13,7 @@ import {
   Users, Activity, ShieldCheck, TrendingDown, AlertTriangle, Building2,
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
+import { CalendrierAlertesWidget } from '@/components/CalendrierAlertesWidget';
 
 import heroImg from '@/assets/hero-audit.png';
 import sectionControles from '@/assets/section-controles.png';
@@ -208,6 +209,11 @@ export default function Dashboard() {
         <KpiCard icon={AlertTriangle} label="Risques identifiés" value={risques.length} sublabel={criticalCount > 0 ? `${criticalCount} critique(s)` : undefined} delay={100} />
         <KpiCard icon={Users} label="Auditeurs" value={params.equipe.filter(m => m.isAuditeur).length} sublabel={params.equipe.length > 0 ? `${params.equipe.length} dans l'équipe` : undefined} delay={150} />
         <KpiCard icon={Building2} label="Établissements" value={params.etablissements.length} sublabel={currentEtab ? currentEtab.ville : undefined} delay={200} />
+      </div>
+
+      {/* ─── Calendrier annuel : alertes AC ─── */}
+      <div className="opacity-0 animate-fade-in" style={{ animationDelay: '230ms' }}>
+        <CalendrierAlertesWidget />
       </div>
 
       {/* ─── Risk Charts ─── */}

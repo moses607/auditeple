@@ -20,4 +20,8 @@ export interface ActiviteCalendrier {
   tousEtablissements: boolean;
   /** Notes libres */
   notes?: string;
+  /** Suivi de réalisation */
+  realisee?: boolean;
+  realiseeAt?: string; // ISO datetime
+  realiseePar?: string; // nom de l'utilisateur
 }

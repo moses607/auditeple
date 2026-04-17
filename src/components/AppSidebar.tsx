@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import {
   FileText, Pencil, Check, BarChart3,
@@ -18,6 +18,9 @@ import { Badge } from '@/components/ui/badge';
 import logoImg from '@/assets/logo-circle.png';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Progress } from '@/components/ui/progress';
+import { loadState } from '@/lib/store';
+import { getAlertesAC } from '@/lib/calendrier-mail';
+import type { ActiviteCalendrier } from '@/lib/calendrier-types';
 
 const SECTION_DOT_COLORS: Record<string, string> = {
   'CONTRÔLES SUR PLACE': 'bg-section-controles',
@@ -35,6 +38,13 @@ export function AppSidebar() {
   const [modules, updateModules] = useModules();
   const [editMode, setEditMode] = useState(false);
   const auditProgress = useAuditProgress();
+  const [calendrierAlertes, setCalendrierAlertes] = useState(0);
+
+  // Recompute alertes count on route change (cheap localStorage read)
+  useEffect(() => {
+    const acts = loadState<ActiviteCalendrier[]>('calendrier_annuel_v1', []);
+    setCalendrierAlertes(getAlertesAC(acts).total);
+  }, [location.pathname]);
 
   const toggleModule = (id: string) => {
     const updated = modules.map(m => m.id === id ? { ...m, enabled: !m.enabled } : m);
@@ -144,7 +154,12 @@ export function AppSidebar() {
                             >
                               <Icon className="h-4 w-4" />
                               {!collapsed && <span>{mod.label}</span>}
-                              {!editMode && mod.enabled && (
+                              {!collapsed && mod.id === 'calendrier-annuel' && calendrierAlertes > 0 && (
+                                <Badge variant="destructive" className="ml-auto h-4 min-w-4 px-1 text-[9px] font-bold tabular-nums shrink-0">
+                                  {calendrierAlertes}
+                                </Badge>
+                              )}
+                              {!editMode && mod.enabled && !(mod.id === 'calendrier-annuel' && calendrierAlertes > 0) && (
                                 <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary/60 shrink-0" />
                               )}
                             </NavLink>

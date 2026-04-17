@@ -9,6 +9,7 @@ import {
 } from '@/lib/calendrier-activites';
 import type { ActiviteCalendrier } from '@/lib/calendrier-types';
 import { exportCalendrierPDF, exportCalendrierDOCX } from '@/lib/calendrier-export';
+import { downloadEmlFile, getActivitesGroupees } from '@/lib/calendrier-mail';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,7 +28,7 @@ import {
 } from '@/components/ui/tooltip';
 import {
   FileDown, FileText, Plus, Trash2, AlertTriangle, Filter,
-  Building2, Pencil,
+  Building2, Pencil, Mail, CheckCircle2, Clock,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -154,8 +155,29 @@ export default function CalendrierAnnuel() {
     toast.success('Document Word généré');
   };
 
+  const exportMailMensuel = () => {
+    if (activites.length === 0) {
+      toast.error('Initialisez d\'abord la bibliothèque');
+      return;
+    }
+    const moisCible = new Date().getMonth() + 1;
+    const { duMois, enRetard } = getActivitesGroupees(activites, moisCible);
+    if (duMois.length === 0 && enRetard.length === 0) {
+      toast.info('Aucune opération à signaler ce mois-ci');
+      return;
+    }
+    downloadEmlFile({
+      activites, etablissements: etablissementsRattaches, agenceComptable: ac,
+      exercice: params.exercice, agentComptable: params.agentComptable, moisCible,
+    });
+    toast.success(`Mail .eml généré (${duMois.length} du mois, ${enRetard.length} en retard)`);
+  };
+
   const headerActions = (
     <div className="flex flex-wrap gap-2">
+      <Button onClick={exportMailMensuel} size="sm" className="gap-1.5">
+        <Mail className="h-4 w-4" /> Mail mensuel ER (.eml)
+      </Button>
       <Button onClick={exportPDF} size="sm" variant="secondary" className="gap-1.5">
         <FileDown className="h-4 w-4" /> PDF paysage
       </Button>
@@ -337,7 +359,11 @@ function ActiviteRow({
   editing: boolean;
   onEdit: () => void;
 }) {
-  const critColor = activite.criticite === 'haute' ? 'border-l-destructive bg-destructive/5'
+  const { params } = useAuditParamsContext();
+  const realisee = !!activite.realisee;
+  const critColor = realisee
+    ? 'border-l-emerald-500 bg-emerald-50/40 dark:bg-emerald-950/20 opacity-70'
+    : activite.criticite === 'haute' ? 'border-l-destructive bg-destructive/5'
     : activite.criticite === 'moyenne' ? 'border-l-amber-500 bg-amber-50/50 dark:bg-amber-950/20'
     : 'border-l-sky-500 bg-sky-50/50 dark:bg-sky-950/20';
 
@@ -345,12 +371,39 @@ function ActiviteRow({
     ? `Tous les ER (${etablissements.length})`
     : `${activite.etablissementsIds.length} ER sélectionné(s)`;
 
+  const toggleRealisee = (c: boolean) => {
+    if (c) {
+      onUpdate({
+        realisee: true,
+        realiseeAt: new Date().toISOString(),
+        realiseePar: params.agentComptable || 'Agent comptable',
+      });
+      toast.success('Activité marquée comme réalisée');
+    } else {
+      onUpdate({ realisee: false, realiseeAt: undefined, realiseePar: undefined });
+    }
+  };
+
   return (
-    <div className={cn('rounded-lg border border-border border-l-4 p-3', critColor)}>
+    <div className={cn('rounded-lg border border-border border-l-4 p-3 transition-all', critColor)}>
       <div className="flex items-start gap-3">
+        <div className="pt-0.5">
+          <Checkbox
+            checked={realisee}
+            onCheckedChange={(c) => toggleRealisee(!!c)}
+            aria-label="Marquer comme réalisée"
+          />
+        </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="font-semibold text-sm">{activite.titre}</span>
+            <span className={cn('font-semibold text-sm', realisee && 'line-through text-muted-foreground')}>
+              {activite.titre}
+            </span>
+            {realisee && (
+              <Badge variant="outline" className="text-[10px] bg-emerald-100 text-emerald-900 border-emerald-300 gap-1">
+                <CheckCircle2 className="h-3 w-3" /> Réalisée
+              </Badge>
+            )}
             <Badge variant="outline" className={cn('text-[10px]', CATEGORIES_COULEURS[activite.categorie])}>
               {activite.categorie}
             </Badge>
@@ -369,6 +422,12 @@ function ActiviteRow({
             <span className="text-muted-foreground flex items-center gap-1">
               <Building2 className="h-3 w-3" /> {erResume}
             </span>
+            {realisee && activite.realiseeAt && (
+              <span className="text-emerald-700 dark:text-emerald-400 flex items-center gap-1">
+                <Clock className="h-3 w-3" />
+                {new Date(activite.realiseeAt).toLocaleDateString('fr-FR')} — {activite.realiseePar}
+              </span>
+            )}
           </div>
         </div>
         <div className="flex gap-1 shrink-0">
