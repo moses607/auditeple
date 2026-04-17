@@ -168,6 +168,15 @@ export default function VoyagesPage() {
                 </div>
               </div>
 
+              {/* ═══ Alerte voyage lointain (>7000 km / hors UE) — éligibilité Erasmus+ ═══ */}
+              {isVoyageLointain(voyage) && !voyage.erasmusSubvention && (
+                <ControlAlert level="alerte"
+                  title="Voyage lointain détecté — éligibilité Erasmus+ à vérifier"
+                  description={`Destination « ${voyage.destination} » : voyage potentiellement > 7 000 km. Au-delà, le programme Erasmus+ majore les forfaits de voyage et impose le calcul via le distance calculator officiel.`}
+                  refKey="erasmus-7074"
+                  action="Vérifier l'éligibilité au programme Erasmus+ et la prise en compte du forfait « voyage longue distance ». Le cas échéant, cocher la subvention Erasmus+ ci-dessus." />
+              )}
+
               {/* Montants */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
