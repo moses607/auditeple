@@ -4,8 +4,8 @@ import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 import { getAgenceComptable } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import {
-  ACTIVITES_MODELES, CATEGORIES_COULEURS, MOIS_NOMS, MOIS_NOMS_COURT,
-  type ActiviteModele,
+  ACTIVITES_MODELES, CATEGORIES_COULEURS, MOIS_NOMS,
+  type ActiviteModele, type Categorie, type Periodicite,
 } from '@/lib/calendrier-activites';
 import type { ActiviteCalendrier } from '@/lib/calendrier-types';
 import { exportCalendrierPDF, exportCalendrierDOCX } from '@/lib/calendrier-export';
