@@ -12,6 +12,11 @@ import { loadState, saveState } from '@/lib/store';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { REGIES_REGLEMENTATION } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/* ═══ SEUILS RÉGLEMENTAIRES ═══ */
+const SEUIL_CAUTIONNEMENT = 1220; // €  — Arrêté 28/05/1993 modifié : cautionnement obligatoire au-delà
+const SEUIL_IR_REGISSEUR = 1220;  // €  — IR (indemnité de responsabilité) due si plafond > 1220 €
 
 /* ═══ TYPES ═══ */
 interface ControleCaisseItem {
