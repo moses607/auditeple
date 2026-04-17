@@ -487,18 +487,41 @@ function ActiviteRow({
       {editing && (
         <div className="mt-3 pt-3 border-t space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
+            <div className="md:col-span-2">
               <Label className="text-xs">Titre</Label>
               <Input value={activite.titre} onChange={e => onUpdate({ titre: e.target.value })} className="h-8 text-sm" />
             </div>
             <div>
-              <Label className="text-xs">Date d'échéance</Label>
+              <Label className="text-xs">Catégorie</Label>
+              <Select value={activite.categorie} onValueChange={(v) => onUpdate({ categorie: v as Categorie })}>
+                <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {Object.keys(CATEGORIES_COULEURS).map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Périodicité</Label>
+              <Select value={activite.periodicite} onValueChange={(v) => onUpdate({ periodicite: v as Periodicite })}>
+                <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="annuelle">Annuelle</SelectItem>
+                  <SelectItem value="trimestrielle">Trimestrielle</SelectItem>
+                  <SelectItem value="mensuelle">Mensuelle</SelectItem>
+                  <SelectItem value="ponctuelle">Ponctuelle</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Date d'échéance précise</Label>
               <Input type="date" value={activite.dateEcheance || ''} onChange={e => onUpdate({ dateEcheance: e.target.value })} className="h-8 text-sm" />
             </div>
             <div>
-              <Label className="text-xs">Mois début (1-12)</Label>
-              <Input type="number" min={1} max={12} value={activite.moisDebut || ''}
-                onChange={e => onUpdate({ moisDebut: parseInt(e.target.value, 10) || 1 })} className="h-8 text-sm" />
+              <Label className="text-xs">Mois début (1-12, 0 si mensuelle)</Label>
+              <Input type="number" min={0} max={12} value={activite.moisDebut ?? ''}
+                onChange={e => onUpdate({ moisDebut: parseInt(e.target.value, 10) || 0 })} className="h-8 text-sm" />
             </div>
             <div>
               <Label className="text-xs">Mois fin (optionnel)</Label>
@@ -527,12 +550,19 @@ function ActiviteRow({
                 </SelectContent>
               </Select>
             </div>
+            <div className="md:col-span-2">
+              <Label className="text-xs">Référence réglementaire (optionnel)</Label>
+              <Input value={activite.reference || ''}
+                onChange={e => onUpdate({ reference: e.target.value })}
+                placeholder="ex : M9.6, art. R. 421-77, circ. n° 2011-117…"
+                className="h-8 text-sm" />
+            </div>
           </div>
 
           <div>
             <Label className="text-xs">Description</Label>
             <Textarea value={activite.description} onChange={e => onUpdate({ description: e.target.value })}
-              className="text-sm" rows={2} />
+              className="text-sm" rows={3} />
           </div>
 
           {/* Affectation établissements rattachés */}
