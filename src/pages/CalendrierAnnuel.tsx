@@ -9,6 +9,7 @@ import {
 } from '@/lib/calendrier-activites';
 import type { ActiviteCalendrier } from '@/lib/calendrier-types';
 import { exportCalendrierPDF, exportCalendrierDOCX } from '@/lib/calendrier-export';
+import { downloadEmlFile, getActivitesGroupees } from '@/lib/calendrier-mail';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -27,7 +28,7 @@ import {
 } from '@/components/ui/tooltip';
 import {
   FileDown, FileText, Plus, Trash2, AlertTriangle, Filter,
-  Building2, Pencil,
+  Building2, Pencil, Mail, CheckCircle2, Clock,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
