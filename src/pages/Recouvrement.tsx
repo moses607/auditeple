@@ -75,8 +75,24 @@ export default function Recouvrement() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground">Créances suivies</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{fmt(totalMontant)}</p><p className="text-xs text-muted-foreground">Montant total</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{contentieux.length}</p><p className="text-xs text-muted-foreground">Contentieux</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className={`text-2xl font-bold ${anciennes.length > 0 ? 'text-orange-600' : 'text-green-600'}`}>{anciennes.length}</p><p className="text-xs text-muted-foreground">Créances &gt; 60 jours</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className={`text-2xl font-bold ${prescriptionAlert.length > 0 ? 'text-destructive' : 'text-green-600'}`}>{prescriptionAlert.length}</p><p className="text-xs text-muted-foreground">Prescription &lt; 90 j</p></CardContent></Card>
       </div>
+
+      {/* ═══ ALERTES PRESCRIPTION QUADRIENNALE ═══ */}
+      {prescrites.length > 0 && (
+        <ControlAlert level="critique"
+          title={`${prescrites.length} créance${prescrites.length > 1 ? 's' : ''} PRESCRITE${prescrites.length > 1 ? 'S' : ''} (loi 31/12/1968)`}
+          description={`Total prescrit : ${fmt(prescrites.reduce((s, p) => s + p.montant, 0))}. La prescription quadriennale rend la créance définitivement irrécouvrable. Sans diligences prouvées, la responsabilité personnelle et pécuniaire de l'agent comptable peut être engagée par la chambre régionale des comptes.`}
+          refKey="presc-quadri"
+          action="Préparer immédiatement le dossier d'admission en non-valeur (ANV) avec justification des diligences effectuées et soumettre au CA." />
+      )}
+      {prochesPrescription.length > 0 && (
+        <ControlAlert level="alerte"
+          title={`${prochesPrescription.length} créance${prochesPrescription.length > 1 ? 's' : ''} en zone d'alerte prescription (T-${ALERTE_T_MOINS_JOURS} j)`}
+          description={`Débiteurs : ${prochesPrescription.map(p => `${p.debiteur} (${p.joursRestants} j restants)`).join(' • ')}. Toute carence engage la RPP de l'agent comptable.`}
+          refKey="presc-quadri"
+          action="Émettre une mise en demeure interruptive de prescription par lettre recommandée AR sous 15 jours, puis engager la procédure contentieuse." />
+      )}
 
       {/* Contrôles réglementaires */}
       <ModuleSection title="Contrôles réglementaires — Recouvrement" description="Art. 20 GBCP — Ordonnance 2022-408 (RGP)" badge={`${(CONTROLES_RECOUVREMENT).filter(c => regChecks[c.id]).length}/${(CONTROLES_RECOUVREMENT).length}`}>
