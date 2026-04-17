@@ -9,6 +9,18 @@ import { CreanceItem, fmt, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_RECOUVREMENT } from '@/lib/regulatory-data';
 import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/* ═══ Prescription quadriennale (loi 31/12/1968) ═══ */
+const PRESCRIPTION_ANS = 4;
+const ALERTE_T_MOINS_JOURS = 90;
+
+function joursAvantPrescription(dateEmission: string): number | null {
+  if (!dateEmission) return null;
+  const echeance = new Date(dateEmission);
+  echeance.setFullYear(echeance.getFullYear() + PRESCRIPTION_ANS);
+  return Math.ceil((echeance.getTime() - Date.now()) / 86400000);
+}
 
 export default function Recouvrement() {
   const [items, setItems] = useState<CreanceItem[]>(() => loadState('creances', []));
