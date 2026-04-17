@@ -4,8 +4,8 @@ import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 import { getAgenceComptable } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import {
-  ACTIVITES_MODELES, CATEGORIES_COULEURS, MOIS_NOMS, MOIS_NOMS_COURT,
-  type ActiviteModele,
+  ACTIVITES_MODELES, CATEGORIES_COULEURS, MOIS_NOMS,
+  type ActiviteModele, type Categorie, type Periodicite,
 } from '@/lib/calendrier-activites';
 import type { ActiviteCalendrier } from '@/lib/calendrier-types';
 import { exportCalendrierPDF, exportCalendrierDOCX } from '@/lib/calendrier-export';
@@ -97,12 +97,31 @@ export default function CalendrierAnnuel() {
     const id = `custom-${Date.now()}`;
     setActivites(prev => [...prev, {
       id, titre: 'Nouvelle activité', categorie: 'Pilotage / Conseil AC',
-      periodicite: 'annuelle', moisDebut: 1, description: '',
+      periodicite: 'annuelle', moisDebut: new Date().getMonth() + 1, description: '',
       responsable: 'AC', criticite: 'moyenne',
       etablissementsIds: etablissementsRattaches.map(e => e.id),
       tousEtablissements: true,
     }]);
     setEditingId(id);
+    toast.success('Activité personnalisée créée — éditez-la');
+  };
+
+  const addAllFromLibrary = () => {
+    const allIds = etablissementsRattaches.map(e => e.id);
+    const existingModeleIds = new Set(activites.map(a => a.modeleId).filter(Boolean));
+    const toAdd = ACTIVITES_MODELES.filter(m => !existingModeleIds.has(m.id));
+    if (toAdd.length === 0) {
+      toast.info('Toutes les activités de la bibliothèque sont déjà ajoutées');
+      return;
+    }
+    setActivites(prev => [...prev, ...toAdd.map(m => buildFromModele(m, allIds))]);
+    toast.success(`${toAdd.length} activité(s) ajoutée(s)`);
+  };
+
+  const clearAll = () => {
+    if (!confirm('Vider tout le calendrier ? Cette action est irréversible.')) return;
+    setActivites([]);
+    toast.success('Calendrier vidé');
   };
 
   // Filtrage
@@ -233,22 +252,44 @@ export default function CalendrierAnnuel() {
         </div>
       </Card>
 
+      {/* ─── Note autonomie AC ─── */}
+      <Card className="p-3 border-primary/30 bg-primary/5">
+        <p className="text-sm text-foreground/80">
+          <strong className="text-primary">Votre calendrier, votre méthode.</strong> Chaque agent comptable
+          construit son propre calendrier en piochant dans la bibliothèque réglementaire ({ACTIVITES_MODELES.length} activités
+          pré-rédigées) et en y ajoutant ses activités personnalisées propres à son groupement (audits planifiés,
+          réunions internes, échéances locales…). Modifiez librement titres, dates, références et établissements concernés.
+        </p>
+      </Card>
+
       {/* ─── Actions ─── */}
       <div className="flex flex-wrap gap-2 items-center">
         {activites.length === 0 ? (
-          <Button onClick={initFromLibrary} className="gap-1.5">
-            <Plus className="h-4 w-4" /> Initialiser avec la bibliothèque ({ACTIVITES_MODELES.length} activités)
-          </Button>
+          <>
+            <Button onClick={initFromLibrary} className="gap-1.5">
+              <Plus className="h-4 w-4" /> Initialiser avec la bibliothèque ({ACTIVITES_MODELES.length} activités)
+            </Button>
+            <Button onClick={addBlank} variant="outline" className="gap-1.5">
+              <Plus className="h-4 w-4" /> Démarrer vide (activités personnalisées)
+            </Button>
+          </>
         ) : (
           <>
             <Dialog open={showLibrary} onOpenChange={setShowLibrary}>
               <DialogTrigger asChild>
                 <Button variant="outline" size="sm" className="gap-1.5">
-                  <Plus className="h-4 w-4" /> Ajouter depuis la bibliothèque
+                  <Plus className="h-4 w-4" /> Bibliothèque ({ACTIVITES_MODELES.length})
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-                <DialogHeader><DialogTitle>Bibliothèque d'activités réglementaires</DialogTitle></DialogHeader>
+                <DialogHeader>
+                  <DialogTitle>Bibliothèque d'activités réglementaires</DialogTitle>
+                </DialogHeader>
+                <div className="flex justify-end mb-2">
+                  <Button size="sm" variant="secondary" onClick={addAllFromLibrary} className="gap-1.5">
+                    <Plus className="h-3.5 w-3.5" /> Tout ajouter (manquantes)
+                  </Button>
+                </div>
                 <div className="space-y-2">
                   {ACTIVITES_MODELES.map(m => {
                     const alreadyAdded = activites.some(a => a.modeleId === m.id);
@@ -277,6 +318,9 @@ export default function CalendrierAnnuel() {
             </Dialog>
             <Button onClick={addBlank} variant="outline" size="sm" className="gap-1.5">
               <Plus className="h-4 w-4" /> Activité personnalisée
+            </Button>
+            <Button onClick={clearAll} variant="ghost" size="sm" className="gap-1.5 text-destructive hover:text-destructive ml-auto">
+              <Trash2 className="h-4 w-4" /> Tout vider
             </Button>
           </>
         )}
@@ -443,18 +487,41 @@ function ActiviteRow({
       {editing && (
         <div className="mt-3 pt-3 border-t space-y-3">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
+            <div className="md:col-span-2">
               <Label className="text-xs">Titre</Label>
               <Input value={activite.titre} onChange={e => onUpdate({ titre: e.target.value })} className="h-8 text-sm" />
             </div>
             <div>
-              <Label className="text-xs">Date d'échéance</Label>
+              <Label className="text-xs">Catégorie</Label>
+              <Select value={activite.categorie} onValueChange={(v) => onUpdate({ categorie: v as Categorie })}>
+                <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {Object.keys(CATEGORIES_COULEURS).map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Périodicité</Label>
+              <Select value={activite.periodicite} onValueChange={(v) => onUpdate({ periodicite: v as Periodicite })}>
+                <SelectTrigger className="h-8 text-sm"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="annuelle">Annuelle</SelectItem>
+                  <SelectItem value="trimestrielle">Trimestrielle</SelectItem>
+                  <SelectItem value="mensuelle">Mensuelle</SelectItem>
+                  <SelectItem value="ponctuelle">Ponctuelle</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label className="text-xs">Date d'échéance précise</Label>
               <Input type="date" value={activite.dateEcheance || ''} onChange={e => onUpdate({ dateEcheance: e.target.value })} className="h-8 text-sm" />
             </div>
             <div>
-              <Label className="text-xs">Mois début (1-12)</Label>
-              <Input type="number" min={1} max={12} value={activite.moisDebut || ''}
-                onChange={e => onUpdate({ moisDebut: parseInt(e.target.value, 10) || 1 })} className="h-8 text-sm" />
+              <Label className="text-xs">Mois début (1-12, 0 si mensuelle)</Label>
+              <Input type="number" min={0} max={12} value={activite.moisDebut ?? ''}
+                onChange={e => onUpdate({ moisDebut: parseInt(e.target.value, 10) || 0 })} className="h-8 text-sm" />
             </div>
             <div>
               <Label className="text-xs">Mois fin (optionnel)</Label>
@@ -483,12 +550,19 @@ function ActiviteRow({
                 </SelectContent>
               </Select>
             </div>
+            <div className="md:col-span-2">
+              <Label className="text-xs">Référence réglementaire (optionnel)</Label>
+              <Input value={activite.reference || ''}
+                onChange={e => onUpdate({ reference: e.target.value })}
+                placeholder="ex : M9.6, art. R. 421-77, circ. n° 2011-117…"
+                className="h-8 text-sm" />
+            </div>
           </div>
 
           <div>
             <Label className="text-xs">Description</Label>
             <Textarea value={activite.description} onChange={e => onUpdate({ description: e.target.value })}
-              className="text-sm" rows={2} />
+              className="text-sm" rows={3} />
           </div>
 
           {/* Affectation établissements rattachés */}
