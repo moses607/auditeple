@@ -9,11 +9,17 @@ import { BoursierEleve, ECHELONS_BOURSES, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_BOURSES } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/* ═══ Seuil absentéisme déclenchant le retrait de bourse ═══ */
+const SEUIL_ABSENTEISME_DEMI_JOURS = 15; // Art. R.531-13 Code éducation
 
 export default function Bourses() {
   const [items, setItems] = useState<BoursierEleve[]>(() => loadState('bourses', []));
   const [regChecks, setRegChecks] = useState<Record<string, boolean>>(() => loadState('bourses_checks', {}));
+  const [absences, setAbsences] = useState<Record<string, number>>(() => loadState('bourses_absences', {}));
   const toggleRegCheck = (id: string) => { const u = { ...regChecks, [id]: !regChecks[id] }; setRegChecks(u); saveState('bourses_checks', u); };
+  const setAbsence = (id: string, n: number) => { const u = { ...absences, [id]: n }; setAbsences(u); saveState('bourses_absences', u); };
   const [form, setForm] = useState<any>(null);
   const save = (d: BoursierEleve[]) => { setItems(d); saveState('bourses', d); };
 
@@ -32,6 +38,7 @@ export default function Bourses() {
   const totAnn = items.reduce((s, x) => s + x.annuel, 0);
   const totVerse = items.reduce((s, x) => s + x.verse, 0);
   const nbRetard = items.filter(x => x.statut === 'Retard versement').length;
+  const boursiersAbsenteistes = items.filter(x => (absences[x.id] || 0) >= SEUIL_ABSENTEISME_DEMI_JOURS);
 
   return (
     <ModulePageLayout
@@ -97,22 +104,46 @@ export default function Bourses() {
         </Card>
       )}
 
+      {/* ═══ Alerte absentéisme global ═══ */}
+      {boursiersAbsenteistes.length > 0 && (
+        <ControlAlert level="critique"
+          title={`${boursiersAbsenteistes.length} boursier${boursiersAbsenteistes.length > 1 ? 's' : ''} en absentéisme caractérisé (≥ ${SEUIL_ABSENTEISME_DEMI_JOURS} demi-journées)`}
+          description={`Élève(s) concerné(s) : ${boursiersAbsenteistes.map(b => b.nom).join(', ')}. Au-delà de 15 demi-journées d'absences non justifiées par mois, le chef d'établissement doit signaler à la DSDEN qui peut prononcer le retrait de la bourse.`}
+          refKey="ce-r531-1"
+          action="Saisir la DSDEN par courrier circonstancié et suspendre les versements suivants jusqu'à décision." />
+      )}
+
       {items.length === 0 && !form && <Card><CardContent className="py-12 text-center text-muted-foreground">Aucun boursier enregistré.</CardContent></Card>}
       {items.length > 0 && (
         <Card><CardContent className="pt-6 overflow-x-auto">
           <table className="w-full text-sm">
-            <tbody>{items.map(x => (
-              <tr key={x.id} className={`border-b ${x.statut === 'Retard versement' ? 'bg-destructive/5' : ''}`}>
-                <td className="p-2 font-bold">{x.nom}</td><td className="p-2">{x.classe}</td><td className="p-2 text-center">{x.echelon}</td>
-                <td className="p-2 text-right font-mono">{fmt(x.annuel)}</td><td className="p-2 text-right font-mono font-bold">{fmt(x.verse)}</td>
-                <td className={`p-2 text-right font-mono font-bold ${x.reliquat > 0 ? 'text-orange-600' : 'text-green-600'}`}>{fmt(x.reliquat)}</td>
-                <td className="p-2"><Badge variant={x.statut === 'Soldé' ? 'secondary' : x.statut === 'Retard versement' ? 'destructive' : 'default'}>{x.statut}</Badge></td>
-                <td className="p-2"><div className="flex gap-1">
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...x, echelon: String(x.echelon), t1: String(x.t1), t2: String(x.t2), t3: String(x.t3) })}><Pencil className="h-3 w-3" /></Button>
-                  <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== x.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
-                </div></td>
+            <thead>
+              <tr className="border-b text-xs text-muted-foreground">
+                <th className="text-left p-2">Élève</th><th className="p-2">Classe</th><th className="p-2">Éch.</th>
+                <th className="text-right p-2">Annuel</th><th className="text-right p-2">Versé</th>
+                <th className="text-right p-2">Reliquat</th><th className="p-2">Statut</th>
+                <th className="p-2 text-center">Absences (½j)</th><th></th>
               </tr>
-            ))}</tbody>
+            </thead>
+            <tbody>{items.map(x => {
+              const abs = absences[x.id] || 0;
+              const alert = abs >= SEUIL_ABSENTEISME_DEMI_JOURS;
+              return (
+                <tr key={x.id} className={`border-b ${x.statut === 'Retard versement' || alert ? 'bg-destructive/5' : ''}`}>
+                  <td className="p-2 font-bold">{x.nom}</td><td className="p-2">{x.classe}</td><td className="p-2 text-center">{x.echelon}</td>
+                  <td className="p-2 text-right font-mono">{fmt(x.annuel)}</td><td className="p-2 text-right font-mono font-bold">{fmt(x.verse)}</td>
+                  <td className={`p-2 text-right font-mono font-bold ${x.reliquat > 0 ? 'text-orange-600' : 'text-green-600'}`}>{fmt(x.reliquat)}</td>
+                  <td className="p-2"><Badge variant={x.statut === 'Soldé' ? 'secondary' : x.statut === 'Retard versement' ? 'destructive' : 'default'}>{x.statut}</Badge></td>
+                  <td className="p-2 text-center">
+                    <Input type="number" min={0} value={abs || ''} onChange={e => setAbsence(x.id, parseInt(e.target.value) || 0)} className={`h-7 w-16 text-xs text-center ${alert ? 'border-destructive text-destructive font-bold' : ''}`} />
+                  </td>
+                  <td className="p-2"><div className="flex gap-1">
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...x, echelon: String(x.echelon), t1: String(x.t1), t2: String(x.t2), t3: String(x.t3) })}><Pencil className="h-3 w-3" /></Button>
+                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== x.id))}><Trash2 className="h-3 w-3 text-destructive" /></Button>
+                  </div></td>
+                </tr>
+              );
+            })}</tbody>
           </table>
         </CardContent></Card>
       )}

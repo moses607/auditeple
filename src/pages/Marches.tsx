@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,25 @@ import { MarchePublic, SEUILS_MARCHES, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_MARCHES } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/* ═══ Détection saucissonnage : marchés de même nature dont le cumul 12 mois dépasse un seuil formalisé ═══ */
+const SEUIL_FORMALISE = 143000;            // € HT — seuil procédure formalisée fournitures/services
+const SEUIL_CUMUL_SUSPECT = 40000;         // € HT — au-dessus, risque de fractionnement à signaler
+
+function normaliseObjet(s: string) {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').trim();
+}
+function similarite(a: string, b: string): number {
+  const sa = new Set(normaliseObjet(a).split(/\s+/).filter(w => w.length > 3));
+  const sb = new Set(normaliseObjet(b).split(/\s+/).filter(w => w.length > 3));
+  if (!sa.size || !sb.size) return 0;
+  let inter = 0; sa.forEach(w => { if (sb.has(w)) inter++; });
+  return inter / Math.min(sa.size, sb.size);
+}
+interface ClusterSaucissonnage {
+  motCle: string; nature: string; total: number; nb: number; ids: string[];
+}
 
 const NATURES = ['Fournitures', 'Services', 'Travaux', 'Fournitures et services', 'Prestations intellectuelles'];
 const PROCEDURES = ['Gré à gré (< 40 000 €)', 'MAPA simplifié', 'MAPA avec publicité', 'Appel d\'offres ouvert', 'Appel d\'offres restreint', 'Procédure négociée', 'Dialogue compétitif'];
@@ -36,6 +55,29 @@ export default function MarchesPage() {
   const remove = (id: string) => save(marches.filter(m => m.id !== id));
   const totMontant = marches.reduce((s, m) => s + m.montant, 0);
 
+  /* ═══ Détection auto saucissonnage : regroupe les marchés similaires (objet + nature) ═══ */
+  const clustersSaucissonnage = useMemo<ClusterSaucissonnage[]>(() => {
+    const visited = new Set<string>();
+    const clusters: ClusterSaucissonnage[] = [];
+    for (const m of marches) {
+      if (visited.has(m.id)) continue;
+      const groupe = marches.filter(x =>
+        x.typeMarche === m.typeMarche &&
+        (x.id === m.id || similarite(x.objet, m.objet) >= 0.5)
+      );
+      if (groupe.length < 2) continue;
+      const total = groupe.reduce((s, g) => s + (g.montant || 0), 0);
+      groupe.forEach(g => visited.add(g.id));
+      if (total >= SEUIL_CUMUL_SUSPECT) {
+        clusters.push({
+          motCle: m.objet.slice(0, 40), nature: m.typeMarche,
+          total, nb: groupe.length, ids: groupe.map(g => g.id),
+        });
+      }
+    }
+    return clusters.sort((a, b) => b.total - a.total);
+  }, [marches]);
+
   return (
     <ModulePageLayout
       title="Commande et marchés publics"
@@ -60,6 +102,22 @@ export default function MarchesPage() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{marches.filter(x => (x.montant||0) >= 40000).length}</p><p className="text-xs text-muted-foreground mt-0.5">MAPA (&gt; 40K)</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{marches.filter(x => (x.montant||0) >= 143000).length}</p><p className="text-xs text-muted-foreground mt-0.5">Procédure formalisée</p></CardContent></Card>
       </div>
+
+      {/* ═══ ALERTE SAUCISSONNAGE AUTO ═══ */}
+      {clustersSaucissonnage.length > 0 && (
+        <div className="space-y-2">
+          {clustersSaucissonnage.map((c, idx) => (
+            <ControlAlert key={idx}
+              level={c.total >= SEUIL_FORMALISE ? 'critique' : 'alerte'}
+              title={`Risque de fractionnement détecté — « ${c.motCle}… »`}
+              description={`${c.nb} marchés similaires de nature « ${c.nature} » totalisent ${fmt(c.total)}. ${c.total >= SEUIL_FORMALISE ? 'Le cumul dépasse le seuil de procédure formalisée (143 000 € HT) : passation séparée potentiellement irrégulière.' : 'Le cumul dépasse le seuil de dispense (40 000 € HT) sans publicité : à justifier ou regrouper.'}`}
+              refKey="ccp-saucissonnage"
+              action={c.total >= SEUIL_FORMALISE
+                ? 'Réinterroger la computation des seuils (besoin homogène) et engager une procédure formalisée pour le besoin global.'
+                : 'Vérifier la computation des seuils par familles homogènes (CCP art. R.2121-1) ou regrouper en MAPA avec publicité.'} />
+          ))}
+        </div>
+      )}
 
       {/* Contrôles réglementaires */}
       <ModuleSection title="Contrôles commande publique" description="CCP — Décrets 2025-1386/1383 — Seuils 2026" badge={`${(CONTROLES_MARCHES).filter(c => regChecks[c.id]).length}/${(CONTROLES_MARCHES).length}`}>

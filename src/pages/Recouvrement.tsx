@@ -9,6 +9,18 @@ import { CreanceItem, fmt, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_RECOUVREMENT } from '@/lib/regulatory-data';
 import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/* ═══ Prescription quadriennale (loi 31/12/1968) ═══ */
+const PRESCRIPTION_ANS = 4;
+const ALERTE_T_MOINS_JOURS = 90;
+
+function joursAvantPrescription(dateEmission: string): number | null {
+  if (!dateEmission) return null;
+  const echeance = new Date(dateEmission);
+  echeance.setFullYear(echeance.getFullYear() + PRESCRIPTION_ANS);
+  return Math.ceil((echeance.getTime() - Date.now()) / 86400000);
+}
 
 export default function Recouvrement() {
   const [items, setItems] = useState<CreanceItem[]>(() => loadState('creances', []));
@@ -31,6 +43,13 @@ export default function Recouvrement() {
     if (!x.dateEmission) return false;
     return (Date.now() - new Date(x.dateEmission).getTime()) > 60 * 86400000;
   });
+
+  /* ═══ Prescription quadriennale — créances dans la zone d'alerte (T-90j) ou prescrites ═══ */
+  const prescriptionAlert = items
+    .map(x => ({ ...x, joursRestants: joursAvantPrescription(x.dateEmission) }))
+    .filter(x => x.joursRestants !== null && x.statut !== 'ANV' && x.joursRestants <= ALERTE_T_MOINS_JOURS);
+  const prescrites = prescriptionAlert.filter(x => (x.joursRestants ?? 0) <= 0);
+  const prochesPrescription = prescriptionAlert.filter(x => (x.joursRestants ?? 0) > 0);
 
   return (
     <ModulePageLayout
@@ -56,8 +75,24 @@ export default function Recouvrement() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground">Créances suivies</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{fmt(totalMontant)}</p><p className="text-xs text-muted-foreground">Montant total</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{contentieux.length}</p><p className="text-xs text-muted-foreground">Contentieux</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className={`text-2xl font-bold ${anciennes.length > 0 ? 'text-orange-600' : 'text-green-600'}`}>{anciennes.length}</p><p className="text-xs text-muted-foreground">Créances &gt; 60 jours</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className={`text-2xl font-bold ${prescriptionAlert.length > 0 ? 'text-destructive' : 'text-green-600'}`}>{prescriptionAlert.length}</p><p className="text-xs text-muted-foreground">Prescription &lt; 90 j</p></CardContent></Card>
       </div>
+
+      {/* ═══ ALERTES PRESCRIPTION QUADRIENNALE ═══ */}
+      {prescrites.length > 0 && (
+        <ControlAlert level="critique"
+          title={`${prescrites.length} créance${prescrites.length > 1 ? 's' : ''} PRESCRITE${prescrites.length > 1 ? 'S' : ''} (loi 31/12/1968)`}
+          description={`Total prescrit : ${fmt(prescrites.reduce((s, p) => s + p.montant, 0))}. La prescription quadriennale rend la créance définitivement irrécouvrable. Sans diligences prouvées, la responsabilité personnelle et pécuniaire de l'agent comptable peut être engagée par la chambre régionale des comptes.`}
+          refKey="presc-quadri"
+          action="Préparer immédiatement le dossier d'admission en non-valeur (ANV) avec justification des diligences effectuées et soumettre au CA." />
+      )}
+      {prochesPrescription.length > 0 && (
+        <ControlAlert level="alerte"
+          title={`${prochesPrescription.length} créance${prochesPrescription.length > 1 ? 's' : ''} en zone d'alerte prescription (T-${ALERTE_T_MOINS_JOURS} j)`}
+          description={`Débiteurs : ${prochesPrescription.map(p => `${p.debiteur} (${p.joursRestants} j restants)`).join(' • ')}. Toute carence engage la RPP de l'agent comptable.`}
+          refKey="presc-quadri"
+          action="Émettre une mise en demeure interruptive de prescription par lettre recommandée AR sous 15 jours, puis engager la procédure contentieuse." />
+      )}
 
       {/* Contrôles réglementaires */}
       <ModuleSection title="Contrôles réglementaires — Recouvrement" description="Art. 20 GBCP — Ordonnance 2022-408 (RGP)" badge={`${(CONTROLES_RECOUVREMENT).filter(c => regChecks[c.id]).length}/${(CONTROLES_RECOUVREMENT).length}`}>

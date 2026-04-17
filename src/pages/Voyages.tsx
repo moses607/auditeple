@@ -11,6 +11,20 @@ import { VoyageScolaire, SEUILS_MARCHES } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_VOYAGES } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/* ═══ Détection voyages "Erasmus-éligibles" : longue distance ou hors UE ═══ */
+const DESTINATIONS_LOINTAINES = /\b(canada|usa|etats[- ]unis|japon|chine|inde|asie|amerique|australie|nouvelle[- ]zelande|bresil|argentine|mexique|afrique|maroc|tunisie|egypte|reunion|guadeloupe|martinique|guyane|nouvelle[- ]caledonie|polynesie)\b/i;
+const SEUIL_VOYAGE_LOINTAIN = 1500; // € / élève — proxy financier d'un voyage > 7000 km
+function isVoyageLointain(v: VoyageScolaire): boolean {
+  if (DESTINATIONS_LOINTAINES.test(v.destination || '')) return true;
+  // Proxy : voyage de plusieurs jours et coût/élève élevé → souvent > 7000 km
+  if (v.montantTotal >= 30000 && v.dateDepart && v.dateRetour) {
+    const j = (new Date(v.dateRetour).getTime() - new Date(v.dateDepart).getTime()) / 86400000;
+    if (j >= 5 && v.montantTotal >= SEUIL_VOYAGE_LOINTAIN * 20) return true;
+  }
+  return false;
+}
 
 const PIECES_OBLIGATOIRES = [
   { key: 'listeParticipants', label: 'Liste nominative des participants (élèves et accompagnateurs)' },
@@ -153,6 +167,15 @@ export default function VoyagesPage() {
                   )}
                 </div>
               </div>
+
+              {/* ═══ Alerte voyage lointain (>7000 km / hors UE) — éligibilité Erasmus+ ═══ */}
+              {isVoyageLointain(voyage) && !voyage.erasmusSubvention && (
+                <ControlAlert level="alerte"
+                  title="Voyage lointain détecté — éligibilité Erasmus+ à vérifier"
+                  description={`Destination « ${voyage.destination} » : voyage potentiellement > 7 000 km. Au-delà, le programme Erasmus+ majore les forfaits de voyage et impose le calcul via le distance calculator officiel.`}
+                  refKey="erasmus-7074"
+                  action="Vérifier l'éligibilité au programme Erasmus+ et la prise en compte du forfait « voyage longue distance ». Le cas échéant, cocher la subvention Erasmus+ ci-dessus." />
+              )}
 
               {/* Montants */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
