@@ -155,8 +155,29 @@ export default function CalendrierAnnuel() {
     toast.success('Document Word généré');
   };
 
+  const exportMailMensuel = () => {
+    if (activites.length === 0) {
+      toast.error('Initialisez d\'abord la bibliothèque');
+      return;
+    }
+    const moisCible = new Date().getMonth() + 1;
+    const { duMois, enRetard } = getActivitesGroupees(activites, moisCible);
+    if (duMois.length === 0 && enRetard.length === 0) {
+      toast.info('Aucune opération à signaler ce mois-ci');
+      return;
+    }
+    downloadEmlFile({
+      activites, etablissements: etablissementsRattaches, agenceComptable: ac,
+      exercice: params.exercice, agentComptable: params.agentComptable, moisCible,
+    });
+    toast.success(`Mail .eml généré (${duMois.length} du mois, ${enRetard.length} en retard)`);
+  };
+
   const headerActions = (
     <div className="flex flex-wrap gap-2">
+      <Button onClick={exportMailMensuel} size="sm" className="gap-1.5">
+        <Mail className="h-4 w-4" /> Mail mensuel ER (.eml)
+      </Button>
       <Button onClick={exportPDF} size="sm" variant="secondary" className="gap-1.5">
         <FileDown className="h-4 w-4" /> PDF paysage
       </Button>
