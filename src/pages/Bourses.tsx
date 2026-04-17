@@ -109,7 +109,7 @@ export default function Bourses() {
         <ControlAlert level="critique"
           title={`${boursiersAbsenteistes.length} boursier${boursiersAbsenteistes.length > 1 ? 's' : ''} en absentéisme caractérisé (≥ ${SEUIL_ABSENTEISME_DEMI_JOURS} demi-journées)`}
           description={`Élève(s) concerné(s) : ${boursiersAbsenteistes.map(b => b.nom).join(', ')}. Au-delà de 15 demi-journées d'absences non justifiées par mois, le chef d'établissement doit signaler à la DSDEN qui peut prononcer le retrait de la bourse.`}
-          refKey="bourses-r531-1"
+          refKey="ce-r531-1"
           action="Saisir la DSDEN par courrier circonstancié et suspendre les versements suivants jusqu'à décision." />
       )}
 
