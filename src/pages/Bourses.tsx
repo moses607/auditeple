@@ -17,7 +17,9 @@ const SEUIL_ABSENTEISME_DEMI_JOURS = 15; // Art. R.531-13 Code éducation
 export default function Bourses() {
   const [items, setItems] = useState<BoursierEleve[]>(() => loadState('bourses', []));
   const [regChecks, setRegChecks] = useState<Record<string, boolean>>(() => loadState('bourses_checks', {}));
+  const [absences, setAbsences] = useState<Record<string, number>>(() => loadState('bourses_absences', {}));
   const toggleRegCheck = (id: string) => { const u = { ...regChecks, [id]: !regChecks[id] }; setRegChecks(u); saveState('bourses_checks', u); };
+  const setAbsence = (id: string, n: number) => { const u = { ...absences, [id]: n }; setAbsences(u); saveState('bourses_absences', u); };
   const [form, setForm] = useState<any>(null);
   const save = (d: BoursierEleve[]) => { setItems(d); saveState('bourses', d); };
 
