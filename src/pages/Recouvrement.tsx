@@ -44,6 +44,13 @@ export default function Recouvrement() {
     return (Date.now() - new Date(x.dateEmission).getTime()) > 60 * 86400000;
   });
 
+  /* ═══ Prescription quadriennale — créances dans la zone d'alerte (T-90j) ou prescrites ═══ */
+  const prescriptionAlert = items
+    .map(x => ({ ...x, joursRestants: joursAvantPrescription(x.dateEmission) }))
+    .filter(x => x.joursRestants !== null && x.statut !== 'ANV' && x.joursRestants <= ALERTE_T_MOINS_JOURS);
+  const prescrites = prescriptionAlert.filter(x => (x.joursRestants ?? 0) <= 0);
+  const prochesPrescription = prescriptionAlert.filter(x => (x.joursRestants ?? 0) > 0);
+
   return (
     <ModulePageLayout
       title="Recouvrement des créances"
