@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -10,6 +10,25 @@ import { MarchePublic, SEUILS_MARCHES, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_MARCHES } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/* ═══ Détection saucissonnage : marchés de même nature dont le cumul 12 mois dépasse un seuil formalisé ═══ */
+const SEUIL_FORMALISE = 143000;            // € HT — seuil procédure formalisée fournitures/services
+const SEUIL_CUMUL_SUSPECT = 40000;         // € HT — au-dessus, risque de fractionnement à signaler
+
+function normaliseObjet(s: string) {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').trim();
+}
+function similarite(a: string, b: string): number {
+  const sa = new Set(normaliseObjet(a).split(/\s+/).filter(w => w.length > 3));
+  const sb = new Set(normaliseObjet(b).split(/\s+/).filter(w => w.length > 3));
+  if (!sa.size || !sb.size) return 0;
+  let inter = 0; sa.forEach(w => { if (sb.has(w)) inter++; });
+  return inter / Math.min(sa.size, sb.size);
+}
+interface ClusterSaucissonnage {
+  motCle: string; nature: string; total: number; nb: number; ids: string[];
+}
 
 const NATURES = ['Fournitures', 'Services', 'Travaux', 'Fournitures et services', 'Prestations intellectuelles'];
 const PROCEDURES = ['Gré à gré (< 40 000 €)', 'MAPA simplifié', 'MAPA avec publicité', 'Appel d\'offres ouvert', 'Appel d\'offres restreint', 'Procédure négociée', 'Dialogue compétitif'];
