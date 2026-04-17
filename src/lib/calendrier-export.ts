@@ -109,7 +109,7 @@ export async function exportCalendrierDOCX(ctx: ExportContext) {
     })],
   });
 
-  const bodyCell = (text: string, width: number, opts?: { bold?: boolean; fill?: string; align?: AlignmentType }) => new TableCell({
+  const bodyCell = (text: string, width: number, opts?: { bold?: boolean; fill?: string; align?: typeof AlignmentType[keyof typeof AlignmentType] }) => new TableCell({
     width: { size: width, type: WidthType.DXA },
     shading: opts?.fill ? { fill: opts.fill, type: ShadingType.CLEAR, color: 'auto' } : undefined,
     margins: { top: 50, bottom: 50, left: 80, right: 80 },
