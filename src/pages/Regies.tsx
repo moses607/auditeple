@@ -135,10 +135,12 @@ export default function RegiesPage() {
       section="CONTRÔLES SUR PLACE"
       description="Contrôle des régies d'avances et de recettes : acte constitutif, nomination, cautionnement, comptage de caisse, chèques en coffre, valeurs inactives et délai de versement au comptable."
       refs={[
-        { code: 'Décret 2019-798', label: 'Régies de recettes et d\'avances' },
-        { code: 'Décret 2020-128', label: 'Modification du régime des régies' },
-        { code: 'Art. 18 Décret 2012-1246', label: 'Contrôle inopiné obligatoire' },
-        { code: 'M9-6 § 3.2', label: 'Contrôle de la caisse' },
+        { refKey: 'reg-2019-798', label: 'Plafonds' },
+        { refKey: 'reg-acte-constitutif', label: 'Acte constitutif' },
+        { refKey: 'reg-nomination', label: 'Nomination' },
+        { refKey: 'reg-controle-inopine', label: 'Contrôle inopiné' },
+        { refKey: 'reg-dft', label: 'DFT' },
+        { refKey: 'm96-3.2', label: 'M9-6 § 3.2' },
       ]}
       completedChecks={(REGIES_REGLEMENTATION.controles_obligatoires).filter(c => regChecks[c.id]).length}
       totalChecks={(REGIES_REGLEMENTATION.controles_obligatoires).length}

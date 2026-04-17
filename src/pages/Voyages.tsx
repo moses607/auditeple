@@ -68,10 +68,11 @@ export default function VoyagesPage() {
       section="GESTION COMPTABLE"
       description="Vérification des pièces obligatoires, analyse du risque financier et conformité avec la circulaire du 16 juillet 2024. Aucun voyage ne peut être organisé sans financement intégralement assuré."
       refs={[
-        { code: 'Circ. 16/07/2024', label: 'Sorties et voyages scolaires' },
-        { code: 'Art. R.421-20 C.Édu', label: 'Compétences du CA' },
-        { code: 'CCP', label: 'Seuils commande publique 2026' },
-        { code: 'C/7074', label: 'Erasmus+ (si > 7 000 km)' },
+        { refKey: 'circ-voyages-2024', label: 'Voyages 2024' },
+        { refKey: 'ce-r421-20', label: 'Compétences CA' },
+        { refKey: 'circ-voyages-2011', label: 'Actes du CA' },
+        { refKey: 'erasmus-7074', label: 'Erasmus+' },
+        { refKey: 'ccp-seuils-2026', label: 'Seuils CCP 2026' },
       ]}
       headerActions={
         <Button className="bg-white/20 hover:bg-white/30 text-white border-white/25" variant="outline" onClick={addVoyage}>

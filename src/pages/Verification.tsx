@@ -45,10 +45,12 @@ export default function VerificationPage() {
       section="VÉRIFICATION & ORDONNATEUR"
       description="Points de contrôle à vérifier lors de la visite sur place ou de l'audit périodique de l'agence comptable."
       refs={[
-        { code: 'M9-6 § 3.2', label: 'Contrôle de la caisse' },
-        { code: 'Décret 2012-1246', label: 'GBCP art. 18-20' },
-        { code: 'Décret 2019-798', label: 'Régies' },
-        { code: 'Ord. 2022-408', label: 'RGP' },
+        { refKey: 'gbcp-19', label: 'Contrôles AC dépenses' },
+        { refKey: 'gbcp-20', label: 'Contrôles AC recettes' },
+        { refKey: 'gbcp-38', label: '5 motifs suspension' },
+        { refKey: 'arrete-pj-2013', label: 'Pièces justificatives' },
+        { refKey: 'm96-2.4', label: 'Comptes d\'attente' },
+        { refKey: 'rgp-l131-9', label: 'RGP' },
       ]}
       completedChecks={completedCount}
       totalChecks={ALL_ITEMS.length}
