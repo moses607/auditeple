@@ -39,9 +39,10 @@ export default function Bourses() {
       section="GESTION COMPTABLE"
       description="Suivi des bourses nationales par échelon, vérification de l'assiduité des boursiers et contrôle du versement trimestriel. Les montants sont fixés annuellement par arrêté ministériel."
       refs={[
-        { code: "Art. R.531-1 à R.531-6 C.Édu", label: "Bourses nationales" },
-        { code: "Circ. rentrée", label: "Montants par échelon" },
-        { code: "M9-6 § 4.2", label: "Constatation des droits" },
+        { refKey: 'ce-r531-1', label: 'Bourses nationales' },
+        { refKey: 'circ-bourses-rentree', label: 'Barèmes annuels' },
+        { refKey: 'fs-circ-2017-122', label: 'Plafond bourse + FSC' },
+        { refKey: 'gbcp-20', label: 'Constatation droits' },
       ]}
       completedChecks={(CONTROLES_BOURSES).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_BOURSES).length}

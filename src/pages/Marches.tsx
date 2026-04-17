@@ -42,9 +42,12 @@ export default function MarchesPage() {
       section="FINANCES & BUDGET"
       description="Vérification de la conformité des procédures d'achat selon les seuils en vigueur, respect des obligations de publicité et de mise en concurrence."
       refs={[
-        { code: "CCP", label: "Code de la commande publique" },
-        { code: "Décrets 2025-1386/1383", label: "Seuils 2026" },
-        { code: "Art. L.421-14 C.Édu", label: "Contrôle de légalité > 90 K€" },
+        { refKey: 'ccp-r2122-8', label: 'Dispense < 40 K€' },
+        { refKey: 'ccp-r2124', label: 'MAPA' },
+        { refKey: 'ccp-seuils-2026', label: 'Seuils 2026' },
+        { refKey: 'ce-l421-14', label: 'Contrôle légalité > 90 K€' },
+        { refKey: 'ccp-saucissonnage', label: 'Anti-fractionnement' },
+        { refKey: 'ccp-delai-paiement', label: 'Délai 30 j' },
       ]}
       completedChecks={(CONTROLES_MARCHES).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_MARCHES).length}

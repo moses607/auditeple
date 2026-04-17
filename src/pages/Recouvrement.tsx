@@ -38,10 +38,10 @@ export default function Recouvrement() {
       section="FINANCES & BUDGET"
       description="Suivi des créances à recouvrer, relances, et procédure de recouvrement contentieux sous le régime RGP. Toute carence dans le recouvrement engage la responsabilité du gestionnaire public."
       refs={[
-        { code: 'Ord. 2022-408', label: 'RGP — Responsabilité du gestionnaire public' },
-        { code: 'Art. L.131-9 à L.131-15 CJF', label: 'Recouvrement contentieux' },
-        { code: 'Art. 20 GBCP', label: 'Recouvrement des recettes' },
-        { code: 'M9-6 § 4.2', label: 'Droits constatés et recouvrement' },
+        { refKey: 'rgp-l131-9', label: 'RGP' },
+        { refKey: 'gbcp-art20', label: 'Diligences AC' },
+        { refKey: 'presc-quadri', label: 'Prescription 4 ans' },
+        { refKey: 'anv-procedure', label: 'Admission non-valeur' },
       ]}
       headerActions={
         <Button className="bg-white/20 hover:bg-white/30 text-white border-white/25" variant="outline"
