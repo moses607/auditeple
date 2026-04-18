@@ -1,15 +1,21 @@
+/**
+ * AppSidebar — Parcours d'Audit en 7 étapes (Sprint 4).
+ *
+ * - Étapes affichées dans l'ordre du workflow (Préparer → Suivre)
+ * - Étape contenant la route active : ouverte par défaut
+ * - Mini-mode (collapsed) : icônes + numéro d'étape uniquement
+ * - Progression par étape calculée depuis useAuditProgress
+ */
 import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import {
-  FileText, Pencil, Check, BarChart3,
-} from 'lucide-react';
+import { FileText, Pencil, Check, BarChart3, ChevronDown } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel,
   SidebarGroupContent, SidebarMenu, SidebarMenuItem,
   SidebarMenuButton, SidebarHeader, SidebarFooter, useSidebar,
 } from '@/components/ui/sidebar';
-import { SECTIONS } from '@/lib/audit-modules';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { ICON_MAP } from '@/lib/icon-map';
 import { useModules } from '@/hooks/useModules';
 import { useAuditProgress } from '@/hooks/useAuditProgress';
@@ -21,15 +27,7 @@ import { Progress } from '@/components/ui/progress';
 import { loadState } from '@/lib/store';
 import { getAlertesAC } from '@/lib/calendrier-mail';
 import type { ActiviteCalendrier } from '@/lib/calendrier-types';
-
-const SECTION_DOT_COLORS: Record<string, string> = {
-  'CONTRÔLES SUR PLACE': 'bg-section-controles',
-  'VÉRIFICATION & ORDONNATEUR': 'bg-section-verification',
-  'GESTION COMPTABLE': 'bg-section-comptable',
-  'FINANCES & BUDGET': 'bg-section-finances',
-  'CONTRÔLE INTERNE': 'bg-section-controle-interne',
-  'AUDIT & RESTITUTION': 'bg-section-restitution',
-};
+import { PARCOURS_ETAPES, getOrphanModuleIds, getEtapeForModule } from '@/lib/audit-parcours';
 
 export function AppSidebar() {
   const { state } = useSidebar();
@@ -40,18 +38,85 @@ export function AppSidebar() {
   const auditProgress = useAuditProgress();
   const [calendrierAlertes, setCalendrierAlertes] = useState(0);
 
-  // Recompute alertes count on route change (cheap localStorage read)
   useEffect(() => {
     const acts = loadState<ActiviteCalendrier[]>('calendrier_annuel_v1', []);
     setCalendrierAlertes(getAlertesAC(acts).total);
   }, [location.pathname]);
 
   const toggleModule = (id: string) => {
-    const updated = modules.map(m => m.id === id ? { ...m, enabled: !m.enabled } : m);
-    updateModules(updated);
+    updateModules(modules.map(m => m.id === id ? { ...m, enabled: !m.enabled } : m));
   };
 
   const enabledCount = modules.filter(m => m.enabled).length;
+  const moduleById = useMemo(() => new Map(modules.map(m => [m.id, m])), [modules]);
+
+  // Étape contenant la route active → ouverte par défaut
+  const activeEtapeId = useMemo(() => {
+    const activeMod = modules.find(m => location.pathname === m.path || location.pathname.startsWith(m.path + '/'));
+    if (!activeMod) return null;
+    return getEtapeForModule(activeMod.id)?.id ?? null;
+  }, [location.pathname, modules]);
+
+  const [openEtapes, setOpenEtapes] = useState<Record<string, boolean>>({});
+  // Garder l'étape active toujours ouverte
+  useEffect(() => {
+    if (activeEtapeId) setOpenEtapes(prev => ({ ...prev, [activeEtapeId]: true }));
+  }, [activeEtapeId]);
+
+  // Progression par étape (basée sur les modules activés et leur completion)
+  const etapeStats = useMemo(() => {
+    const stats: Record<string, { done: number; total: number; pct: number }> = {};
+    PARCOURS_ETAPES.forEach(et => {
+      const mods = et.moduleIds.map(id => moduleById.get(id)).filter(Boolean);
+      const enabled = mods.filter(m => m!.enabled);
+      // Approximation : on additionne les contrôles via auditProgress par section
+      let done = 0, total = 0;
+      enabled.forEach(m => {
+        const sec = auditProgress.sections[m!.section];
+        if (sec) { done += sec.completed / Math.max(1, mods.length); total += sec.total / Math.max(1, mods.length); }
+      });
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      stats[et.id] = { done: Math.round(done), total: Math.round(total), pct };
+    });
+    return stats;
+  }, [moduleById, auditProgress]);
+
+  const orphans = useMemo(() => {
+    const ids = getOrphanModuleIds(modules.map(m => m.id));
+    return ids.map(id => moduleById.get(id)).filter(Boolean) as typeof modules;
+  }, [modules, moduleById]);
+
+  const renderModuleItem = (mod: typeof modules[number]) => {
+    const Icon = ICON_MAP[mod.icon] || FileText;
+    const isActive = location.pathname === mod.path || location.pathname.startsWith(mod.path + '/');
+    return (
+      <SidebarMenuItem key={mod.id}>
+        <div className="flex items-center w-full">
+          {editMode && !collapsed && (
+            <div className="flex items-center pl-2 pr-0 shrink-0" onClick={e => e.stopPropagation()}>
+              <Checkbox checked={mod.enabled} onCheckedChange={() => toggleModule(mod.id)} className="h-3.5 w-3.5" />
+            </div>
+          )}
+          <SidebarMenuButton asChild isActive={isActive}
+            className={cn('flex-1', editMode && !mod.enabled && 'opacity-50')}>
+            <NavLink to={mod.path} className="flex items-center gap-2"
+              activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
+              <Icon className="h-4 w-4" />
+              {!collapsed && <span className="truncate">{mod.label}</span>}
+              {!collapsed && mod.id === 'calendrier-annuel' && calendrierAlertes > 0 && (
+                <Badge variant="destructive" className="ml-auto h-4 min-w-4 px-1 text-[9px] font-bold tabular-nums shrink-0">
+                  {calendrierAlertes}
+                </Badge>
+              )}
+              {!editMode && mod.enabled && !(mod.id === 'calendrier-annuel' && calendrierAlertes > 0) && (
+                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary/60 shrink-0" />
+              )}
+            </NavLink>
+          </SidebarMenuButton>
+        </div>
+      </SidebarMenuItem>
+    );
+  };
 
   return (
     <Sidebar collapsible="icon">
@@ -61,12 +126,8 @@ export function AppSidebar() {
             <div className="flex items-center gap-2.5">
               <img src={logoImg} alt="CIC Expert Pro" className="h-9 w-9 rounded-lg object-contain" />
               <div>
-                <h2 className="text-sm font-bold tracking-wide text-sidebar-primary-foreground">
-                  CIC Expert Pro
-                </h2>
-                <p className="text-[10px] text-sidebar-foreground/50 mt-0.5 tracking-wider uppercase">
-                  Audit comptable EPLE
-                </p>
+                <h2 className="text-sm font-bold tracking-wide text-sidebar-primary-foreground">CIC Expert Pro</h2>
+                <p className="text-[10px] text-sidebar-foreground/50 mt-0.5 tracking-wider uppercase">Parcours d'audit en 7 étapes</p>
               </div>
             </div>
           </div>
@@ -78,15 +139,16 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Dashboard link */}
+        {/* Tableau de bord */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === '/'}>
-                  <NavLink to="/" className="flex items-center gap-2" activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
+                  <NavLink to="/" className="flex items-center gap-2"
+                    activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
                     <BarChart3 className="h-4 w-4" />
-                    {!collapsed && <span>Tableau de Bord</span>}
+                    {!collapsed && <span>Tableau de bord</span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -94,85 +156,78 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* Module sections — always navigable */}
-        {SECTIONS.map(section => {
-          const sectionModules = modules.filter(m => m.section === section);
-          if (sectionModules.length === 0) return null;
-          const dotColor = SECTION_DOT_COLORS[section] || 'bg-sidebar-primary';
+        {/* ═══ Les 7 étapes du parcours ═══ */}
+        {PARCOURS_ETAPES.map(etape => {
+          const EtapeIcon = etape.icon;
+          const isOpen = openEtapes[etape.id] ?? activeEtapeId === etape.id;
+          const isActive = activeEtapeId === etape.id;
+          const stats = etapeStats[etape.id];
+          const etapeMods = etape.moduleIds
+            .map(id => moduleById.get(id))
+            .filter(Boolean) as typeof modules;
+
+          if (etapeMods.length === 0) return null;
 
           return (
-            <SidebarGroup key={section}>
-              <SidebarGroupLabel className="text-[9px] font-extrabold tracking-widest uppercase text-sidebar-foreground/40 flex items-center gap-1.5">
-                {!collapsed && (
-                  <>
-                    <span className={cn('h-1.5 w-1.5 rounded-full', dotColor)} />
-                    <span className="flex-1">{section}</span>
-                    {auditProgress.sections[section]?.total > 0 && (
-                      <span className="text-[8px] font-bold text-sidebar-foreground/30 tabular-nums">
-                        {auditProgress.sections[section].percentage}%
-                      </span>
+            <SidebarGroup key={etape.id}>
+              <Collapsible open={isOpen} onOpenChange={(o) => setOpenEtapes(prev => ({ ...prev, [etape.id]: o }))}>
+                <SidebarGroupLabel asChild>
+                  <CollapsibleTrigger className={cn(
+                    'group/etape w-full flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors',
+                    'hover:bg-sidebar-accent/40',
+                    isActive && 'bg-sidebar-accent/30',
+                  )}>
+                    <span className={cn(
+                      'flex items-center justify-center h-5 w-5 rounded-full text-[10px] font-bold shrink-0',
+                      isActive ? 'bg-sidebar-primary text-sidebar-primary-foreground' : 'bg-sidebar-accent/60 text-sidebar-foreground/70',
+                    )}>
+                      {etape.numero}
+                    </span>
+                    <EtapeIcon className={cn('h-3.5 w-3.5 shrink-0', isActive ? 'text-sidebar-primary' : 'text-sidebar-foreground/60')} />
+                    {!collapsed && (
+                      <>
+                        <span className={cn(
+                          'flex-1 text-left text-[11px] font-bold tracking-wide uppercase',
+                          isActive ? 'text-sidebar-primary-foreground' : 'text-sidebar-foreground/80',
+                        )}>
+                          {etape.label}
+                        </span>
+                        {stats?.total > 0 && (
+                          <span className="text-[9px] font-mono tabular-nums text-sidebar-foreground/40">
+                            {stats.pct}%
+                          </span>
+                        )}
+                        <ChevronDown className={cn(
+                          'h-3 w-3 transition-transform text-sidebar-foreground/40',
+                          isOpen && 'rotate-180',
+                        )} />
+                      </>
                     )}
-                  </>
-                )}
-              </SidebarGroupLabel>
-              <SidebarGroupContent>
-                <SidebarMenu>
-                  {sectionModules.map((mod) => {
-                    const Icon = ICON_MAP[mod.icon] || FileText;
-                    const isActive = location.pathname === mod.path ||
-                      location.pathname.startsWith(mod.path + '/');
-
-                    return (
-                      <SidebarMenuItem key={mod.id}>
-                        <div className="flex items-center w-full">
-                          {/* Checkbox for audit selection — only in edit mode */}
-                          {editMode && !collapsed && (
-                            <div
-                              className="flex items-center pl-2 pr-0 shrink-0"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <Checkbox
-                                checked={mod.enabled}
-                                onCheckedChange={() => toggleModule(mod.id)}
-                                className="h-3.5 w-3.5"
-                              />
-                            </div>
-                          )}
-                          {/* Navigation link — always clickable */}
-                          <SidebarMenuButton
-                            asChild
-                            isActive={isActive}
-                            className={cn(
-                              'flex-1',
-                              editMode && !mod.enabled && 'opacity-50',
-                            )}
-                          >
-                            <NavLink
-                              to={mod.path}
-                              className="flex items-center gap-2"
-                              activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                            >
-                              <Icon className="h-4 w-4" />
-                              {!collapsed && <span>{mod.label}</span>}
-                              {!collapsed && mod.id === 'calendrier-annuel' && calendrierAlertes > 0 && (
-                                <Badge variant="destructive" className="ml-auto h-4 min-w-4 px-1 text-[9px] font-bold tabular-nums shrink-0">
-                                  {calendrierAlertes}
-                                </Badge>
-                              )}
-                              {!editMode && mod.enabled && !(mod.id === 'calendrier-annuel' && calendrierAlertes > 0) && (
-                                <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary/60 shrink-0" />
-                              )}
-                            </NavLink>
-                          </SidebarMenuButton>
-                        </div>
-                      </SidebarMenuItem>
-                    );
-                  })}
-                </SidebarMenu>
-              </SidebarGroupContent>
+                  </CollapsibleTrigger>
+                </SidebarGroupLabel>
+                <CollapsibleContent>
+                  <SidebarGroupContent>
+                    <SidebarMenu>
+                      {etapeMods.map(renderModuleItem)}
+                    </SidebarMenu>
+                  </SidebarGroupContent>
+                </CollapsibleContent>
+              </Collapsible>
             </SidebarGroup>
           );
         })}
+
+        {/* Modules orphelins (Mentions légales etc.) */}
+        {orphans.length > 0 && (
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-[9px] font-extrabold tracking-widest uppercase text-sidebar-foreground/30 px-2">
+              {!collapsed && 'Autre'}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{orphans.map(renderModuleItem)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border">
@@ -191,27 +246,11 @@ export function AppSidebar() {
               <Badge variant="outline" className="text-[10px] border-sidebar-border text-sidebar-foreground/60">
                 {enabledCount} module{enabledCount > 1 ? 's' : ''} actif{enabledCount > 1 ? 's' : ''}
               </Badge>
-            <button
-              onClick={() => setEditMode(!editMode)}
-              className={cn(
-                "flex items-center gap-1 text-xs transition-colors",
-                editMode
-                  ? "text-primary font-medium"
-                  : "text-sidebar-primary hover:underline"
-              )}
-            >
-              {editMode ? (
-                <>
-                  <Check className="h-3 w-3" />
-                  Terminé
-                </>
-              ) : (
-                <>
-                  <Pencil className="h-3 w-3" />
-                  Périmètre audit
-                </>
-              )}
-            </button>
+              <button onClick={() => setEditMode(!editMode)}
+                className={cn('flex items-center gap-1 text-xs transition-colors',
+                  editMode ? 'text-primary font-medium' : 'text-sidebar-primary hover:underline')}>
+                {editMode ? <><Check className="h-3 w-3" /> Terminé</> : <><Pencil className="h-3 w-3" /> Périmètre</>}
+              </button>
             </div>
           </div>
         )}
