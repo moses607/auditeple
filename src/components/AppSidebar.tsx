@@ -69,11 +69,13 @@ export function AppSidebar() {
     PARCOURS_ETAPES.forEach(et => {
       const mods = et.moduleIds.map(id => moduleById.get(id)).filter(Boolean);
       const enabled = mods.filter(m => m!.enabled);
-      // Approximation : on additionne les contrôles via auditProgress par section
       let done = 0, total = 0;
       enabled.forEach(m => {
         const sec = auditProgress.sections[m!.section];
-        if (sec) { done += sec.completed / Math.max(1, mods.length); total += sec.total / Math.max(1, mods.length); }
+        if (sec) {
+          done += sec.checked / Math.max(1, mods.length);
+          total += sec.total / Math.max(1, mods.length);
+        }
       });
       const pct = total > 0 ? Math.round((done / total) * 100) : 0;
       stats[et.id] = { done: Math.round(done), total: Math.round(total), pct };

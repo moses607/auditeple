@@ -64,7 +64,11 @@ export function OnboardingWizard() {
       id: crypto.randomUUID(),
       uai: uai.trim().toUpperCase(),
       nom: nom.trim(),
+      type: '',
+      adresse: '',
+      codePostal: '',
       ville: ville.trim(),
+      academie: '',
     };
     update({
       etablissements: [...params.etablissements, newEtab],
