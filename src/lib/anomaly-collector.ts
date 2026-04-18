@@ -133,13 +133,14 @@ function collectRegies(): PVVerification[] {
     }
   });
 
-  if (!nomination.cautionnement) {
+  // Indemnité de responsabilité (cautionnement supprimé par Ord. 2022-408)
+  if (nomination.plafondEncaisse > 1220 && !nomination.indemniteResponsabilite) {
     anomalies.push({
-      label: 'Cautionnement du régisseur non vérifié',
-      reference: 'Décret 2008-227',
+      label: `Régisseur — Indemnité de responsabilité non versée (plafond > 1 220 €)`,
+      reference: 'Arrêté du 28 mai 1993 — Décret 2022-1605 (RGP)',
       criticite: 'MAJEURE',
       status: 'anomalie',
-      observations: 'Le cautionnement du régisseur n\'a pas été confirmé.',
+      observations: `Le plafond d'encaisse (${nomination.plafondEncaisse}€) dépasse le seuil de 1 220 €. L'indemnité de responsabilité doit être versée au régisseur. Le cautionnement n'est plus exigé depuis l'ordonnance 2022-408.`,
     });
   }
 
@@ -159,13 +160,33 @@ function collectRegies(): PVVerification[] {
 // ═══ Stocks ═══
 function collectStocks(): PVVerification[] {
   const stocks = loadState<any[]>('stocks', []);
-  return stocks.filter(s => s.ecart !== 0).map(s => ({
+  const anomalies: PVVerification[] = [];
+
+  // Écarts inventaire
+  stocks.filter(s => s.ecart !== 0).forEach(s => anomalies.push({
     label: `Écart stock : ${s.nom}`,
-    reference: 'Inventaire physique',
-    criticite: Math.abs(s.ecart) > 5 ? 'MAJEURE' as const : 'MINEURE' as const,
-    status: 'anomalie' as const,
+    reference: 'M9-6 § 2.1.4 — Inventaire physique',
+    criticite: Math.abs(s.ecart) > 5 ? 'MAJEURE' : 'MINEURE',
+    status: 'anomalie',
     observations: `Théorique: ${s.theo}, Physique: ${s.phys}, Écart: ${s.ecart}`,
   }));
+
+  // Stock dormant > 12 mois (rotation)
+  stocks.forEach(s => {
+    if (!s.dlc || !s.valeur) return;
+    const moisDepuisDLC = (Date.now() - new Date(s.dlc).getTime()) / (30 * 86400000);
+    if (moisDepuisDLC > 12 && s.valeur > 0) {
+      anomalies.push({
+        label: `Stock dormant : ${s.nom} (DLC dépassée de ${Math.round(moisDepuisDLC)} mois)`,
+        reference: 'M9-6 § 2.1.4 — Rotation stocks',
+        criticite: 'MAJEURE',
+        status: 'anomalie',
+        observations: `Valeur résiduelle : ${s.valeur}€. Article sans rotation depuis plus de 12 mois — déclassement, dépréciation (C/6817) ou destruction (PV) requis.`,
+      });
+    }
+  });
+
+  return anomalies;
 }
 
 // ═══ Rapprochement bancaire ═══
@@ -272,7 +293,31 @@ function collectRestauration(): PVVerification[] {
   const va = loadState<any>('rest_ventes_achats', {});
   const titres = loadState<any[]>('rest_titres_recettes', []);
   const contrat = loadState<any>('rest_contrat', {});
+  const mois = loadState<any[]>('restauration', []);
   const anomalies: PVVerification[] = [];
+
+  // Seuils EGAlim (Loi 2018-938) sur le dernier mois
+  const last = mois[0];
+  if (last) {
+    if (last.bio < 20) {
+      anomalies.push({
+        label: `EGAlim — Taux bio insuffisant (${last.bio}%)`,
+        reference: 'Loi EGAlim 2018-938 — Art. 24',
+        criticite: last.bio < 10 ? 'MAJEURE' : 'MINEURE',
+        status: 'anomalie',
+        observations: `Mois ${last.mois} : ${last.bio}% bio constaté, seuil légal 20%. Réviser la politique d'approvisionnement et tracer les justificatifs.`,
+      });
+    }
+    if (last.durable < 50) {
+      anomalies.push({
+        label: `EGAlim — Taux produits durables insuffisant (${last.durable}%)`,
+        reference: 'Loi EGAlim 2018-938 — Art. 24',
+        criticite: last.durable < 25 ? 'MAJEURE' : 'MINEURE',
+        status: 'anomalie',
+        observations: `Mois ${last.mois} : ${last.durable}% durable constaté, seuil légal 50%.`,
+      });
+    }
+  }
 
   grammages.forEach(g => {
     if (g.ecart > g.quantiteNecessaire * 0.1) {
@@ -343,6 +388,113 @@ function collectCartographie(): PVVerification[] {
   }));
 }
 
+// ═══ Marchés publics — Saucissonnage (seuils 2025 : 60K€ HT / 100K€ travaux) ═══
+function collectMarches(): PVVerification[] {
+  const marches = loadState<any[]>('marches', []);
+  const anomalies: PVVerification[] = [];
+
+  // Cluster par objet/nature similaire (1ers mots-clés)
+  const norm = (s: string) => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, '').split(/\s+/).slice(0, 3).join(' ');
+  const clusters = new Map<string, { total: number; items: any[] }>();
+  marches.forEach(m => {
+    const key = `${m.nature || 'fournitures'}::${norm(m.objet || '')}`;
+    const c = clusters.get(key) || { total: 0, items: [] };
+    c.total += m.montant || 0;
+    c.items.push(m);
+    clusters.set(key, c);
+  });
+
+  clusters.forEach((c, key) => {
+    if (c.items.length < 2) return;
+    const seuil = key.startsWith('travaux') ? 100000 : 60000;
+    if (c.total > seuil) {
+      anomalies.push({
+        label: `Saucissonnage potentiel : ${c.items.length} marchés similaires cumulant ${c.total.toLocaleString('fr-FR')}€`,
+        reference: 'Décret 2025-1386 — CCP art. R.2122-8',
+        criticite: 'MAJEURE',
+        status: 'anomalie',
+        observations: `Cluster « ${key.split('::')[1]} » : ${c.items.map(i => i.objet).join(' / ')}. Total ${c.total}€ > seuil ${seuil}€. Risque de fractionnement artificiel pour éviter la procédure formalisée.`,
+      });
+    }
+  });
+
+  // Délai global de paiement > 30 jours
+  marches.forEach(m => {
+    if (m.delaiPaiement && m.delaiPaiement > 30) {
+      anomalies.push({
+        label: `Marché ${m.objet || m.id} — Délai paiement > 30 jours (${m.delaiPaiement}j)`,
+        reference: 'Décret 2013-269',
+        criticite: 'MINEURE',
+        status: 'anomalie',
+        observations: `Le délai global de paiement légal est de 30 jours pour les EPLE. Intérêts moratoires dus.`,
+      });
+    }
+  });
+
+  return anomalies;
+}
+
+// ═══ Recouvrement — Prescription quadriennale (T-90j et atteinte) ═══
+function collectRecouvrement(): PVVerification[] {
+  const creances = loadState<any[]>('recouvrement', []);
+  const anomalies: PVVerification[] = [];
+  const now = Date.now();
+
+  creances.forEach(c => {
+    if (!c.dateEmission || c.statut === 'Soldée' || c.statut === 'ANV') return;
+    const ageJours = (now - new Date(c.dateEmission).getTime()) / 86400000;
+    const joursAvantPrescription = 4 * 365 - ageJours;
+    if (joursAvantPrescription <= 0) {
+      anomalies.push({
+        label: `Créance prescrite : ${c.debiteur || c.id} (${c.montant}€)`,
+        reference: 'Loi 68-1250 — Prescription quadriennale',
+        criticite: 'MAJEURE',
+        status: 'anomalie',
+        observations: `Créance émise le ${c.dateEmission}. Prescription quadriennale atteinte. Constater l'admission en non-valeur (C/6541) après décision motivée du CA.`,
+      });
+    } else if (joursAvantPrescription <= 90) {
+      anomalies.push({
+        label: `Créance proche de la prescription : ${c.debiteur || c.id} (T-${Math.round(joursAvantPrescription)}j)`,
+        reference: 'Loi 68-1250',
+        criticite: 'MAJEURE',
+        status: 'anomalie',
+        observations: `Créance ${c.montant}€ émise le ${c.dateEmission}. Engager sans délai un acte interruptif (commandement de payer, OTD, action contentieuse).`,
+      });
+    }
+  });
+
+  return anomalies;
+}
+
+// ═══ Annexe comptable — FRNG / DRFN (IGAENR 2016-071) ═══
+function collectAnnexe(): PVVerification[] {
+  const data = loadState<Record<string, string>>('annexe_comptable', {});
+  const anomalies: PVVerification[] = [];
+  const fdr = parseFloat(data['bilan_fdr']) || 0;
+  const depRealisees = parseFloat(data['budget_depenses_realisees']) || 0;
+  if (fdr > 0 && depRealisees > 0) {
+    const fdrJours = Math.round((fdr / depRealisees) * 365);
+    if (fdrJours < 15) {
+      anomalies.push({
+        label: `FRNG critique : ${fdrJours} jours de DRFN (seuil 15j)`,
+        reference: 'IGAENR 2016-071 — Modèle FDRM',
+        criticite: 'MAJEURE',
+        status: 'anomalie',
+        observations: `Fonds de roulement très insuffisant. Continuité d'exploitation compromise. Plan de redressement à présenter au CA.`,
+      });
+    } else if (fdrJours < 30) {
+      anomalies.push({
+        label: `FRNG faible : ${fdrJours} jours de DRFN (seuil prudentiel 30j)`,
+        reference: 'IGAENR 2016-071',
+        criticite: 'MINEURE',
+        status: 'anomalie',
+        observations: `Risque de tension de trésorerie. Maîtrise des dépenses et optimisation des recettes à documenter.`,
+      });
+    }
+  }
+  return anomalies;
+}
+
 // ═══ COLLECTEUR PRINCIPAL ═══
 
 const MODULE_COLLECTORS: Record<string, () => PVVerification[]> = {
@@ -355,6 +507,9 @@ const MODULE_COLLECTORS: Record<string, () => PVVerification[]> = {
   'subventions': collectSubventions,
   'restauration': collectRestauration,
   'cartographie': collectCartographie,
+  'marches': collectMarches,
+  'recouvrement': collectRecouvrement,
+  'annexe-comptable': collectAnnexe,
 };
 
 /**
