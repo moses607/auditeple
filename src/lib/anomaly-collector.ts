@@ -133,13 +133,14 @@ function collectRegies(): PVVerification[] {
     }
   });
 
-  if (!nomination.cautionnement) {
+  // Indemnité de responsabilité (cautionnement supprimé par Ord. 2022-408)
+  if (nomination.plafondEncaisse > 1220 && !nomination.indemniteResponsabilite) {
     anomalies.push({
-      label: 'Cautionnement du régisseur non vérifié',
-      reference: 'Décret 2008-227',
+      label: `Régisseur — Indemnité de responsabilité non versée (plafond > 1 220 €)`,
+      reference: 'Arrêté du 28 mai 1993 — Décret 2022-1605 (RGP)',
       criticite: 'MAJEURE',
       status: 'anomalie',
-      observations: 'Le cautionnement du régisseur n\'a pas été confirmé.',
+      observations: `Le plafond d'encaisse (${nomination.plafondEncaisse}€) dépasse le seuil de 1 220 €. L'indemnité de responsabilité doit être versée au régisseur. Le cautionnement n'est plus exigé depuis l'ordonnance 2022-408.`,
     });
   }
 
@@ -159,13 +160,33 @@ function collectRegies(): PVVerification[] {
 // ═══ Stocks ═══
 function collectStocks(): PVVerification[] {
   const stocks = loadState<any[]>('stocks', []);
-  return stocks.filter(s => s.ecart !== 0).map(s => ({
+  const anomalies: PVVerification[] = [];
+
+  // Écarts inventaire
+  stocks.filter(s => s.ecart !== 0).forEach(s => anomalies.push({
     label: `Écart stock : ${s.nom}`,
-    reference: 'Inventaire physique',
-    criticite: Math.abs(s.ecart) > 5 ? 'MAJEURE' as const : 'MINEURE' as const,
-    status: 'anomalie' as const,
+    reference: 'M9-6 § 2.1.4 — Inventaire physique',
+    criticite: Math.abs(s.ecart) > 5 ? 'MAJEURE' : 'MINEURE',
+    status: 'anomalie',
     observations: `Théorique: ${s.theo}, Physique: ${s.phys}, Écart: ${s.ecart}`,
   }));
+
+  // Stock dormant > 12 mois (rotation)
+  stocks.forEach(s => {
+    if (!s.dlc || !s.valeur) return;
+    const moisDepuisDLC = (Date.now() - new Date(s.dlc).getTime()) / (30 * 86400000);
+    if (moisDepuisDLC > 12 && s.valeur > 0) {
+      anomalies.push({
+        label: `Stock dormant : ${s.nom} (DLC dépassée de ${Math.round(moisDepuisDLC)} mois)`,
+        reference: 'M9-6 § 2.1.4 — Rotation stocks',
+        criticite: 'MAJEURE',
+        status: 'anomalie',
+        observations: `Valeur résiduelle : ${s.valeur}€. Article sans rotation depuis plus de 12 mois — déclassement, dépréciation (C/6817) ou destruction (PV) requis.`,
+      });
+    }
+  });
+
+  return anomalies;
 }
 
 // ═══ Rapprochement bancaire ═══
