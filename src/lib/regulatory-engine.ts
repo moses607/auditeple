@@ -369,6 +369,7 @@ export function getSourceBadgeClass(source: SourceLegale): string {
     'CIRCULAIRE': 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300',
     'ARRÊTÉ': 'bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950/40 dark:text-indigo-300',
     'DÉCRET': 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-950/40 dark:text-cyan-300',
+    'ORDONNANCE': 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300',
   };
   return map[source];
 }
