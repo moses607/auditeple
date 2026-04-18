@@ -208,8 +208,8 @@ export function OnboardingWizard() {
 
           {step === 4 && (
             <div className="space-y-4 text-center py-6">
-              <div className="mx-auto h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center">
-                <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+              <div className="mx-auto h-16 w-16 rounded-full bg-primary/10 flex items-center justify-center">
+                <CheckCircle2 className="h-8 w-8 text-primary" />
               </div>
               <div>
                 <h3 className="text-lg font-bold">Tout est prêt !</h3>
