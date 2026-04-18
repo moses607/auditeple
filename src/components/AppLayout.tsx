@@ -15,6 +15,7 @@ import {
 import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { SmartBreadcrumb } from '@/components/SmartBreadcrumb';
 import { OnboardingWizard } from '@/components/OnboardingWizard';
+import { EtapeSuivante } from '@/components/EtapeSuivante';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -95,6 +96,9 @@ export function AppLayout({ children }: AppLayoutProps) {
           <SmartBreadcrumb />
           <main className="flex-1 overflow-auto p-4 md:p-6 bg-background pb-20 md:pb-6">
             {children}
+            <div className="max-w-5xl mx-auto">
+              <EtapeSuivante />
+            </div>
           </main>
           <footer className="min-h-[2rem] hidden md:flex flex-wrap items-center justify-center border-t border-border bg-card/50 text-[10px] text-muted-foreground/50 shrink-0 px-4 gap-x-4 gap-y-1 py-1 no-print">
             <span>CIC Expert Pro v8.0</span>
