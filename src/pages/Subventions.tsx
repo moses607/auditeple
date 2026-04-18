@@ -126,6 +126,26 @@ export default function Subventions() {
         </CardContent></Card>
       )}
 
+      {/* Alerte déchéance quadriennale (Loi 68-1250) */}
+      {(() => {
+        const prescrites = items.filter(x => checkDecheance(x.dateVersement) === 'PRESCRITE');
+        const proches = items.filter(x => checkDecheance(x.dateVersement) === 'ALERTE');
+        if (prescrites.length === 0 && proches.length === 0) return null;
+        return (
+          <ControlAlert
+            level={prescrites.length > 0 ? 'critique' : 'alerte'}
+            title={prescrites.length > 0
+              ? `${prescrites.length} subvention${prescrites.length > 1 ? 's atteintes' : ' atteinte'} par la déchéance quadriennale`
+              : `${proches.length} subvention${proches.length > 1 ? 's' : ''} approchant de la déchéance quadriennale (3 ans+)`}
+            description={`Toute créance non réclamée à l'État dans le délai de 4 ans à compter du 1er janvier de l'année suivant le fait générateur est définitivement éteinte. ${prescrites.length > 0 ? `Montant prescrit : ${fmt(prescrites.reduce((s, x) => s + x.reliquat, 0))}.` : ''}`}
+            action={prescrites.length > 0
+              ? "Constater la perte (compte 6718) et tracer la décision motivée du CA. Identifier les défaillances de suivi pour prévenir de nouvelles prescriptions."
+              : "Émettre sans délai le titre de recette ou produire le justificatif d'emploi auprès du financeur. Relancer formellement avant la date butoir."}
+            refLabel="Loi 68-1250 — Déchéance quadriennale"
+          />
+        );
+      })()}
+
       {/* Alerte reliquats */}
       {items.filter(x => x.reliquat > 0 && x.statut !== 'Soldé').length > 0 && (
         <Card className="border-l-4 border-l-orange-500">
