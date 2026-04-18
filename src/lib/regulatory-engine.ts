@@ -5,7 +5,7 @@
  */
 
 export type SourceLegale =
-  | 'GBCP' | 'M9-6' | 'CE' | 'CCP' | 'RGP' | 'CIRCULAIRE' | 'ARRÊTÉ' | 'DÉCRET';
+  | 'GBCP' | 'M9-6' | 'CE' | 'CCP' | 'RGP' | 'CIRCULAIRE' | 'ARRÊTÉ' | 'DÉCRET' | 'ORDONNANCE';
 
 export interface RegleArticle {
   id: string;
@@ -185,20 +185,20 @@ export const REGLES_BASE: RegleArticle[] = [
     motsCles: ['nomination', 'régisseur', 'agrément', 'suppléant', 'IR', 'formation'],
   },
   {
-    id: 'arrete-cautionnement',
-    source: 'ARRÊTÉ',
-    reference: 'Arrêté 28/05/1993 modifié — Décret 66-850',
-    titre: 'Cautionnement du régisseur — obligatoire au-delà de 1 220 €',
-    resume: "Tout régisseur dont le plafond d'avances ou le montant moyen mensuel d'encaisse excède 1 220 € doit obligatoirement souscrire un cautionnement auprès d'une association de caution mutuelle (ex. AFCM) ou fournir une caution personnelle. Le cautionnement garantit la responsabilité personnelle et pécuniaire (RPP).",
-    url: 'https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000536293',
-    motsCles: ['cautionnement', 'régisseur', '1220', 'RPP', 'AFCM'],
+    id: 'fin-cautionnement',
+    source: 'ORDONNANCE',
+    reference: 'Ord. 2022-408 + Décret 2022-1605 du 22/12/2022',
+    titre: 'Suppression du cautionnement du régisseur',
+    resume: "Depuis l'entrée en vigueur de la réforme de la responsabilité des gestionnaires publics (Ord. 2022-408 du 21 mars 2022, en vigueur au 1er janvier 2023), l'obligation de cautionnement des régisseurs des organismes publics est SUPPRIMÉE. Le décret 2022-1605 du 22 décembre 2022 a abrogé les dispositions correspondantes. La responsabilité personnelle et pécuniaire (RPP) est remplacée par le régime unifié de responsabilité financière (RGP) jugé par la Cour des comptes.",
+    url: 'https://www.legifrance.gouv.fr/jorf/id/JORFTEXT000046767632',
+    motsCles: ['cautionnement', 'suppression', 'RGP', 'régisseur', '2022-408', '2022-1605'],
   },
   {
     id: 'arrete-ir-regisseur',
     source: 'ARRÊTÉ',
-    reference: 'Arrêté 28/05/1993 — Décret 2008-227',
+    reference: 'Arrêté 28/05/1993 modifié — Décret 2008-227',
     titre: 'Indemnité de responsabilité (IR) du régisseur',
-    resume: "L'indemnité de responsabilité (IR) est due au régisseur dont le plafond d'encaisse ou d'avance excède 1 220 €. Son montant annuel est calculé selon un barème par tranches du plafond. Elle compense l'engagement de la responsabilité personnelle et pécuniaire.",
+    resume: "L'indemnité de responsabilité (IR) reste due au régisseur dont le plafond d'encaisse ou d'avance excède 1 220 €, malgré la suppression du cautionnement. Son montant annuel est calculé selon un barème par tranches du plafond. Elle compense l'engagement de la responsabilité (désormais RGP).",
     url: 'https://www.legifrance.gouv.fr/loda/id/JORFTEXT000000536293',
     motsCles: ['IR', 'indemnité responsabilité', 'régisseur', 'barème'],
   },
@@ -369,6 +369,7 @@ export function getSourceBadgeClass(source: SourceLegale): string {
     'CIRCULAIRE': 'bg-slate-100 text-slate-800 border-slate-300 dark:bg-slate-800 dark:text-slate-300',
     'ARRÊTÉ': 'bg-indigo-100 text-indigo-800 border-indigo-300 dark:bg-indigo-950/40 dark:text-indigo-300',
     'DÉCRET': 'bg-cyan-100 text-cyan-800 border-cyan-300 dark:bg-cyan-950/40 dark:text-cyan-300',
+    'ORDONNANCE': 'bg-rose-100 text-rose-800 border-rose-300 dark:bg-rose-950/40 dark:text-rose-300',
   };
   return map[source];
 }

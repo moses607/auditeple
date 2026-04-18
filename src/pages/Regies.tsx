@@ -15,8 +15,8 @@ import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/M
 import { ControlAlert } from '@/components/ControlAlert';
 
 /* ═══ SEUILS RÉGLEMENTAIRES ═══ */
-const SEUIL_CAUTIONNEMENT = 1220; // €  — Arrêté 28/05/1993 modifié : cautionnement obligatoire au-delà
-const SEUIL_IR_REGISSEUR = 1220;  // €  — IR (indemnité de responsabilité) due si plafond > 1220 €
+/* Cautionnement SUPPRIMÉ depuis l'Ord. 2022-408 + Décret 2022-1605 (entrée en vigueur 1er janvier 2023) */
+const SEUIL_IR_REGISSEUR = 1220;  // €  — IR (indemnité de responsabilité) demeure due si plafond > 1220 € (arrêté 28/05/1993)
 
 /* ═══ TYPES ═══ */
 interface ControleCaisseItem {
@@ -44,7 +44,6 @@ interface NominationRegisseur {
   nom: string; prenom: string; fonction: string; dateNomination: string;
   referenceArrete: string; suppleant: string; dateSuppleance: string;
   formationRegie: boolean; dateFormation: string; observations: string;
-  cautionnementMontant: number; cautionnementSouscrit: boolean;
   irMontantAnnuel: number; irVersee: boolean;
 }
 
@@ -71,7 +70,6 @@ export default function RegiesPage() {
   const [nomination, setNomination] = useState<NominationRegisseur>(() => loadState('regies_nomination', {
     nom: '', prenom: '', fonction: '', dateNomination: '', referenceArrete: '',
     suppleant: '', dateSuppleance: '', formationRegie: false, dateFormation: '', observations: '',
-    cautionnementMontant: 0, cautionnementSouscrit: false,
     irMontantAnnuel: 0, irVersee: false,
   }));
 
@@ -142,7 +140,7 @@ export default function RegiesPage() {
     <ModulePageLayout
       title="Régies"
       section="CONTRÔLES SUR PLACE"
-      description="Contrôle des régies d'avances et de recettes : acte constitutif, nomination, cautionnement, comptage de caisse, chèques en coffre, valeurs inactives et délai de versement au comptable."
+      description="Contrôle des régies d'avances et de recettes : acte constitutif, nomination, comptage de caisse, chèques en coffre, valeurs inactives et délai de versement au comptable. (Cautionnement supprimé depuis l'Ord. 2022-408 — RGP)"
       refs={[
         { refKey: 'reg-2019-798', label: 'Plafonds' },
         { refKey: 'reg-acte-constitutif', label: 'Acte constitutif' },
@@ -415,13 +413,11 @@ export default function RegiesPage() {
                   refKey="reg-acte-constitutif" action="Récupérer l'arrêté du chef d'établissement et saisir la date de création." />
               )}
 
-              {/* Alerte cautionnement automatique selon plafond */}
-              {acte.montantPlafond > SEUIL_CAUTIONNEMENT && (
-                <ControlAlert level="alerte" title={`Cautionnement obligatoire (plafond ${fmt(acte.montantPlafond)} > ${SEUIL_CAUTIONNEMENT} €)`}
-                  description="Au-delà de 1 220 € de plafond, le régisseur doit obligatoirement souscrire un cautionnement (caution mutuelle ou personnelle) avant son entrée en fonction."
-                  refKey="arrete-cautionnement"
-                  action="Vérifier l'attestation de cautionnement dans l'onglet Nomination, et que son montant est cohérent avec le barème de l'arrêté du 28/05/1993." />
-              )}
+              {/* Information : suppression du cautionnement (Ord. 2022-408 + Décret 2022-1605) */}
+              <ControlAlert level="info" title="Cautionnement du régisseur supprimé"
+                description="Depuis le 1er janvier 2023, l'obligation de cautionnement des régisseurs des organismes publics est supprimée (Ord. 2022-408 du 21/03/2022 et Décret 2022-1605 du 22/12/2022). La RPP est remplacée par le Régime de Responsabilité des Gestionnaires Publics (RGP), jugé par la Cour des comptes."
+                refKey="fin-cautionnement"
+                action="Vérifier qu'aucun cautionnement résiduel ne figure encore dans les actes de nomination postérieurs au 01/01/2023." />
             </CardContent>
           </Card>
         </TabsContent>
@@ -466,23 +462,8 @@ export default function RegiesPage() {
                 </div>
               </div>
 
-              {/* ═══ Cautionnement & IR (Sprint 3) ═══ */}
+              {/* ═══ Indemnité de responsabilité (IR) — cautionnement supprimé Ord. 2022-408 ═══ */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className={`p-3 rounded-lg border ${acte.montantPlafond > SEUIL_CAUTIONNEMENT && !nomination.cautionnementSouscrit ? 'border-destructive bg-destructive/10' : 'border-border bg-muted/30'}`}>
-                  <p className="text-xs font-bold mb-2">Cautionnement {acte.montantPlafond > SEUIL_CAUTIONNEMENT && <span className="text-destructive">(obligatoire)</span>}</p>
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <Button size="sm" variant={nomination.cautionnementSouscrit ? 'default' : 'outline'} onClick={() => updateNom('cautionnementSouscrit', true)}>✓ Souscrit</Button>
-                      <Button size="sm" variant={!nomination.cautionnementSouscrit ? 'secondary' : 'outline'} onClick={() => updateNom('cautionnementSouscrit', false)}>✗ Non souscrit</Button>
-                    </div>
-                    {nomination.cautionnementSouscrit && (
-                      <div className="space-y-1"><Label className="text-xs">Montant du cautionnement (€)</Label>
-                        <Input type="number" value={nomination.cautionnementMontant || ''} onChange={e => updateNom('cautionnementMontant', parseFloat(e.target.value) || 0)} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
                 <div className="p-3 rounded-lg border border-border bg-muted/30">
                   <p className="text-xs font-bold mb-2">Indemnité de responsabilité (IR)</p>
                   <div className="space-y-2">
@@ -495,20 +476,20 @@ export default function RegiesPage() {
                     </div>
                   </div>
                 </div>
+
+                <div className="p-3 rounded-lg border border-border bg-primary/5">
+                  <p className="text-xs font-bold mb-1">Régime de responsabilité</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Depuis le <strong>1er janvier 2023</strong>, le régisseur n'est plus soumis à la <strong>RPP</strong> ni au <strong>cautionnement</strong>. Il relève désormais du <strong>RGP</strong> (Régime de Responsabilité des Gestionnaires Publics) — Ord. 2022-408.
+                  </p>
+                </div>
               </div>
 
-              {/* Alertes croisées plafond ↔ cautionnement / IR */}
-              {acte.montantPlafond > SEUIL_CAUTIONNEMENT && !nomination.cautionnementSouscrit && (
-                <ControlAlert level="critique"
-                  title="Cautionnement absent — manquement réglementaire majeur"
-                  description={`Le plafond de la régie (${fmt(acte.montantPlafond)}) excède 1 220 € : le régisseur DOIT avoir souscrit un cautionnement avant prise de fonction. Sa responsabilité personnelle et pécuniaire (RPP) est engagée sans filet.`}
-                  refKey="arrete-cautionnement"
-                  action="Suspendre le fonctionnement de la régie ou faire produire l'attestation de cautionnement sous 8 jours." />
-              )}
+              {/* IR demeure due au-delà de 1 220 € de plafond */}
               {acte.montantPlafond > SEUIL_IR_REGISSEUR && !nomination.irVersee && (
                 <ControlAlert level="alerte"
                   title="Indemnité de responsabilité (IR) non versée"
-                  description="Au-delà de 1 220 € de plafond de régie, le régisseur a droit à une indemnité de responsabilité annuelle calculée selon le barème de l'arrêté du 28/05/1993."
+                  description={`Au-delà de ${SEUIL_IR_REGISSEUR} € de plafond de régie, le régisseur a droit à une indemnité de responsabilité annuelle calculée selon le barème de l'arrêté du 28/05/1993 modifié. Cette IR demeure due malgré la suppression du cautionnement.`}
                   refKey="arrete-ir-regisseur"
                   action="Vérifier la mise en paiement de l'IR par l'ordonnateur et son rattachement au bon exercice." />
               )}

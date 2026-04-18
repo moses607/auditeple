@@ -19,13 +19,13 @@
 export const SEUILS_MARCHES_2026 = [
   {
     seuil: 0,
-    label: 'Achat < 40 000 € HT',
-    consigne: 'Dispense de publicité et de mise en concurrence. L\'acheteur veille au bon usage des deniers publics et choisit une offre pertinente.',
-    ref: 'Art. R.2122-8 CCP',
+    label: 'Achat < 60 000 € HT (fournitures/services) — < 100 000 € HT (travaux)',
+    consigne: 'Dispense de publicité et de mise en concurrence (Décret 2025-1386 — seuil relevé). L\'acheteur veille au bon usage des deniers publics et choisit une offre pertinente. Recommandation : 3 devis dès 25 000 € HT.',
+    ref: 'Art. R.2122-8 CCP — Décret 2025-1386',
   },
   {
-    seuil: 40_000,
-    label: '40 000 € HT',
+    seuil: 60_000,
+    label: '60 000 € HT',
     consigne: 'Marché à procédure adaptée (MAPA). Publicité et mise en concurrence adaptées au montant et à la nature du marché. Obligation de publicité sur le profil acheteur.',
     ref: 'Art. R.2123-1 CCP',
   },
@@ -112,7 +112,7 @@ export const PIECES_JUSTIFICATIVES_DEPENSES = [
   { id: 'pj4', label: 'Bon de livraison ou attestation de service fait', obligatoire: true, ref: 'Arrêté PJ — rubrique 4' },
   { id: 'pj5', label: 'RIB du créancier', obligatoire: true, ref: 'Art. 38 4° GBCP' },
   { id: 'pj6', label: 'Pièces de marché (acte d\'engagement, CCAP, CCTP)', obligatoire: false, ref: 'Si montant > seuil MAPA' },
-  { id: 'pj7', label: 'Rapport de présentation / fiche de procédure', obligatoire: false, ref: 'Si marché > 40 000 € HT' },
+  { id: 'pj7', label: 'Rapport de présentation / fiche de procédure', obligatoire: false, ref: 'Si marché ≥ 60 000 € HT' },
   { id: 'pj8', label: 'Acte du CA ou convention habilitante', obligatoire: false, ref: 'Art. R.421-20 Code Éducation' },
 ];
 
@@ -239,7 +239,7 @@ export const CARTOPALE_PROCESSUS = [
     code: 'P5',
     label: 'Régies',
     sousProcessus: [
-      'Acte constitutif', 'Nomination et cautionnement',
+      'Acte constitutif', 'Nomination du régisseur (cautionnement supprimé — Ord. 2022-408)',
       'Contrôle de caisse inopiné', 'Respect des plafonds',
       'Délai de reversement', 'Journal de caisse',
     ],

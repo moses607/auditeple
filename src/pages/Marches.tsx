@@ -13,8 +13,9 @@ import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/M
 import { ControlAlert } from '@/components/ControlAlert';
 
 /* ═══ Détection saucissonnage : marchés de même nature dont le cumul 12 mois dépasse un seuil formalisé ═══ */
-const SEUIL_FORMALISE = 143000;            // € HT — seuil procédure formalisée fournitures/services
-const SEUIL_CUMUL_SUSPECT = 40000;         // € HT — au-dessus, risque de fractionnement à signaler
+const SEUIL_FORMALISE = 216000;            // € HT — seuil procédure formalisée fournitures/services (UE 2026-2027)
+const SEUIL_DISPENSE = 60000;              // € HT — seuil de dispense rehaussé (Décret 2025-1386)
+const SEUIL_CUMUL_SUSPECT = 60000;         // € HT — au-dessus, risque de fractionnement à signaler
 
 function normaliseObjet(s: string) {
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9 ]/g, ' ').trim();
@@ -31,7 +32,7 @@ interface ClusterSaucissonnage {
 }
 
 const NATURES = ['Fournitures', 'Services', 'Travaux', 'Fournitures et services', 'Prestations intellectuelles'];
-const PROCEDURES = ['Gré à gré (< 40 000 €)', 'MAPA simplifié', 'MAPA avec publicité', 'Appel d\'offres ouvert', 'Appel d\'offres restreint', 'Procédure négociée', 'Dialogue compétitif'];
+const PROCEDURES = ['Gré à gré (< 60 000 €)', 'MAPA simplifié', 'MAPA avec publicité', 'Appel d\'offres ouvert', 'Appel d\'offres restreint', 'Procédure négociée', 'Dialogue compétitif'];
 
 export default function MarchesPage() {
   const [marches, setMarches] = useState<MarchePublic[]>(() => loadState('marches', []));
@@ -99,8 +100,8 @@ export default function MarchesPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{marches.length}</p><p className="text-xs text-muted-foreground mt-0.5">Marchés suivis</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(totMontant)}</p><p className="text-xs text-muted-foreground mt-0.5">Montant total</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{marches.filter(x => (x.montant||0) >= 40000).length}</p><p className="text-xs text-muted-foreground mt-0.5">MAPA (&gt; 40K)</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{marches.filter(x => (x.montant||0) >= 143000).length}</p><p className="text-xs text-muted-foreground mt-0.5">Procédure formalisée</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-amber-600">{marches.filter(x => (x.montant||0) >= 60000).length}</p><p className="text-xs text-muted-foreground mt-0.5">MAPA (≥ 60 K€)</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-destructive">{marches.filter(x => (x.montant||0) >= 216000).length}</p><p className="text-xs text-muted-foreground mt-0.5">Procédure formalisée (≥ 216 K€)</p></CardContent></Card>
       </div>
 
       {/* ═══ ALERTE SAUCISSONNAGE AUTO ═══ */}
@@ -110,7 +111,7 @@ export default function MarchesPage() {
             <ControlAlert key={idx}
               level={c.total >= SEUIL_FORMALISE ? 'critique' : 'alerte'}
               title={`Risque de fractionnement détecté — « ${c.motCle}… »`}
-              description={`${c.nb} marchés similaires de nature « ${c.nature} » totalisent ${fmt(c.total)}. ${c.total >= SEUIL_FORMALISE ? 'Le cumul dépasse le seuil de procédure formalisée (143 000 € HT) : passation séparée potentiellement irrégulière.' : 'Le cumul dépasse le seuil de dispense (40 000 € HT) sans publicité : à justifier ou regrouper.'}`}
+              description={`${c.nb} marchés similaires de nature « ${c.nature} » totalisent ${fmt(c.total)}. ${c.total >= SEUIL_FORMALISE ? 'Le cumul dépasse le seuil de procédure formalisée (216 000 € HT) : passation séparée potentiellement irrégulière.' : 'Le cumul dépasse le seuil de dispense (60 000 € HT) sans publicité : à justifier ou regrouper.'}`}
               refKey="ccp-saucissonnage"
               action={c.total >= SEUIL_FORMALISE
                 ? 'Réinterroger la computation des seuils (besoin homogène) et engager une procédure formalisée pour le besoin global.'

@@ -76,7 +76,7 @@ function collectVerification(): PVVerification[] {
     v12: "Vérification des régies d'avances",
     v13: "Vérification des régies de recettes",
     v14: "Actes constitutifs des régies à jour",
-    v15: "Cautionnement des régisseurs vérifié",
+    v15: "IR des régisseurs versée (cautionnement supprimé — Ord. 2022-408)",
     v16: "État des créances à recouvrer",
     v17: "Suivi des titres de recettes émis",
     v18: "Contrôle des encaissements du jour",
