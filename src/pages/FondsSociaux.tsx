@@ -9,6 +9,12 @@ import { FondSocial, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_FONDS_SOCIAUX } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/** Plafond indicatif d'aide individuelle FSL/FSC : au-delà, examen renforcé en commission. */
+const PLAFOND_AIDE_INDIVIDUELLE = 600;
+/** Une aide annuelle cumulée ne doit pas dépasser le montant de la facture (frais scolaires + DP). */
+const PLAFOND_BOURSE_FSC_ANNUEL = 1500;
 
 export default function FondsSociaux() {
   const [items, setItems] = useState<FondSocial[]>(() => loadState('fonds_sociaux', []));

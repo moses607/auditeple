@@ -11,6 +11,7 @@ import { SubventionItem, fmt, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_SUBVENTIONS } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
 
 export default function Subventions() {
   const [items, setItems] = useState<SubventionItem[]>(() => loadState('subventions', []));

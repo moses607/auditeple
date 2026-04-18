@@ -12,6 +12,14 @@ import { loadState, saveState } from '@/lib/store';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CONTROLES_RESTAURATION } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/** Seuils EGAlim (loi 2018-938) : 50 % produits durables/qualité dont 20 % bio. */
+const SEUIL_BIO_EGALIM = 20;
+const SEUIL_DURABLE_EGALIM = 50;
+/** Seuil DGAL — agrément sanitaire requis dès 80 repas/jour distribués vers un établissement tiers
+ *  (Règlement (CE) 853/2004 + arrêté du 21/12/2009). */
+const SEUIL_DGAL_REPAS_JOUR = 80;
 
 /* ═══ TYPES LOCAUX ═══ */
 interface GrammageVerif {

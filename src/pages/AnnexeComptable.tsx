@@ -8,6 +8,11 @@ import { useAuditParams } from '@/hooks/useAuditStore';
 import { getSelectedEtablissement } from '@/lib/types';
 import { CONTROLES_ANNEXE } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/** Seuil prudentiel IGAENR 2016-071 : FRNG en jours de DRFN. */
+const SEUIL_FRNG_BAS = 30;   // < 30 jours = alerte
+const SEUIL_FRNG_CRITIQUE = 15; // < 15 jours = critique
 
 // Structure conforme au modèle espaceple.org (format paysage, exercice N-1)
 const SECTIONS_ANNEXE = [
