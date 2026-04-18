@@ -15,6 +15,10 @@ import { useAuditParams } from '@/hooks/useAuditStore';
 import { getSelectedEtablissement } from '@/lib/types';
 import { aggregateCockpit } from '@/lib/cockpit-aggregator';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
+
+const SUPABASE_URL = 'https://mpexzicaotykelgogdwv.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1wZXh6aWNhb3R5a2VsZ29nZHd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzMwODM5MDAsImV4cCI6MjA4ODY1OTkwMH0.-CF0-oJ-jMtt6Hc5-Jh3YvWSNMKKGaH4qfYY1v_-eoc';
 
 interface Msg {
   role: 'user' | 'assistant';
