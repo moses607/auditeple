@@ -16,6 +16,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Ba
 import { CalendrierAlertesWidget } from '@/components/CalendrierAlertesWidget';
 import { CockpitIntelligent } from '@/components/CockpitIntelligent';
 import { AlertesConsolidees } from '@/components/AlertesConsolidees';
+import { ParcoursProgress } from '@/components/ParcoursProgress';
 
 import heroImg from '@/assets/hero-audit.png';
 import sectionControles from '@/assets/section-controles.png';
@@ -206,6 +207,11 @@ export default function Dashboard() {
 
       {/* ─── 🚀 COCKPIT INTELLIGENT — Score conformité + Top alertes cross-modules ─── */}
       <CockpitIntelligent />
+
+      {/* ─── 🧭 PROGRESSION DU PARCOURS — frise des 7 étapes + bouton Continuer ─── */}
+      <div className="opacity-0 animate-fade-in" style={{ animationDelay: '90ms' }}>
+        <ParcoursProgress />
+      </div>
 
       {/* ─── 🚨 CENTRE D'ALERTES CONSOLIDÉES — anomalies critiques tous modules ─── */}
       <div className="opacity-0 animate-fade-in" style={{ animationDelay: '120ms' }}>
