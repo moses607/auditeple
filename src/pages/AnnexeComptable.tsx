@@ -8,6 +8,11 @@ import { useAuditParams } from '@/hooks/useAuditStore';
 import { getSelectedEtablissement } from '@/lib/types';
 import { CONTROLES_ANNEXE } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/** Seuil prudentiel IGAENR 2016-071 : FRNG en jours de DRFN. */
+const SEUIL_FRNG_BAS = 30;   // < 30 jours = alerte
+const SEUIL_FRNG_CRITIQUE = 15; // < 15 jours = critique
 
 // Structure conforme au modèle espaceple.org (format paysage, exercice N-1)
 const SECTIONS_ANNEXE = [
@@ -146,7 +151,28 @@ export default function AnnexeComptablePage() {
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{SECTIONS_ANNEXE.length}</p><p className="text-xs text-muted-foreground mt-0.5">Sections de l'annexe</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{exerciceN1}</p><p className="text-xs text-muted-foreground mt-0.5">Exercice</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className={`text-2xl font-bold ${fdrJours < SEUIL_FRNG_CRITIQUE ? 'text-destructive' : fdrJours < SEUIL_FRNG_BAS ? 'text-amber-600' : 'text-green-600'}`}>{fdrJours} j</p><p className="text-xs text-muted-foreground mt-0.5">FRNG / DRFN</p></CardContent></Card>
       </div>
+
+      {/* Alerte FRNG — IGAENR 2016-071 */}
+      {fdrJours > 0 && fdrJours < SEUIL_FRNG_BAS && (
+        <ControlAlert
+          level={fdrJours < SEUIL_FRNG_CRITIQUE ? 'critique' : 'alerte'}
+          title={`Fonds de roulement faible : ${fdrJours} jours de DRFN (seuil prudentiel : ${SEUIL_FRNG_BAS} jours)`}
+          description={`Le rapport IGAENR 2016-071 considère qu'un FRNG inférieur à ${SEUIL_FRNG_BAS} jours de Dépenses Réelles de Fonctionnement Net signale un risque de tension de trésorerie. ${fdrJours < SEUIL_FRNG_CRITIQUE ? `En dessous de ${SEUIL_FRNG_CRITIQUE} jours, la continuité d'exploitation peut être compromise.` : ''}`}
+          action="Présenter au CA un plan de redressement : maîtrise des dépenses, optimisation des recettes, demande éventuelle d'avance de la collectivité de rattachement. Documenter dans la présente annexe."
+          refLabel="IGAENR 2016-071 — Modèle FDRM"
+        />
+      )}
+
+      {fdrJours >= SEUIL_FRNG_BAS && fdr > 0 && fdrJours < 60 && (
+        <ControlAlert
+          level="info"
+          title={`FRNG correct : ${fdrJours} jours`}
+          description="Le fonds de roulement est conforme au seuil prudentiel mais reste limité. Maintenir la vigilance sur l'évolution des charges."
+          refLabel="IGAENR 2016-071"
+        />
+      )}
 
       <div>
         <p className="text-sm text-muted-foreground">

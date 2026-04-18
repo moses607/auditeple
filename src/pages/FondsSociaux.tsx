@@ -9,6 +9,12 @@ import { FondSocial, fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_FONDS_SOCIAUX } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/** Plafond indicatif d'aide individuelle FSL/FSC : au-delà, examen renforcé en commission. */
+const PLAFOND_AIDE_INDIVIDUELLE = 600;
+/** Une aide annuelle cumulée ne doit pas dépasser le montant de la facture (frais scolaires + DP). */
+const PLAFOND_BOURSE_FSC_ANNUEL = 1500;
 
 export default function FondsSociaux() {
   const [items, setItems] = useState<FondSocial[]>(() => loadState('fonds_sociaux', []));
@@ -45,6 +51,38 @@ export default function FondsSociaux() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{fmt(items.reduce((s,x) => s + (x.montant || 0), 0))}</p><p className="text-xs text-muted-foreground mt-0.5">Montant attribué</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold text-green-600">{items.filter(x => x.type === 'FSL').length}</p><p className="text-xs text-muted-foreground mt-0.5">Fonds social lycéen</p></CardContent></Card>
       </div>
+
+      {/* Alertes plafonds — Circ. 98-044 et 2017-122 */}
+      {(() => {
+        const accordes = items.filter(i => i.decision === 'Accordé');
+        const depassementUnitaire = accordes.filter(i => (i.montant || 0) > PLAFOND_AIDE_INDIVIDUELLE);
+        const cumuls = new Map<string, number>();
+        accordes.forEach(i => cumuls.set(i.nom, (cumuls.get(i.nom) || 0) + (i.montant || 0)));
+        const depassementCumul = Array.from(cumuls.entries()).filter(([, m]) => m > PLAFOND_BOURSE_FSC_ANNUEL);
+        if (depassementUnitaire.length === 0 && depassementCumul.length === 0) return null;
+        return (
+          <div className="space-y-2">
+            {depassementUnitaire.length > 0 && (
+              <ControlAlert
+                level="alerte"
+                title={`${depassementUnitaire.length} aide${depassementUnitaire.length > 1 ? 's' : ''} dépassant le plafond unitaire de ${fmt(PLAFOND_AIDE_INDIVIDUELLE)}`}
+                description="Au-delà de ce seuil, l'attribution doit faire l'objet d'un examen renforcé en commission, avec pièces justificatives complètes (avis d'imposition, situation familiale)."
+                action="Vérifier la motivation au PV de commission, l'anonymisation du dossier et la traçabilité (compte 6576)."
+                refLabel="Circ. 98-044 — Fonds sociaux"
+              />
+            )}
+            {depassementCumul.length > 0 && (
+              <ControlAlert
+                level="critique"
+                title={`${depassementCumul.length} bénéficiaire${depassementCumul.length > 1 ? 's' : ''} : aide cumulée FSC + bourse > ${fmt(PLAFOND_BOURSE_FSC_ANNUEL)}/an`}
+                description="Le cumul des aides (bourse nationale + fonds social) ne doit pas excéder le coût total de la scolarité (frais d'internat / DP + fournitures). Tout excédent doit être restitué."
+                action="Recalculer la facture annuelle de chaque bénéficiaire concerné et procéder à la régularisation (titre de recette ou réduction de l'aide). Tracer en commission."
+                refLabel="Circ. 2017-122 — Aides sociales aux familles"
+              />
+            )}
+          </div>
+        );
+      })()}
 
       <div className="flex justify-end">
         <Button onClick={() => setForm({ type: 'FSL', nom: '', objet: '', montant: '', decision: 'Accordé', dateCommission: new Date().toISOString().split('T')[0] })}><Plus className="h-4 w-4 mr-2" /> Nouvelle aide</Button>

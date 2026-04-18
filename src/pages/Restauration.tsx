@@ -12,6 +12,14 @@ import { loadState, saveState } from '@/lib/store';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CONTROLES_RESTAURATION } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/** Seuils EGAlim (loi 2018-938) : 50 % produits durables/qualité dont 20 % bio. */
+const SEUIL_BIO_EGALIM = 20;
+const SEUIL_DURABLE_EGALIM = 50;
+/** Seuil DGAL — agrément sanitaire requis dès 80 repas/jour distribués vers un établissement tiers
+ *  (Règlement (CE) 853/2004 + arrêté du 21/12/2009). */
+const SEUIL_DGAL_REPAS_JOUR = 80;
 
 /* ═══ TYPES LOCAUX ═══ */
 interface GrammageVerif {
@@ -158,10 +166,30 @@ export default function Restauration() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
               <Card className="shadow-card"><CardContent className="p-4"><p className="text-lg font-bold">{last.mois}</p><p className="text-xs text-muted-foreground">Dernier mois</p></CardContent></Card>
               <Card className="shadow-card"><CardContent className="p-4"><p className="text-lg font-bold">{last.coutTotal.toFixed(2)} €</p><p className="text-xs text-muted-foreground">Coût/repas</p></CardContent></Card>
-              <Card className="shadow-card"><CardContent className="p-4"><p className={`text-lg font-bold ${last.bio >= 20 ? 'text-green-600' : 'text-destructive'}`}>{last.bio}%</p><p className="text-xs text-muted-foreground">Bio</p></CardContent></Card>
-              <Card className="shadow-card"><CardContent className="p-4"><p className={`text-lg font-bold ${last.durable >= 50 ? 'text-green-600' : 'text-destructive'}`}>{last.durable}%</p><p className="text-xs text-muted-foreground">Durable</p></CardContent></Card>
+              <Card className="shadow-card"><CardContent className="p-4"><p className={`text-lg font-bold ${last.bio >= SEUIL_BIO_EGALIM ? 'text-green-600' : 'text-destructive'}`}>{last.bio}%</p><p className="text-xs text-muted-foreground">Bio</p></CardContent></Card>
+              <Card className="shadow-card"><CardContent className="p-4"><p className={`text-lg font-bold ${last.durable >= SEUIL_DURABLE_EGALIM ? 'text-green-600' : 'text-destructive'}`}>{last.durable}%</p><p className="text-xs text-muted-foreground">Durable</p></CardContent></Card>
               <Card className="shadow-card"><CardContent className="p-4"><p className={`text-lg font-bold ${last.impayes > 0 ? 'text-destructive' : 'text-green-600'}`}>{fmt(last.impayes)}</p><p className="text-xs text-muted-foreground">Impayés</p></CardContent></Card>
             </div>
+          )}
+
+          {last && (last.bio < SEUIL_BIO_EGALIM || last.durable < SEUIL_DURABLE_EGALIM) && (
+            <ControlAlert
+              level={last.bio < SEUIL_BIO_EGALIM / 2 || last.durable < SEUIL_DURABLE_EGALIM / 2 ? 'critique' : 'alerte'}
+              title="Seuils EGAlim non atteints"
+              description={`La loi EGAlim impose au moins ${SEUIL_DURABLE_EGALIM} % de produits durables/qualité dont ${SEUIL_BIO_EGALIM} % bio. Constaté : ${last.bio}% bio / ${last.durable}% durable.`}
+              action="Réviser la politique d'approvisionnement avec le chef cuisinier. Tracer les justificatifs (factures, certifications) et présenter le plan d'amélioration au CA."
+              refLabel="Loi EGAlim 2018-938 — Art. 24"
+            />
+          )}
+
+          {last && last.repas > 0 && last.joursService > 0 && (last.repas / last.joursService) >= SEUIL_DGAL_REPAS_JOUR && (
+            <ControlAlert
+              level="info"
+              title={`Production moyenne de ${Math.round(last.repas / last.joursService)} repas/jour — vérifier l'agrément sanitaire`}
+              description={`Si la cuisine livre des repas à un autre établissement, un agrément sanitaire DGAL est requis dès ${SEUIL_DGAL_REPAS_JOUR} repas/jour livrés à des tiers (Règl. (CE) 853/2004). En cuisine sur place uniquement, une déclaration suffit.`}
+              action="Si livraison vers tiers : vérifier l'arrêté préfectoral d'agrément (n° EAU/CE) et son affichage en cuisine. Maintenir le PMS HACCP à jour."
+              refLabel="Règlement (CE) 853/2004 — Arrêté 21/12/2009"
+            />
           )}
 
           {form && (

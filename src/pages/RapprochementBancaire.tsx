@@ -10,6 +10,7 @@ import { RapprochementItem, fmt, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_RAPPROCHEMENT } from '@/lib/regulatory-data';
 import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
 
 export default function RapprochementBancaire() {
   const [items, setItems] = useState<RapprochementItem[]>(() => loadState('rapprochement', []));
@@ -74,9 +75,19 @@ export default function RapprochementBancaire() {
       </ModuleSection>
 
       {ecarts.length > 0 && (
-        <AnomalyAlert title={`${ecarts.length} rapprochement${ecarts.length > 1 ? 's' : ''} avec écart non justifié`}
-          description="Tout écart entre le solde DFT et la comptabilité doit être justifié par des opérations en suspens identifiées."
-          severity="error" />
+        <>
+          <AnomalyAlert title={`${ecarts.length} rapprochement${ecarts.length > 1 ? 's' : ''} avec écart non justifié`}
+            description="Tout écart entre le solde DFT et la comptabilité doit être justifié par des opérations en suspens identifiées."
+            severity="error" />
+          <ControlAlert
+            level="critique"
+            title={`Écart non justifié entre la comptabilité et le compte au Trésor — ${ecarts.length} occurrence${ecarts.length > 1 ? 's' : ''}`}
+            description={`Le solde du C/515100 (compte au Trésor / DFT) doit être strictement égal au solde comptable de l'EPLE après prise en compte des suspens. Tout écart résiduel engage la responsabilité financière de l'agent comptable (RGP — décret 2022-1605).`}
+            action="Identifier l'origine de l'écart (chèques émis non débités, virements en transit, prélèvements non comptabilisés) et régulariser sans délai. Joindre le justificatif au prochain état de rapprochement."
+            refKey="m96-3-1-3"
+            refLabel="M9-6 § 3.1.3 — Rapprochement bancaire / Art. 18 GBCP"
+          />
+        </>
       )}
 
       {form && (

@@ -10,6 +10,10 @@ import { loadState, saveState } from '@/lib/store';
 
 import { CONTROLES_STOCKS } from '@/lib/regulatory-data';
 import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/** Seuil critique : un article sans mouvement depuis > 12 mois doit être déclassé (M9-6 § 2.1.4). */
+const SEUIL_ROTATION_MOIS = 12;
 
 export default function Stocks() {
   const [items, setItems] = useState<StockItem[]>(() => loadState('stocks', []));
@@ -31,6 +35,13 @@ export default function Stocks() {
 
   const ecarts = items.filter(x => x.ecart !== 0);
   const alertesDLC = items.filter(x => x.statut !== 'Normal');
+
+  // Rotation > 12 mois : DLC dépassée de plus d'un an OU pas de DLC + valeur résiduelle = stock dormant
+  const dormants = items.filter(x => {
+    if (!x.dlc) return false;
+    const moisDepuisDLC = (Date.now() - new Date(x.dlc).getTime()) / (30 * 86400000);
+    return moisDepuisDLC > SEUIL_ROTATION_MOIS && x.valeur > 0;
+  });
 
   return (
     <ModulePageLayout
@@ -78,6 +89,17 @@ export default function Stocks() {
 
       {ecarts.length > 0 && (
         <AnomalyAlert title={`${ecarts.length} écart${ecarts.length > 1 ? 's' : ''} entre stock physique et théorique`} description="Tout écart doit être justifié et régularisé comptablement (manquant = charge exceptionnelle C/6718)." severity="warning" />
+      )}
+
+      {dormants.length > 0 && (
+        <ControlAlert
+          level="alerte"
+          title={`${dormants.length} article${dormants.length > 1 ? 's' : ''} sans rotation depuis plus de ${SEUIL_ROTATION_MOIS} mois`}
+          description={`Stock dormant valorisé à ${fmt(dormants.reduce((s, x) => s + x.valeur, 0))}. Tout article sans mouvement depuis plus d'un an doit être analysé : déclassement, dépréciation (C/6817) ou destruction (PV à joindre).`}
+          action="Établir un PV de destruction ou constater une dépréciation pour les articles concernés. Vérifier la fiabilité du fichier inventaire."
+          refKey="m96-2-1-4"
+          refLabel="M9-6 § 2.1.4 — Inventaire physique"
+        />
       )}
 
       {form && (
