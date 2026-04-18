@@ -462,23 +462,8 @@ export default function RegiesPage() {
                 </div>
               </div>
 
-              {/* ═══ Cautionnement & IR (Sprint 3) ═══ */}
+              {/* ═══ Indemnité de responsabilité (IR) — cautionnement supprimé Ord. 2022-408 ═══ */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className={`p-3 rounded-lg border ${acte.montantPlafond > SEUIL_CAUTIONNEMENT && !nomination.cautionnementSouscrit ? 'border-destructive bg-destructive/10' : 'border-border bg-muted/30'}`}>
-                  <p className="text-xs font-bold mb-2">Cautionnement {acte.montantPlafond > SEUIL_CAUTIONNEMENT && <span className="text-destructive">(obligatoire)</span>}</p>
-                  <div className="space-y-2">
-                    <div className="flex gap-2">
-                      <Button size="sm" variant={nomination.cautionnementSouscrit ? 'default' : 'outline'} onClick={() => updateNom('cautionnementSouscrit', true)}>✓ Souscrit</Button>
-                      <Button size="sm" variant={!nomination.cautionnementSouscrit ? 'secondary' : 'outline'} onClick={() => updateNom('cautionnementSouscrit', false)}>✗ Non souscrit</Button>
-                    </div>
-                    {nomination.cautionnementSouscrit && (
-                      <div className="space-y-1"><Label className="text-xs">Montant du cautionnement (€)</Label>
-                        <Input type="number" value={nomination.cautionnementMontant || ''} onChange={e => updateNom('cautionnementMontant', parseFloat(e.target.value) || 0)} />
-                      </div>
-                    )}
-                  </div>
-                </div>
-
                 <div className="p-3 rounded-lg border border-border bg-muted/30">
                   <p className="text-xs font-bold mb-2">Indemnité de responsabilité (IR)</p>
                   <div className="space-y-2">
@@ -491,20 +476,20 @@ export default function RegiesPage() {
                     </div>
                   </div>
                 </div>
+
+                <div className="p-3 rounded-lg border border-border bg-primary/5">
+                  <p className="text-xs font-bold mb-1">Régime de responsabilité</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Depuis le <strong>1er janvier 2023</strong>, le régisseur n'est plus soumis à la <strong>RPP</strong> ni au <strong>cautionnement</strong>. Il relève désormais du <strong>RGP</strong> (Régime de Responsabilité des Gestionnaires Publics) — Ord. 2022-408.
+                  </p>
+                </div>
               </div>
 
-              {/* Alertes croisées plafond ↔ cautionnement / IR */}
-              {acte.montantPlafond > SEUIL_CAUTIONNEMENT && !nomination.cautionnementSouscrit && (
-                <ControlAlert level="critique"
-                  title="Cautionnement absent — manquement réglementaire majeur"
-                  description={`Le plafond de la régie (${fmt(acte.montantPlafond)}) excède 1 220 € : le régisseur DOIT avoir souscrit un cautionnement avant prise de fonction. Sa responsabilité personnelle et pécuniaire (RPP) est engagée sans filet.`}
-                  refKey="arrete-cautionnement"
-                  action="Suspendre le fonctionnement de la régie ou faire produire l'attestation de cautionnement sous 8 jours." />
-              )}
+              {/* IR demeure due au-delà de 1 220 € de plafond */}
               {acte.montantPlafond > SEUIL_IR_REGISSEUR && !nomination.irVersee && (
                 <ControlAlert level="alerte"
                   title="Indemnité de responsabilité (IR) non versée"
-                  description="Au-delà de 1 220 € de plafond de régie, le régisseur a droit à une indemnité de responsabilité annuelle calculée selon le barème de l'arrêté du 28/05/1993."
+                  description={`Au-delà de ${SEUIL_IR_REGISSEUR} € de plafond de régie, le régisseur a droit à une indemnité de responsabilité annuelle calculée selon le barème de l'arrêté du 28/05/1993 modifié. Cette IR demeure due malgré la suppression du cautionnement.`}
                   refKey="arrete-ir-regisseur"
                   action="Vérifier la mise en paiement de l'IR par l'ordonnateur et son rattachement au bon exercice." />
               )}
