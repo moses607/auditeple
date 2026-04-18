@@ -239,7 +239,7 @@ export const CARTOPALE_PROCESSUS = [
     code: 'P5',
     label: 'Régies',
     sousProcessus: [
-      'Acte constitutif', 'Nomination et cautionnement',
+      'Acte constitutif', 'Nomination du régisseur (cautionnement supprimé — Ord. 2022-408)',
       'Contrôle de caisse inopiné', 'Respect des plafonds',
       'Délai de reversement', 'Journal de caisse',
     ],
