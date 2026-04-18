@@ -322,10 +322,11 @@ export interface DFTCalcul {
 
 // ═══ CONSTANTES ═══
 export const SEUILS_MARCHES = [
-  { seuil: 40000, label: '40 000 €', consigne: 'Marché à procédure adaptée (MAPA) : obligation de publicité et de mise en concurrence adaptées au montant et à la nature du marché.' },
-  { seuil: 90000, label: '90 000 €', consigne: 'MAPA avec obligation de publicité : publication sur le profil d\'acheteur et dans un support de publication adapté. Transmission au contrôle de légalité obligatoire.' },
-  { seuil: 221000, label: '221 000 €', consigne: 'Procédure formalisée obligatoire : appel d\'offres ouvert ou restreint. Publication au JOUE et au BOAMP.' },
-  { seuil: 5382000, label: '5 382 000 €', consigne: 'Seuil européen pour les marchés de travaux : procédure formalisée avec publication au JOUE obligatoire.' },
+  { seuil: 60000, label: '60 000 € HT', consigne: 'Marché à procédure adaptée (MAPA) : publicité et mise en concurrence adaptées au montant et à la nature. Décret 2025-1386 — seuil de dispense relevé à 60 000 € HT (fournitures/services).' },
+  { seuil: 90000, label: '90 000 € HT', consigne: 'MAPA avec publicité renforcée : publication au BOAMP/JAL + profil acheteur. Transmission au contrôle de légalité obligatoire pour les EPLE.' },
+  { seuil: 100000, label: '100 000 € HT (travaux)', consigne: 'Seuil de dispense porté à 100 000 € HT pour les marchés de travaux (Décret 2025-1386). Au-delà : MAPA avec publicité.' },
+  { seuil: 216000, label: '216 000 € HT', consigne: 'Procédure formalisée obligatoire pour fournitures/services (seuil européen 2026-2027) : appel d\'offres ouvert/restreint. Publication JOUE + BOAMP.' },
+  { seuil: 5538000, label: '5 538 000 € HT (travaux)', consigne: 'Seuil européen pour les marchés de travaux : procédure formalisée avec publication au JOUE obligatoire.' },
 ];
 
 export const MOTIFS_SUSPENSION = [
