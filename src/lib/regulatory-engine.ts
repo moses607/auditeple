@@ -5,7 +5,7 @@
  */
 
 export type SourceLegale =
-  | 'GBCP' | 'M9-6' | 'CE' | 'CCP' | 'RGP' | 'CIRCULAIRE' | 'ARRÊTÉ' | 'DÉCRET';
+  | 'GBCP' | 'M9-6' | 'CE' | 'CCP' | 'RGP' | 'CIRCULAIRE' | 'ARRÊTÉ' | 'DÉCRET' | 'ORDONNANCE';
 
 export interface RegleArticle {
   id: string;
