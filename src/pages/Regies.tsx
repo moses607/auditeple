@@ -413,13 +413,11 @@ export default function RegiesPage() {
                   refKey="reg-acte-constitutif" action="Récupérer l'arrêté du chef d'établissement et saisir la date de création." />
               )}
 
-              {/* Alerte cautionnement automatique selon plafond */}
-              {acte.montantPlafond > SEUIL_CAUTIONNEMENT && (
-                <ControlAlert level="alerte" title={`Cautionnement obligatoire (plafond ${fmt(acte.montantPlafond)} > ${SEUIL_CAUTIONNEMENT} €)`}
-                  description="Au-delà de 1 220 € de plafond, le régisseur doit obligatoirement souscrire un cautionnement (caution mutuelle ou personnelle) avant son entrée en fonction."
-                  refKey="arrete-cautionnement"
-                  action="Vérifier l'attestation de cautionnement dans l'onglet Nomination, et que son montant est cohérent avec le barème de l'arrêté du 28/05/1993." />
-              )}
+              {/* Information : suppression du cautionnement (Ord. 2022-408 + Décret 2022-1605) */}
+              <ControlAlert level="info" title="Cautionnement du régisseur supprimé"
+                description="Depuis le 1er janvier 2023, l'obligation de cautionnement des régisseurs des organismes publics est supprimée (Ord. 2022-408 du 21/03/2022 et Décret 2022-1605 du 22/12/2022). La RPP est remplacée par le Régime de Responsabilité des Gestionnaires Publics (RGP), jugé par la Cour des comptes."
+                refKey="fin-cautionnement"
+                action="Vérifier qu'aucun cautionnement résiduel ne figure encore dans les actes de nomination postérieurs au 01/01/2023." />
             </CardContent>
           </Card>
         </TabsContent>
