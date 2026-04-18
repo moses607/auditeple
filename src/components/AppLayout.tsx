@@ -13,6 +13,8 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { MobileBottomNav } from '@/components/MobileBottomNav';
+import { SmartBreadcrumb } from '@/components/SmartBreadcrumb';
+import { OnboardingWizard } from '@/components/OnboardingWizard';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -90,6 +92,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </Button>
           </header>
           <RegulatoryUpdateBanner />
+          <SmartBreadcrumb />
           <main className="flex-1 overflow-auto p-4 md:p-6 bg-background pb-20 md:pb-6">
             {children}
           </main>
@@ -108,6 +111,7 @@ export function AppLayout({ children }: AppLayoutProps) {
           </footer>
           <MobileBottomNav />
         </div>
+        <OnboardingWizard />
       </div>
     </SidebarProvider>
   );
