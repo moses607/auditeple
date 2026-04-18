@@ -10,6 +10,10 @@ import { loadState, saveState } from '@/lib/store';
 
 import { CONTROLES_STOCKS } from '@/lib/regulatory-data';
 import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { ControlAlert } from '@/components/ControlAlert';
+
+/** Seuil critique : un article sans mouvement depuis > 12 mois doit être déclassé (M9-6 § 2.1.4). */
+const SEUIL_ROTATION_MOIS = 12;
 
 export default function Stocks() {
   const [items, setItems] = useState<StockItem[]>(() => loadState('stocks', []));
