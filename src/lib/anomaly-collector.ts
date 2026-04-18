@@ -507,6 +507,9 @@ const MODULE_COLLECTORS: Record<string, () => PVVerification[]> = {
   'subventions': collectSubventions,
   'restauration': collectRestauration,
   'cartographie': collectCartographie,
+  'marches': collectMarches,
+  'recouvrement': collectRecouvrement,
+  'annexe-comptable': collectAnnexe,
 };
 
 /**
