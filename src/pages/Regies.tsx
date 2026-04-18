@@ -15,8 +15,8 @@ import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/M
 import { ControlAlert } from '@/components/ControlAlert';
 
 /* ═══ SEUILS RÉGLEMENTAIRES ═══ */
-const SEUIL_CAUTIONNEMENT = 1220; // €  — Arrêté 28/05/1993 modifié : cautionnement obligatoire au-delà
-const SEUIL_IR_REGISSEUR = 1220;  // €  — IR (indemnité de responsabilité) due si plafond > 1220 €
+/* Cautionnement SUPPRIMÉ depuis l'Ord. 2022-408 + Décret 2022-1605 (entrée en vigueur 1er janvier 2023) */
+const SEUIL_IR_REGISSEUR = 1220;  // €  — IR (indemnité de responsabilité) demeure due si plafond > 1220 € (arrêté 28/05/1993)
 
 /* ═══ TYPES ═══ */
 interface ControleCaisseItem {
@@ -44,7 +44,6 @@ interface NominationRegisseur {
   nom: string; prenom: string; fonction: string; dateNomination: string;
   referenceArrete: string; suppleant: string; dateSuppleance: string;
   formationRegie: boolean; dateFormation: string; observations: string;
-  cautionnementMontant: number; cautionnementSouscrit: boolean;
   irMontantAnnuel: number; irVersee: boolean;
 }
 
@@ -71,7 +70,6 @@ export default function RegiesPage() {
   const [nomination, setNomination] = useState<NominationRegisseur>(() => loadState('regies_nomination', {
     nom: '', prenom: '', fonction: '', dateNomination: '', referenceArrete: '',
     suppleant: '', dateSuppleance: '', formationRegie: false, dateFormation: '', observations: '',
-    cautionnementMontant: 0, cautionnementSouscrit: false,
     irMontantAnnuel: 0, irVersee: false,
   }));
 
@@ -142,7 +140,7 @@ export default function RegiesPage() {
     <ModulePageLayout
       title="Régies"
       section="CONTRÔLES SUR PLACE"
-      description="Contrôle des régies d'avances et de recettes : acte constitutif, nomination, cautionnement, comptage de caisse, chèques en coffre, valeurs inactives et délai de versement au comptable."
+      description="Contrôle des régies d'avances et de recettes : acte constitutif, nomination, comptage de caisse, chèques en coffre, valeurs inactives et délai de versement au comptable. (Cautionnement supprimé depuis l'Ord. 2022-408 — RGP)"
       refs={[
         { refKey: 'reg-2019-798', label: 'Plafonds' },
         { refKey: 'reg-acte-constitutif', label: 'Acte constitutif' },
