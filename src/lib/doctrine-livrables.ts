@@ -395,4 +395,318 @@ const DOCTRINE: Partial<Record<ThemeMetier, Builder>> = {
       },
     ],
   }),
+
+  // ════════════════════════════════════════════════════════════════════
+  restauration: (etab) => ({
+    analyse: {
+      reformulation:
+        "Pilotage du service de restauration et d'hébergement (SRH) : conformité EGalim, sécurité sanitaire (HACCP), équilibre recettes/dépenses et titres de recettes encaissés via régie.",
+      cadre:
+        "Loi EGalim n° 2018-938 (50 % durables dont 20 % bio) ; Règlement (CE) 852/2004 et arrêté du 21/12/2009 (HACCP, agrément sanitaire dès 80 repas/jour livrés vers tiers) ; M9-6 Tome 2 (SRH) ; tarifs votés par la collectivité.",
+      analyse:
+        "Suivre mensuellement : taux d'achats durables et bio (objectifs EGalim), grammage par convive, ratio ventes / achats denrées, conformité du PMS et de la traçabilité, encaissement régulier des titres par le régisseur, respect du tarif voté par la collectivité, équilibre du SRH.",
+      conclusion:
+        "Tout déséquilibre durable du SRH ou défaut de conformité EGalim/sanitaire doit être signalé à l'ordonnateur et porté à l'ordre du jour du CA. L'agent comptable contrôle la concordance régisseur/comptabilité et la prise en charge des titres.",
+      source: 'Loi EGalim 2018-938 ; Règlement (CE) 852/2004 ; Arrêté 21/12/2009 ; M9-6 Tome 2.',
+    },
+    livrables: [
+      {
+        type: 'mail',
+        titre: 'Alerte EGalim — seuils non atteints',
+        contenu: mailOrdonnateur({
+          objet: 'Restauration scolaire — non-conformité loi EGalim',
+          etablissement: etab,
+          constat:
+            "Le suivi des achats du SRH au [date] fait apparaître [X] % de produits durables/qualité (objectif 50 %) dont [Y] % de bio (objectif 20 %), en deçà des obligations légales.",
+          ref: 'Loi n° 2018-938 du 30 octobre 2018 (EGalim) ; Code rural art. L.230-5-1.',
+          demande:
+            "- transmettre un plan d'action pour atteindre les seuils sur l'exercice ;\n- mettre à jour le marché de denrées avec exigences EGalim chiffrées ;\n- présenter un point d'étape au CA.",
+        }),
+      },
+      {
+        type: 'rapport',
+        titre: 'Extrait rapport CA — équilibre du SRH',
+        contenu: extraitRapportCA({
+          section: 'Section — Service de restauration et d\'hébergement (exercice [N])',
+          constat:
+            "Le SRH de " + etab + " a servi [N] repas, pour des recettes de [X] € et des dépenses de [Y] €, soit un résultat de [Z] €. Coût matière par repas : [C] €. Taux EGalim : [%].",
+          ref: 'M9-6 Tome 2 — SRH ; Loi EGalim 2018-938.',
+          conclusion:
+            "Le SRH présente un équilibre [excédentaire / déficitaire / à surveiller]. Recommandations : [maintien du tarif / ajustement / négociation marché denrées].",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  stocks: (etab) => ({
+    analyse: {
+      reformulation:
+        "Tenue de l'inventaire physique et comptable des stocks de denrées et fournitures, valorisation au CMUP, identification des stocks dormants et des dépréciations.",
+      cadre:
+        "Article 168 GBCP (inventaire) ; M9-6 Tome 1 (stocks) ; PCG art. 213-32 (valorisation) ; règle interne : article sans mouvement > 12 mois = stock dormant à déclasser.",
+      analyse:
+        "Réaliser un inventaire physique annuel avant clôture, rapprocher avec le stock théorique (Op@le), valoriser au CMUP, identifier les écarts (vols, casses, périmés), provisionner les stocks dormants ou périmés, justifier toute mise au rebut par un PV signé.",
+      conclusion:
+        "Tout écart inventaire > seuil de tolérance doit faire l'objet d'une investigation et d'un PV de constat. Les stocks dormants > 12 mois doivent être déclassés et provisionnés. La sincérité du compte de stock conditionne la sincérité du compte de résultat.",
+      source: 'Art. 168 GBCP ; M9-6 Tome 1 ; PCG art. 213-32.',
+    },
+    livrables: [
+      {
+        type: 'note',
+        titre: 'PV d\'inventaire physique — clôture',
+        contenu: noteInterne({
+          titre: 'PV d\'inventaire physique des stocks — exercice [N]',
+          contexte:
+            "Inventaire physique réalisé le [date] au sein de " + etab + ", en présence de [noms et qualités], conformément à l'article 168 GBCP.",
+          analyse:
+            "Stock comptable théorique : [X] € — stock physique constaté : [Y] € — écart : [Z] €. [N] articles dormants identifiés (> 12 mois sans mouvement) pour [V] €. Articles périmés ou détériorés : [détail].",
+          recommandation:
+            "Constatation de l'écart en compte 603 / 7037, déclassement et mise au rebut des articles dormants/périmés sur PV, provisionnement éventuel. Signature conjointe ordonnateur / agent comptable.",
+          ref: 'Art. 168 GBCP ; M9-6 Tome 1.',
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  rapprochement: (etab) => ({
+    analyse: {
+      reformulation:
+        "État de rapprochement mensuel entre le solde du compte au Trésor (DFT — relevé 515) et la comptabilité Op@le de l'EPLE, justification de tous les suspens.",
+      cadre:
+        "Article 47 GBCP (concordance permanente des disponibilités) ; M9-6 Tome 1 § 3.1.3 (état de rapprochement) ; instructions DGFiP — comptes Trésor.",
+      analyse:
+        "Établir mensuellement l'état de rapprochement : solde DFT, solde compte 515100 Op@le, recettes/dépenses non encore enregistrées d'un côté ou de l'autre, identification de chaque suspens par date et nature. Tout écart non justifié sous 30 jours doit faire l'objet d'une note d'investigation.",
+      conclusion:
+        "Un rapprochement non fait ou un suspens non justifié engage la responsabilité de l'agent comptable (Ordonnance 2022-408). Le PV de rapprochement mensuel est une pièce constitutive de la qualité comptable.",
+      source: 'Art. 47 GBCP ; M9-6 Tome 1 § 3.1.3.',
+    },
+    livrables: [
+      {
+        type: 'note',
+        titre: 'Note d\'investigation — suspens > 30 jours',
+        contenu: noteInterne({
+          titre: 'Investigation suspens bancaire — compte 515100',
+          contexte:
+            "Lors du rapprochement bancaire de " + etab + " au [date], un suspens d'un montant de [X] € (sens : [débit/crédit]) demeure non résorbé depuis plus de 30 jours.",
+          analyse:
+            "Origine probable : [virement non identifié / chèque non débité / opération comptable non passée]. Recherches effectuées : [historique DFT, contact services prescripteurs]. Risque : [encaissement non titré / dépense non comptabilisée].",
+          recommandation:
+            "Régulariser sous [délai] par [titre de recette / DP / écriture d'attente compte 471 ou 472 documentée]. Tracer dans la piste d'audit.",
+          ref: 'Art. 47 GBCP ; M9-6 Tome 1 § 3.1.3.',
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  voyages: (etab) => ({
+    analyse: {
+      reformulation:
+        "Encadrement comptable et financier des sorties et voyages scolaires : autorisation CA, budget équilibré, encaissement des participations familles, gratuité des accompagnateurs, fonds sociaux pour familles en difficulté.",
+      cadre:
+        "Circulaire n° 2011-117 du 3 août 2011 et circulaire du 16 juillet 2024 (mise à jour) ; Code éducation art. R.421-20 (compétence du CA) ; principe de gratuité des accompagnateurs ; loi EGalim et CCP pour les marchés > seuils.",
+      analyse:
+        "Pour chaque voyage : vérifier l'acte du CA autorisant la programmation et le financement, le budget prévisionnel équilibré (recettes familles + subventions = dépenses), la liste nominative des participants, la souscription d'une assurance, l'absence de coût supporté par les accompagnateurs, le traitement des familles en difficulté (FSL/FSC).",
+      conclusion:
+        "Tout déséquilibre du budget voyage doit être absorbé par les fonds propres ou refusé. Les voyages > seuils CCP doivent suivre une procédure adaptée. Un suivi distinct par voyage (compte ad hoc) facilite la lisibilité et l'audit.",
+      source: 'Circulaires 2011-117 et 16/07/2024 ; Code éducation art. R.421-20 ; CCP.',
+    },
+    livrables: [
+      {
+        type: 'mail',
+        titre: 'Alerte — déséquilibre budgétaire voyage',
+        contenu: mailOrdonnateur({
+          objet: 'Voyage scolaire [intitulé] — déséquilibre budgétaire',
+          etablissement: etab,
+          constat:
+            "Le budget prévisionnel du voyage [intitulé] présente un déficit de [X] € (recettes familles + subventions = [R] € ; dépenses prévisionnelles = [D] €).",
+          ref: 'Circulaire 2011-117 du 3 août 2011 ; circulaire du 16 juillet 2024 ; Code éducation art. R.421-20.',
+          demande:
+            "- équilibrer le budget par une subvention complémentaire ou une révision des dépenses ;\n- présenter au CA un acte budgétaire rectificatif ;\n- à défaut, surseoir à l'engagement des dépenses.",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  depenses: (etab) => ({
+    analyse: {
+      reformulation:
+        "Chaîne de la dépense publique : engagement, liquidation, ordonnancement par l'ordonnateur ; visa et paiement par l'agent comptable. Contrôle des pièces justificatives et des seuils CCP.",
+      cadre:
+        "Articles 30-33 GBCP (chaîne de la dépense) ; arrêté du 25 juillet 2013 (PJ obligatoires) ; décret 2013-269 (délai global de paiement 30 jours, intérêts moratoires) ; décrets 2025-1386 et 2025-1383 (seuils CCP 2026).",
+      analyse:
+        "Pour chaque demande de paiement (DP) : vérifier l'engagement préalable, la liquidation (service fait + montant), la PJ conforme à l'arrêté du 25/07/2013, le créancier et le RIB, le respect du seuil de procédure CCP, le délai de paiement de 30 jours. Suspendre toute DP irrégulière (art. 38 GBCP).",
+      conclusion:
+        "Le dépassement du DGP de 30 jours déclenche automatiquement les intérêts moratoires (à charge de l'EPLE). Tout paiement irrégulier engage la responsabilité du comptable. La traçabilité de la chaîne (engagement → DP → paiement) est essentielle pour l'audit.",
+      source: 'Art. 30-33 GBCP ; Arrêté du 25/07/2013 ; Décret 2013-269 ; Décrets 2025-1386/1383.',
+    },
+    livrables: [
+      {
+        type: 'mail',
+        titre: 'Alerte délai global de paiement (DGP)',
+        contenu: mailOrdonnateur({
+          objet: 'Dépassement du délai global de paiement — risque d\'intérêts moratoires',
+          etablissement: etab,
+          constat:
+            "Au [date], [N] demandes de paiement de " + etab + " présentent un délai global supérieur à 30 jours, exposant l'établissement à des intérêts moratoires automatiques (estimation : [X] €).",
+          ref: 'Décret n° 2013-269 du 29 mars 2013 ; article L.2192-13 du Code de la commande publique.',
+          demande:
+            "- accélérer la transmission des DP par les services prescripteurs ;\n- automatiser dans Op@le la notification J-25 ;\n- présenter un état mensuel du DGP au CODIR.",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  'controle-caisse': (etab) => ({
+    analyse: {
+      reformulation:
+        "Contrôle inopiné de la caisse et des disponibilités du comptable et des régisseurs : vérification du billetage, concordance encaisse théorique / encaisse constatée, respect du plafond.",
+      cadre:
+        "Article 47 GBCP (contrôle inopiné des disponibilités) ; M9-6 Tome 1 (caisse, plafond, PV mensuel) ; Décret 2019-798 (régies, contrôle annuel obligatoire).",
+      analyse:
+        "Réaliser au moins un contrôle inopiné par an (régie) et mensuel (caisse comptable) : compter physiquement billets et pièces, comparer à l'encaisse théorique du journal de caisse, vérifier le plafond réglementaire, contrôler la sécurisation (coffre, accès), établir un PV signé contradictoirement.",
+      conclusion:
+        "Tout écart de caisse doit être justifié immédiatement ou inscrit en compte d'attente (476/477) puis investigué. Le plafond dépassé entraîne reversement immédiat. Un manque de caisse non justifié engage la responsabilité personnelle du régisseur (Ordonnance 2022-408).",
+      source: 'Art. 47 GBCP ; M9-6 Tome 1 ; Décret 2019-798.',
+    },
+    livrables: [
+      {
+        type: 'note',
+        titre: 'PV de contrôle inopiné de caisse',
+        contenu: noteInterne({
+          titre: 'PV de contrôle inopiné — caisse [régie/comptable]',
+          contexte:
+            "Contrôle inopiné effectué le [date] à [heure] dans " + etab + ", en présence de [régisseur/agent comptable] et de [témoin].",
+          analyse:
+            "Encaisse théorique (journal de caisse) : [X] € — encaisse constatée (billetage) : [Y] € — écart : [Z] €. Plafond réglementaire : [P] €. Sécurisation : [coffre fermé / clés / accès limité].",
+          recommandation:
+            "[Aucune anomalie / Régularisation par compte d'attente 476 ou 477 et investigation sous [délai]]. PV signé contradictoirement et joint au registre des contrôles.",
+          ref: 'Art. 47 GBCP ; M9-6 Tome 1 ; Décret 2019-798 art. 18.',
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  'budgets-annexes': (etab) => ({
+    analyse: {
+      reformulation:
+        "Gestion des budgets annexes (CFA, GRETA, restauration mutualisée, mission de formation continue) rattachés à l'EPLE support : vote, exécution, compensation des mouvements de trésorerie via le compte 185000.",
+      cadre:
+        "M9-6 Tome 2 § 2.1.2.3.2 (budgets annexes) ; compte 185000 (compensation parfaite des mouvements BP/BA) ; Code éducation art. R.421-58 (vote par le CA de l'EPLE support).",
+      analyse:
+        "Pour chaque BA : vérifier l'acte de rattachement, le vote par le CA, l'autonomie d'exécution budgétaire, le suivi distinct des résultats, la compensation parfaite du compte 185000 (somme des mouvements = 0 à tout moment), la qualité des conventions de mutualisation.",
+      conclusion:
+        "Un compte 185000 non équilibré traduit une erreur de comptabilisation à corriger immédiatement. Tout BA en déficit récurrent doit faire l'objet d'un plan de redressement présenté au CA. La séparation des résultats BA/BP est essentielle.",
+      source: 'M9-6 Tome 2 § 2.1.2.3.2 ; Compte 185000 ; Code éducation art. R.421-58.',
+    },
+    livrables: [
+      {
+        type: 'rapport',
+        titre: 'Extrait rapport CA — situation des budgets annexes',
+        contenu: extraitRapportCA({
+          section: 'Section — Budgets annexes (exercice [N])',
+          constat:
+            "L'EPLE support " + etab + " porte [N] budget(s) annexe(s) : [liste]. Résultats N : [détail par BA]. Solde compte 185000 au 31/12 : [X] € (objectif : 0 €).",
+          ref: 'M9-6 Tome 2 § 2.1.2.3.2 ; compte 185000 ; Code éducation art. R.421-58.',
+          conclusion:
+            "Les BA sont [équilibrés / un BA en déficit nécessite un plan de redressement]. La compensation du compte 185000 est [parfaite / à régulariser]. L'agent comptable atteste la séparation des résultats.",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  'analyse-financiere': (etab) => ({
+    analyse: {
+      reformulation:
+        "Analyse financière de l'EPLE selon la méthodologie M9-6 § 4.5.3 : FDR, BFR, trésorerie, DRFN, CAF, ratios prudentiels et tendances pluriannuelles.",
+      cadre:
+        "M9-6 § 4.5.3 (méthodologie) ; rapport IGAENR 2016-071 (modèle FDRM, indicateurs, seuils) ; article 211 GBCP (compte financier et CAF).",
+      analyse:
+        "Calculer FDR, BFR, trésorerie en valeur absolue ET en jours de DRFN (× 365 / DRFN). Apprécier la relation fondamentale FDR = BFR + Trésorerie. Comparer à N-1, N-2. Analyser la CAF comme indicateur de soutenabilité. Seuils prudentiels : FDR ≥ 30 jours (alerte < 15 jours).",
+      conclusion:
+        "Une trajectoire dégradée (FDR en baisse, CAF négative) appelle un plan de redressement présenté au CA et à la collectivité. Une trésorerie surabondante peut justifier un prélèvement après vote du CA. L'analyse doit éclairer les décisions budgétaires.",
+      source: 'M9-6 § 4.5.3 ; IGAENR 2016-071 ; Art. 211 GBCP.',
+    },
+    livrables: [
+      {
+        type: 'rapport',
+        titre: 'Extrait rapport CA — analyse financière annuelle',
+        contenu: extraitRapportCA({
+          section: 'Section — Analyse financière (exercice [N])',
+          constat:
+            "Au 31/12/[N], " + etab + " présente : FDR = [X] € ([J1] j de DRFN) ; BFR = [Y] € ([J2] j) ; Trésorerie = [Z] € ([J3] j) ; CAF = [C] €. Évolution N-2/N-1/N : [tendance].",
+          ref: 'M9-6 § 4.5.3 ; IGAENR 2016-071.',
+          conclusion:
+            "La situation financière est [solide / fragile / en alerte]. Recommandations : [maintien / reconstitution du FDR / prélèvement / plan de redressement]. La relation FDR = BFR + Trésorerie est [vérifiée / écart de [E] € à investiguer].",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  ordonnateur: (etab) => ({
+    analyse: {
+      reformulation:
+        "Contrôle de la qualité d'ordonnateur du chef d'établissement et de ses délégataires : accréditation auprès de l'agent comptable, signatures, séparation des fonctions, actes budgétaires.",
+      cadre:
+        "Article 10 GBCP (séparation ordonnateur/comptable) ; Code éducation art. R.421-13 (le chef d'établissement est ordonnateur) ; arrêté du 25 juillet 2013 (formulaire d'accréditation et spécimens de signature).",
+      analyse:
+        "Vérifier : la production des actes d'accréditation (ordonnateur principal et délégataires), les spécimens de signature à jour, l'absence de cumul ordonnateur/comptable (séparation stricte), la régularité des actes budgétaires (BI, DBM, vote CA, transmission tutelle), la mise à jour à chaque changement de personne.",
+      conclusion:
+        "Toute DP signée par une personne non accréditée doit être suspendue (art. 38 GBCP — défaut de qualité). Tout changement d'ordonnateur ou de délégataire impose la transmission immédiate d'une nouvelle accréditation à l'agent comptable.",
+      source: 'Art. 10 GBCP ; Code éducation art. R.421-13 ; Arrêté du 25 juillet 2013.',
+    },
+    livrables: [
+      {
+        type: 'mail',
+        titre: 'Demande d\'accréditation — nouvel ordonnateur/délégataire',
+        contenu: mailOrdonnateur({
+          objet: 'Accréditation ordonnateur/délégataire — formalisation requise',
+          etablissement: etab,
+          constat:
+            "Suite au changement intervenu le [date] ([prise de fonction / délégation], M./Mme [Nom Prénom]), l'agent comptable n'a pas réceptionné l'acte d'accréditation et le spécimen de signature.",
+          ref: 'Article 10 du décret 2012-1246 (GBCP) ; arrêté du 25 juillet 2013 ; Code éducation art. R.421-13.',
+          demande:
+            "- transmettre sans délai le formulaire officiel d'accréditation signé ;\n- joindre le spécimen de signature et l'acte de nomination/délégation ;\n- dans l'attente, les DP signées par cette personne seront suspendues.",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  organigramme: (etab) => ({
+    analyse: {
+      reformulation:
+        "Organisation du service de l'agence comptable : organigramme fonctionnel, fiches de poste, séparation des tâches, délégations internes, plan de continuité.",
+      cadre:
+        "Code éducation art. R.421-9 (compétences du chef d'établissement et délégations) ; M9-6 (organisation des services) ; décret 2011-1716 (statut SG / adjoint gestionnaire) ; principe CICF de séparation des tâches.",
+      analyse:
+        "Vérifier : l'existence d'un organigramme à jour, la définition claire des rôles (ordonnateur, SG, agent comptable, fondés de pouvoir, régisseurs), la séparation effective des tâches incompatibles (engagement / liquidation / paiement), la formalisation des délégations, l'identification d'un suppléant pour chaque poste critique.",
+      conclusion:
+        "Un cumul de tâches incompatibles ou l'absence de suppléant fragilise le contrôle interne et expose à des fraudes. L'organigramme doit être actualisé à chaque mouvement et porté à la connaissance des services prescripteurs.",
+      source: 'Code éducation art. R.421-9 ; M9-6 ; Décret 2011-1716 ; CICF.',
+    },
+    livrables: [
+      {
+        type: 'note',
+        titre: 'Note interne — actualisation de l\'organigramme',
+        contenu: noteInterne({
+          titre: 'Actualisation de l\'organigramme fonctionnel — agence comptable',
+          contexte:
+            "À la suite des mouvements intervenus dans l'équipe de " + etab + " ([liste]), l'organigramme fonctionnel est mis à jour au [date].",
+          analyse:
+            "Répartition des fonctions : [ordonnateur, SG, agent comptable, fondés de pouvoir, régisseurs]. Séparation des tâches incompatibles : [vérifiée]. Suppléances identifiées pour [postes critiques]. Délégations formalisées : [liste].",
+          recommandation:
+            "Diffuser l'organigramme actualisé aux services prescripteurs et l'afficher dans l'agence. Mettre à jour les profils Op@le et les habilitations en cohérence.",
+          ref: 'Code éducation art. R.421-9 ; M9-6 — organisation des services.',
+        }),
+      },
+    ],
+  }),
 };
