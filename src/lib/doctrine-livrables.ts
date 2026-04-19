@@ -769,7 +769,7 @@ const DOCTRINE: Partial<Record<ThemeMetier, Builder>> = {
         }),
       },
       {
-        type: 'extrait-rapport',
+        type: 'rapport',
         titre: 'Extrait rapport CA — Présentation du PV définitif',
         contenu: extraitRapportCA({
           section: "PV d'audit définitif — exercice [N]",
@@ -859,7 +859,7 @@ const DOCTRINE: Partial<Record<ThemeMetier, Builder>> = {
     },
     livrables: [
       {
-        type: 'extrait-rapport',
+        type: 'rapport',
         titre: 'Extrait rapport CA — Cartographie des risques',
         contenu: extraitRapportCA({
           section: 'Cartographie des risques comptables et financiers — exercice [N]',
@@ -918,7 +918,7 @@ const DOCTRINE: Partial<Record<ThemeMetier, Builder>> = {
     },
     livrables: [
       {
-        type: 'extrait-rapport',
+        type: 'rapport',
         titre: 'Extrait rapport CA — Tableau de bord du contrôle interne',
         contenu: extraitRapportCA({
           section: 'Pilotage du contrôle interne comptable et financier — exercice [N]',
