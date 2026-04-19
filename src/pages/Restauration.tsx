@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CONTROLES_RESTAURATION } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /** Seuils EGAlim (loi 2018-938) : 50 % produits durables/qualité dont 20 % bio. */
 const SEUIL_BIO_EGALIM = 20;
@@ -144,6 +145,7 @@ export default function Restauration() {
       completedChecks={(CONTROLES_RESTAURATION).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_RESTAURATION).length}
     >
+      <DoctrineEPLE theme="restauration" titre="Restauration & SRH" resume="EGalim, HACCP, équilibre du SRH, encaissement régisseur" />
       <div>
       </div>
 

@@ -12,6 +12,7 @@ import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_VOYAGES } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /* ═══ Détection voyages "Erasmus-éligibles" : longue distance ou hors UE ═══ */
 const DESTINATIONS_LOINTAINES = /\b(canada|usa|etats[- ]unis|japon|chine|inde|asie|amerique|australie|nouvelle[- ]zelande|bresil|argentine|mexique|afrique|maroc|tunisie|egypte|reunion|guadeloupe|martinique|guyane|nouvelle[- ]caledonie|polynesie)\b/i;
@@ -96,6 +97,7 @@ export default function VoyagesPage() {
       completedChecks={(CONTROLES_VOYAGES).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_VOYAGES).length}
     >
+      <DoctrineEPLE theme="voyages" titre="Voyages scolaires" resume="Acte CA, équilibre budget, gratuité accompagnateurs, FSC" />
 
       {voyages.length === 0 && (
         <Card className="shadow-card">

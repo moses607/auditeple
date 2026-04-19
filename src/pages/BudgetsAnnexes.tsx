@@ -18,6 +18,7 @@ import {
   BudgetAnnexeRecord, Mouvement185, AuditItemBA,
   AUDIT_ITEMS_BA, defaultAuditItems, computeAuditScore,
 } from '@/lib/budgets-annexes-types';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 // ═══ HELPERS ═══
 const STORE_KEY_BA = 'budgets_annexes_v2';
@@ -233,6 +234,7 @@ export default function BudgetsAnnexes() {
       completedChecks={(CONTROLES_BUDGETS_ANNEXES).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_BUDGETS_ANNEXES).length}
     >
+      <DoctrineEPLE theme="budgets-annexes" titre="Budgets annexes (CFA / GRETA / SRH)" resume="Compte 185000 = 0, vote CA, séparation des résultats" />
       {/* ═══ HEADER ═══ */}
       <div className="flex items-start justify-between">
         <div>

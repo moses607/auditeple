@@ -8,6 +8,7 @@ import { AlertTriangle } from 'lucide-react';
 import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout, ModuleSection, ComplianceCheck, AnomalyAlert } from '@/components/ModulePageLayout';
 import { MOTIFS_SUSPENSION_GBCP, CONTROLES_AGENT_COMPTABLE, PIECES_JUSTIFICATIVES_DEPENSES, SEUILS_MARCHES_2026 } from '@/lib/regulatory-data';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 export default function DepensesPage() {
   const [suspensions, setSuspensions] = useState<Record<string, boolean>>(() => loadState('depenses_suspensions_v2', {}));
@@ -54,6 +55,7 @@ export default function DepensesPage() {
       completedChecks={completed}
       totalChecks={total}
     >
+      <DoctrineEPLE theme="depenses" titre="Chaîne de la dépense publique" resume="Engagement → liquidation → DP → paiement, PJ, DGP 30 j" />
       {/* ─── Contrôles de l'agent comptable (art. 19 GBCP) ─── */}
       <ModuleSection
         title="Contrôles de l'agent comptable en matière de dépenses"

@@ -14,6 +14,7 @@ import { FileText, Send, Printer, RotateCcw } from 'lucide-react';
 import { toast } from 'sonner';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { CONTROLES_ORDONNATEUR } from '@/lib/regulatory-data';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 const ORDONNATEUR_SECTIONS = [
   { key: 'qualite', title: 'Qualité et accréditation', icon: '🏛' },
@@ -172,6 +173,7 @@ export default function OrdonnateurPage() {
       completedChecks={completedCount}
       totalChecks={ALL_ITEMS.length}
     >
+      <DoctrineEPLE theme="ordonnateur" titre="Contrôle de l'ordonnateur" resume="Accréditation, spécimens de signature, séparation art. 10 GBCP" />
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{completedCount}/{ALL_ITEMS.length}</p><p className="text-xs text-muted-foreground mt-0.5">Points vérifiés</p></CardContent></Card>
