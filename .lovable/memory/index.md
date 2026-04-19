@@ -53,4 +53,5 @@ Domain: EPLE accounting audit. Use Op@le terminology ("demande de paiement", "ti
 - [User Profiles](mem://auth/user-profiles) — Profiles table with RLS, auto-creation trigger
 - [Security Posture](mem://tech/security-posture) — Zod validation, rate limit, 30min inactivity logout
 - [UAI Isolation](mem://tech/data-storage/uai-isolation) — LocalStorage prefixing `cic_expert_{UAI}_{key}`
+- [AI Assistant Persona](mem://ai/assistant-persona) — Expert agent comptable EPLE, Op@le, GBCP, M9-6, méthode raisonnement structurée
 - [Persistence Model](mem://tech/data-storage/persistence-model) — Supabase Auth, local Base64 storage for docs
