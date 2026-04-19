@@ -17,6 +17,7 @@ import { CalendrierAlertesWidget } from '@/components/CalendrierAlertesWidget';
 import { CockpitIntelligent } from '@/components/CockpitIntelligent';
 import { AlertesConsolidees } from '@/components/AlertesConsolidees';
 import { ParcoursProgress } from '@/components/ParcoursProgress';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 import heroImg from '@/assets/hero-audit.png';
 import sectionControles from '@/assets/section-controles.png';
@@ -204,6 +205,13 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* ─── 📚 DOCTRINE EPLE — pilotage CICF, cadre M9-6 / GBCP ─── */}
+      <DoctrineEPLE
+        theme="cockpit"
+        titre="Pilotage du contrôle interne — Tableau de bord AC"
+        resume="Cockpit centralisé : score conformité, alertes cross-modules, risques critiques, plan de contrôle."
+      />
 
       {/* ─── 🚀 COCKPIT INTELLIGENT — Score conformité + Top alertes cross-modules ─── */}
       <CockpitIntelligent />

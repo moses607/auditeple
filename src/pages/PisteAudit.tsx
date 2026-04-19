@@ -8,6 +8,7 @@ import { Plus, Download } from 'lucide-react';
 import { LogEntry } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout } from '@/components/ModulePageLayout';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { getSelectedEtablissement } from '@/lib/types';
 
@@ -93,6 +94,12 @@ export default function PisteAudit() {
         </div>
       }
     >
+      <DoctrineEPLE
+        theme="piste-audit"
+        titre="Piste d'audit — traçabilité des contrôles"
+        resume="Journal chronologique horodaté. Preuve des diligences de l'AC opposable au juge financier."
+      />
+
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         <Card className="shadow-card">

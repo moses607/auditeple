@@ -9,6 +9,7 @@ import { CartoRisque, NIVEAUX_RISQUE } from '@/lib/types';
 import { CARTOPALE_PROCESSUS } from '@/lib/regulatory-data';
 import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout, AnomalyAlert } from '@/components/ModulePageLayout';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 const PROCESSUS_LIST = CARTOPALE_PROCESSUS.map(p => `${p.code} — ${p.label}`);
 
@@ -81,6 +82,12 @@ export default function CartographieRisques() {
         </div>
       }
     >
+      <DoctrineEPLE
+        theme="cartographie-risques"
+        titre="Cartographie des risques — méthode P × I × M"
+        resume="11 processus Cartop@le. Risque critique ≥ 40 → action immédiate ; majeur 20-39 → action sous 3 mois."
+      />
+
       {/* ─── KPI ─── */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
         <Card className="shadow-card"><CardContent className="p-4">

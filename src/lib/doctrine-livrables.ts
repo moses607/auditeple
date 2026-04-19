@@ -709,4 +709,226 @@ const DOCTRINE: Partial<Record<ThemeMetier, Builder>> = {
       },
     ],
   }),
+
+  // ════════════════════════════════════════════════════════════════════
+  'piste-audit': (etab) => ({
+    analyse: {
+      reformulation:
+        "Tenue d'une piste d'audit chronologique : traçabilité de tous les contrôles effectués, anomalies relevées et actions correctives par l'agent comptable.",
+      cadre:
+        "Décret 2011-775 (CICF) : obligation de tracer les contrôles. M9-6 (qualité comptable) : journal des opérations. ISA 230 : documentation des travaux d'audit. Ordonnance 2022-408 (RGP) : la traçabilité est une preuve de diligence du comptable.",
+      analyse:
+        "Chaque événement (contrôle, anomalie, action corrective, document vérifié, suspension de paiement) est horodaté, rattaché à un module et à un auditeur. La piste alimente directement le PV contradictoire et permet à l'AC de démontrer les diligences accomplies en cas de mise en cause.",
+      conclusion:
+        "Une piste d'audit incomplète prive l'AC de moyens de défense devant le juge financier. Elle doit être tenue en continu, exportée mensuellement (CSV) et archivée avec le compte financier.",
+      source: 'Décret 2011-775 ; M9-6 ; ISA 230 ; Ordonnance 2022-408.',
+    },
+    livrables: [
+      {
+        type: 'note',
+        titre: "Note interne — protocole de tenue de la piste d'audit",
+        contenu: noteInterne({
+          titre: "Protocole de tenue de la piste d'audit — agence comptable",
+          contexte:
+            "Pour répondre aux obligations CICF et garantir la traçabilité des diligences de l'AC sur " + etab + ", un protocole unique de saisie de la piste d'audit est arrêté.",
+          analyse:
+            "Tout contrôle effectué (caisse, rapprochement, vérification DP, contrôle régie...) est saisi le jour même : type d'action, module concerné, détail, auteur. Toute anomalie ou irrégularité est saisie sous le type approprié et donne lieu à une action corrective tracée.",
+          recommandation:
+            "Export CSV mensuel archivé avec le compte financier. Revue trimestrielle par l'AC. Le défaut de saisie expose l'AC en cas de contentieux RGP.",
+          ref: 'Décret 2011-775 ; M9-6 ; Ordonnance 2022-408.',
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  pv: (etab) => ({
+    analyse: {
+      reformulation:
+        "Production du procès-verbal contradictoire d'audit : synthèse des constats, observations de l'audité, recommandations et plan d'action.",
+      cadre:
+        "Article 47 GBCP (PV de vérification) ; M9-6 (modèle de PV consolidé annuel) ; Code éducation art. R.421-77 (présentation au CA) ; principe du contradictoire (obligation de recueillir les observations de l'ordonnateur avant clôture).",
+      analyse:
+        "Le PV recense les anomalies par module (collecteur centralisé), expose le cadre juridique violé, formule des recommandations opérationnelles et fixe des délais. Phase provisoire → phase contradictoire (15 jours pour observations) → phase définitive signée par AC + ordonnateur.",
+      conclusion:
+        "Un PV non contradictoire ou non transmis au CA est inopposable. Le PV définitif est transmis à la collectivité de rattachement et conservé 10 ans avec le compte financier.",
+      source: 'Art. 47 GBCP ; M9-6 ; Code éducation art. R.421-77.',
+    },
+    livrables: [
+      {
+        type: 'mail',
+        titre: "Transmission du PV provisoire à l'ordonnateur (phase contradictoire)",
+        contenu: mailOrdonnateur({
+          objet: "Transmission du PV d'audit provisoire — observations sous 15 jours",
+          etablissement: etab,
+          constat:
+            "Vous trouverez ci-joint le procès-verbal d'audit provisoire portant sur l'exercice [N]. Il comporte [X] constats dont [Y] anomalies appelant régularisation.",
+          ref: "Article 47 du décret n° 2012-1246 (GBCP) et M9-6 (modèle de PV) ; principe du contradictoire.",
+          demande:
+            "- examiner les constats détaillés en annexe ;\n- formuler vos observations écrites sous 15 jours ;\n- accuser réception de la présente transmission.\n\nÀ l'issue du délai, je clôturerai le PV en phase définitive et le présenterai au CA.",
+        }),
+      },
+      {
+        type: 'rapport',
+        titre: 'Extrait rapport CA — Présentation du PV définitif',
+        contenu: extraitRapportCA({
+          section: "PV d'audit définitif — exercice [N]",
+          constat:
+            "Le PV d'audit a recensé [X] constats, dont [Y] anomalies majeures. La phase contradictoire a permis [résorber Z anomalies / acter Z anomalies persistantes].",
+          ref: "Article 47 GBCP ; M9-6 ; Code éducation art. R.421-77.",
+          conclusion:
+            "Le CA prend acte du PV définitif. Le plan d'action correctif annexé fixe les délais de régularisation. Le PV est transmis à la collectivité de rattachement.",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  'plan-controle': (etab) => ({
+    analyse: {
+      reformulation:
+        "Élaboration du plan annuel de contrôle interne comptable et financier : hiérarchisation des contrôles selon les risques identifiés, fréquence et responsables.",
+      cadre:
+        "Décret 2011-775 (CICF) : obligation pour le comptable d'établir un plan de contrôle annuel. M9-6 : nomenclature des contrôles types. Cartop@le / ODICé : référentiel de risques EPLE. Articles 168-172 GBCP.",
+      analyse:
+        "Pour chaque processus à risque, définir : nature du contrôle (caisse, rapprochement, DP, régie...), fréquence (permanent / mensuel / trimestriel / annuel), niveau de risque, responsable, planning prévisionnel et critères de réalisation.",
+      conclusion:
+        "Le plan de contrôle est arrêté chaque année par l'AC avant le 31 janvier. Il est piloté en continu, ajusté en fonction des anomalies relevées et alimente le PV annuel.",
+      source: 'Décret 2011-775 ; M9-6 ; Cartop@le ; Art. 168-172 GBCP.',
+    },
+    livrables: [
+      {
+        type: 'note',
+        titre: 'Note interne — adoption du plan de contrôle annuel',
+        contenu: noteInterne({
+          titre: "Plan annuel de contrôle interne comptable et financier — exercice [N]",
+          contexte:
+            "En application du décret 2011-775 et de la M9-6, le plan annuel de contrôle de l'agence comptable de " + etab + " est arrêté pour l'exercice [N].",
+          analyse:
+            "Hiérarchisation des contrôles par niveau de risque (Cartop@le) : contrôles permanents (caisse, DP) ; contrôles mensuels (rapprochement bancaire, régies) ; contrôles trimestriels (stocks, voyages) ; contrôles annuels (inventaire, subventions).",
+          recommandation:
+            "Diffuser le plan aux services prescripteurs et aux ER. Suivi mensuel du taux de réalisation. Révision en septembre selon les anomalies relevées.",
+          ref: 'Décret 2011-775 ; M9-6 ; Cartop@le.',
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  'plan-action': (etab) => ({
+    analyse: {
+      reformulation:
+        "Pilotage du plan d'action correctif issu de la cartographie des risques et des anomalies relevées en audit : recommandations, responsables, échéances et suivi de mise en œuvre.",
+      cadre:
+        "Décret 2011-775 (CICF) : obligation de traiter les risques identifiés. M9-6 : démarche d'amélioration continue de la qualité comptable. Cartop@le : actions correctives liées aux risques critiques (score ≥ 40).",
+      analyse:
+        "Chaque action est rattachée à un risque coté (P×I×M), avec recommandation opérationnelle, responsable nommément désigné, échéance datée et statut (À lancer / En cours / Réalisé). Les risques critiques imposent un délai court.",
+      conclusion:
+        "Une action en retard ou non suivie aggrave le risque résiduel et expose l'AC. Le plan d'action est revu en CA et alimente le PV. Les actions réalisées doivent être documentées (preuves archivées).",
+      source: 'Décret 2011-775 ; M9-6 ; Cartop@le.',
+    },
+    livrables: [
+      {
+        type: 'mail',
+        titre: 'Rappel — actions correctives en retard',
+        contenu: mailOrdonnateur({
+          objet: "Plan d'action CICF — actions en retard à régulariser",
+          etablissement: etab,
+          constat:
+            "Le suivi du plan d'action correctif fait apparaître [X] actions arrivées à échéance et non réalisées, dont [Y] portant sur des risques critiques (score ≥ 40).",
+          ref: 'Décret 2011-775 (CICF) ; M9-6 — démarche qualité comptable.',
+          demande:
+            "- procéder à la mise en œuvre des actions listées en annexe ;\n- m'adresser un compte rendu écrit avec preuves de réalisation ;\n- proposer une nouvelle échéance pour les actions ne pouvant être tenues.\n\nLes actions non régularisées seront mentionnées dans le PV annuel.",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  'cartographie-risques': (etab) => ({
+    analyse: {
+      reformulation:
+        "Cartographie des risques comptables et financiers : identification, cotation (P × I × M) et hiérarchisation des risques sur les 11 processus métier des EPLE.",
+      cadre:
+        "Cartop@le / ODICé : référentiel national des 11 processus EPLE (caisse, dépenses, recettes, régies, stocks, voyages, restauration, bourses, fonds sociaux, marchés, immobilisations). Décret 2011-775 (CICF) : obligation d'identifier, hiérarchiser et traiter les risques. M9-6.",
+      analyse:
+        "Pour chaque risque : Probabilité (1-5), Impact (1-5), Maîtrise actuelle (1-5). Score = P × I × M. Risque critique ≥ 40 → plan d'action immédiat. Risque majeur 20-39 → action sous 3 mois. Risque moyen 10-19 → surveillance renforcée.",
+      conclusion:
+        "La cartographie est revue chaque année avant le plan de contrôle, et après chaque incident significatif. Elle est partagée avec l'ordonnateur et présentée au CA. Tout risque critique non traité expose la responsabilité de l'AC.",
+      source: 'Cartop@le ; ODICé ; Décret 2011-775 ; M9-6.',
+    },
+    livrables: [
+      {
+        type: 'rapport',
+        titre: 'Extrait rapport CA — Cartographie des risques',
+        contenu: extraitRapportCA({
+          section: 'Cartographie des risques comptables et financiers — exercice [N]',
+          constat:
+            "La cartographie de " + etab + " recense [X] risques sur les 11 processus Cartop@le. [Y] risques critiques (score ≥ 40), [Z] risques majeurs (score 20-39). Processus les plus exposés : [lister].",
+          ref: 'Cartop@le ; ODICé ; Décret 2011-775 ; M9-6.',
+          conclusion:
+            "Le plan d'action correctif annexé traite l'ensemble des risques critiques avec des échéances datées. La cartographie sera révisée fin [N+1] et après tout incident significatif.",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  calendrier: (etab) => ({
+    analyse: {
+      reformulation:
+        "Tenue du calendrier annuel de l'agent comptable : opérations à réaliser par mois (BI, BR, CF, DSN, TVA, inventaire, PV de caisse, contrôles régies...) à destination des ER.",
+      cadre:
+        "Code éducation art. R.421-77 (CF voté avant 30 avril N+1) ; Art. 175 GBCP (BI voté avant 1er janvier N) ; M9-6 (échéances obligatoires : DSN, TVA, inventaire, PV de caisse) ; circulaire 2011-117 (voyages).",
+      analyse:
+        "Chaque activité est paramétrée par : titre, catégorie, périodicité, mois de début/fin, échéance, responsable (AC / ER / AC+ER), criticité, ER affectés. Le suivi de réalisation horodaté permet d'identifier les retards.",
+      conclusion:
+        "Le non-respect du calendrier met l'AC en difficulté : retard de CF, défaut de DSN, contrôle DGFiP. Le calendrier est diffusé en septembre N-1 aux SG des ER, suivi mensuellement et révisé à mi-exercice.",
+      source: 'Code éducation art. R.421-77 ; Art. 175 GBCP ; M9-6 ; Circ. 2011-117.',
+    },
+    livrables: [
+      {
+        type: 'mail',
+        titre: 'Diffusion du calendrier aux SG des établissements rattachés',
+        contenu: mailOrdonnateur({
+          objet: "Calendrier annuel de l'agence comptable — exercice [N]",
+          etablissement: etab,
+          constat:
+            "Vous trouverez ci-joint le calendrier annuel de l'agence comptable pour l'exercice [N], applicable à l'ensemble des établissements rattachés (ER).",
+          ref: "Code éducation art. R.421-77 ; Art. 175 GBCP ; M9-6 ; circulaire n° 2011-117 (voyages).",
+          demande:
+            "- prendre connaissance des échéances applicables à votre établissement ;\n- intégrer ces dates dans votre calendrier de gestion ;\n- m'alerter sans délai en cas d'impossibilité de tenir une échéance.\n\nLe non-respect de ce calendrier met l'agent comptable en difficulté et fragilise la qualité comptable du groupement.",
+        }),
+      },
+    ],
+  }),
+
+  // ════════════════════════════════════════════════════════════════════
+  cockpit: (etab) => ({
+    analyse: {
+      reformulation:
+        "Pilotage centralisé du contrôle interne via le cockpit : score de conformité, alertes cross-modules, suivi des risques critiques, parcours d'audit.",
+      cadre:
+        "Décret 2011-775 (CICF) : pilotage du dispositif de contrôle interne. M9-6 : indicateurs clés de qualité comptable (DSO, taux de recouvrement, retards de DP, anomalies caisse).",
+      analyse:
+        "Le cockpit agrège en temps réel : nombre d'anomalies par module, risques critiques non traités, actions correctives en retard, échéances calendrier proches, taux de réalisation du plan de contrôle. Il permet à l'AC de prioriser ses interventions.",
+      conclusion:
+        "Le cockpit doit être consulté quotidiennement par l'AC. Les indicateurs sont remontés mensuellement au SG et présentés trimestriellement en CA. Toute alerte rouge appelle une action documentée dans la piste d'audit.",
+      source: 'Décret 2011-775 ; M9-6 ; Cartop@le.',
+    },
+    livrables: [
+      {
+        type: 'rapport',
+        titre: 'Extrait rapport CA — Tableau de bord du contrôle interne',
+        contenu: extraitRapportCA({
+          section: 'Pilotage du contrôle interne comptable et financier — exercice [N]',
+          constat:
+            "Le tableau de bord de " + etab + " présente : score global de conformité [X %], [Y] risques critiques actifs, [Z] anomalies en cours, taux de réalisation du plan de contrôle [W %].",
+          ref: 'Décret 2011-775 (CICF) ; M9-6 ; Cartop@le.',
+          conclusion:
+            "L'agence comptable assure un pilotage continu du dispositif. Les actions correctives prioritaires sont engagées et tracées dans la piste d'audit. Présentation trimestrielle au CA.",
+        }),
+      },
+    ],
+  }),
 };
