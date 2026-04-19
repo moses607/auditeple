@@ -8,6 +8,7 @@ import { EquipeMembre, FONCTIONS_COMPTABLES, TACHES_COMPTABLES } from '@/lib/typ
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_ORGANIGRAMME } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 export default function OrganigrammePage() {
   const [items, setItems] = useState<EquipeMembre[]>(() => loadState('organigramme', []));
@@ -37,6 +38,7 @@ export default function OrganigrammePage() {
       completedChecks={(CONTROLES_ORGANIGRAMME).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_ORGANIGRAMME).length}
     >
+      <DoctrineEPLE theme="organigramme" titre="Organigramme & séparation des tâches" resume="Rôles, délégations, suppléances, séparation engagement/paiement" />
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

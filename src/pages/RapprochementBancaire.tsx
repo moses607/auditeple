@@ -11,6 +11,7 @@ import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_RAPPROCHEMENT } from '@/lib/regulatory-data';
 import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 export default function RapprochementBancaire() {
   const [items, setItems] = useState<RapprochementItem[]>(() => loadState('rapprochement', []));
@@ -48,6 +49,7 @@ export default function RapprochementBancaire() {
       completedChecks={(CONTROLES_RAPPROCHEMENT).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_RAPPROCHEMENT).length}
     >
+      <DoctrineEPLE theme="rapprochement" titre="Rapprochement bancaire (DFT / 515)" resume="État mensuel, suspens > 30 j, concordance permanente" />
       {/* ─── KPI ─── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground">Rapprochements</p></CardContent></Card>

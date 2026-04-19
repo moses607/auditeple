@@ -11,6 +11,7 @@ import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_STOCKS } from '@/lib/regulatory-data';
 import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /** Seuil critique : un article sans mouvement depuis > 12 mois doit être déclassé (M9-6 § 2.1.4). */
 const SEUIL_ROTATION_MOIS = 12;
@@ -61,6 +62,7 @@ export default function Stocks() {
       completedChecks={(CONTROLES_STOCKS).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_STOCKS).length}
     >
+      <DoctrineEPLE theme="stocks" titre="Stocks & inventaire" resume="Inventaire physique, CMUP, stocks dormants > 12 mois" />
       {/* ─── KPI ─── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground">Articles</p></CardContent></Card>

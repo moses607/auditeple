@@ -10,6 +10,7 @@ import { ControleCaisseItem, BILLETS, PIECES, fmt, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_CAISSE } from '@/lib/regulatory-data';
 import { ModulePageLayout, AnomalyAlert , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 export default function ControleCaisse() {
   const [items, setItems] = useState<ControleCaisseItem[]>(() => loadState('ctrl_caisse', []));
@@ -67,6 +68,7 @@ export default function ControleCaisse() {
       completedChecks={(CONTROLES_CAISSE).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_CAISSE).length}
     >
+      <DoctrineEPLE theme="controle-caisse" titre="Contrôle inopiné de caisse" resume="Billetage, plafond, PV signé, écart en compte d'attente 476/477" />
       {/* ─── KPI ─── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground">Contrôles effectués</p></CardContent></Card>

@@ -8,6 +8,7 @@ import { fmt } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout, AnomalyAlert, ModuleSection } from '@/components/ModulePageLayout';
 import { INDICATEURS_FINANCIERS_M96 } from '@/lib/regulatory-data';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -54,6 +55,7 @@ export default function AnalyseFinanciere() {
         { code: 'M9-6 § 4.5.3.4', label: 'CAF' },
       ]}
     >
+      <DoctrineEPLE theme="analyse-financiere" titre="Analyse financière M9-6 § 4.5.3" resume="FDR / BFR / Trésorerie en jours de DRFN, CAF, ratios prudentiels" />
       {/* ─── Saisie des données ─── */}
       <ModuleSection title="Données financières du compte financier" description="Saisir les montants issus de la balance ou du compte financier (Op@le)">
         <Card className="shadow-card">
