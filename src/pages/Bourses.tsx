@@ -10,6 +10,7 @@ import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_BOURSES } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /* ═══ Seuil absentéisme déclenchant le retrait de bourse ═══ */
 const SEUIL_ABSENTEISME_DEMI_JOURS = 15; // Art. R.531-13 Code éducation
@@ -54,6 +55,7 @@ export default function Bourses() {
       completedChecks={(CONTROLES_BOURSES).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_BOURSES).length}
     >
+      <DoctrineEPLE theme="bourses" titre="Bourses nationales" resume="Attribution sur critères, paiement trimestriel, reversement DSDEN" />
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

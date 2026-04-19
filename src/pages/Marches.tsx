@@ -11,6 +11,7 @@ import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_MARCHES } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /* ═══ Détection saucissonnage : marchés de même nature dont le cumul 12 mois dépasse un seuil formalisé ═══ */
 const SEUIL_FORMALISE = 216000;            // € HT — seuil procédure formalisée fournitures/services (UE 2026-2027)
@@ -95,6 +96,7 @@ export default function MarchesPage() {
       completedChecks={(CONTROLES_MARCHES).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_MARCHES).length}
     >
+      <DoctrineEPLE theme="marches" titre="Commande publique & marchés" resume="Seuils CCP 2026 — procédure adaptée à la nature et au montant" />
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

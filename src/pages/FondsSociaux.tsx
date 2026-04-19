@@ -10,6 +10,7 @@ import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_FONDS_SOCIAUX } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /** Plafond indicatif d'aide individuelle FSL/FSC : au-delà, examen renforcé en commission. */
 const PLAFOND_AIDE_INDIVIDUELLE = 600;
@@ -44,6 +45,7 @@ export default function FondsSociaux() {
       completedChecks={(CONTROLES_FONDS_SOCIAUX).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_FONDS_SOCIAUX).length}
     >
+      <DoctrineEPLE theme="fonds-sociaux" titre="Fonds sociaux (collégien / lycéen / cantine)" resume="Circulaire 2017-122 — commission, plafond bourses + FSC ≤ frais scolaires" />
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

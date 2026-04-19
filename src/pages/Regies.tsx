@@ -13,6 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { REGIES_REGLEMENTATION } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /* ═══ SEUILS RÉGLEMENTAIRES ═══ */
 /* Cautionnement SUPPRIMÉ depuis l'Ord. 2022-408 + Décret 2022-1605 (entrée en vigueur 1er janvier 2023) */
@@ -152,6 +153,7 @@ export default function RegiesPage() {
       completedChecks={(REGIES_REGLEMENTATION.controles_obligatoires).filter(c => regChecks[c.id]).length}
       totalChecks={(REGIES_REGLEMENTATION.controles_obligatoires).length}
     >
+      <DoctrineEPLE theme="regies" titre="Régies de recettes et d'avances" resume="Décret 2019-798 — contrôle annuel obligatoire, plafonds et cautionnement" />
 
       <Tabs defaultValue="comptage" className="w-full">
         <TabsList className="grid w-full grid-cols-5">

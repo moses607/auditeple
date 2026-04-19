@@ -10,6 +10,7 @@ import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_RECOUVREMENT } from '@/lib/regulatory-data';
 import { ModulePageLayout, AnomalyAlert, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /* ═══ Prescription quadriennale (loi 31/12/1968) ═══ */
 const PRESCRIPTION_ANS = 4;
@@ -70,6 +71,8 @@ export default function Recouvrement() {
       completedChecks={(CONTROLES_RECOUVREMENT).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_RECOUVREMENT).length}
     >
+      <DoctrineEPLE theme="recouvrement" titre="Recouvrement des créances" resume="Art. 24 GBCP — diligences obligatoires, prescription 4 ans, ANV motivée" />
+
       {/* ─── KPI ─── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground">Créances suivies</p></CardContent></Card>

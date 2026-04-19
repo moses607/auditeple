@@ -12,6 +12,7 @@ import { fmt } from '@/lib/types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { CONTROLES_FDR } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 const COLORS_CHART = {
   green: 'hsl(152, 60%, 40%)',
@@ -134,6 +135,7 @@ export default function FondsRoulementPage() {
       completedChecks={(CONTROLES_FDR).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_FDR).length}
     >
+      <DoctrineEPLE theme="fonds-roulement" titre="Fonds de roulement (FDR)" resume="M9-6 § 4.5.3 — seuil prudentiel ≥ 30 jours de DRFN" />
 
       {/* Paramètres CA */}
       <Card className="shadow-card">

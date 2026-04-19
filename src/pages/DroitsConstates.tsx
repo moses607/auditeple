@@ -12,6 +12,7 @@ import { Separator } from '@/components/ui/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CONTROLES_DROITS_CONSTATES } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /* ═══ TYPES ═══ */
 interface EleveVerifie {
@@ -139,6 +140,8 @@ export default function DroitsConstatesPage() {
       completedChecks={(CONTROLES_DROITS_CONSTATES).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_DROITS_CONSTATES).length}
     >
+      <DoctrineEPLE theme="droits-constates" titre="Droits constatés & titres de recette" resume="Art. 22-23 GBCP — constatation, liquidation, rattachement à l'exercice" />
+
       <div>
           <p className="text-sm text-muted-foreground">Droits de l'établissement (frais scolaires) et droits des élèves (bourses, fonds sociaux, primes).</p>
       </div>
