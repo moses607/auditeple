@@ -32,6 +32,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 const STORAGE_KEY = 'calendrier_annuel_v1';
 
@@ -219,6 +220,12 @@ export default function CalendrierAnnuel() {
       ]}
       headerActions={headerActions}
     >
+      <DoctrineEPLE
+        theme="calendrier"
+        titre="Calendrier annuel de l'agence comptable"
+        resume="Échéances réglementaires (BI, BR, CF, DSN, TVA, inventaire, PV de caisse) à destination des ER."
+      />
+
       {/* ─── Avertissement ─── */}
       <div className="rounded-lg border-l-4 border-l-destructive bg-destructive/5 p-4">
         <div className="flex gap-3">

@@ -9,6 +9,7 @@ import { CartoRisque } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { Plus, Trash2, Pencil } from 'lucide-react';
 import { ModulePageLayout } from '@/components/ModulePageLayout';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 interface ActionItem {
   id: string;
@@ -61,6 +62,11 @@ export default function PlanAction() {
         { code: "Cartop@le", label: "Plans d'action" },
       ]}
     >
+      <DoctrineEPLE
+        theme="plan-action"
+        titre="Plan d'action correctif — CICF"
+        resume="Suivi des actions issues de la cartographie des risques et des PV. Risques critiques (score ≥ 40) prioritaires."
+      />
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">

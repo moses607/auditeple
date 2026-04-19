@@ -16,6 +16,7 @@ import { getModules } from '@/lib/audit-modules';
 import { collectAllAnomalies, collectAnomaliesFlat, ModuleAnomalies } from '@/lib/anomaly-collector';
 import PVPrintDocument from '@/components/PVPrintDocument';
 import { ModulePageLayout } from '@/components/ModulePageLayout';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 // Auto-generate recommendations
 function generateRecommandations(verifications: PVVerification[]): string {
@@ -153,6 +154,11 @@ export default function PVAudit() {
           </div>
         }
       >
+      <DoctrineEPLE
+        theme="pv"
+        titre="PV d'audit contradictoire"
+        resume="Phase provisoire → contradictoire (15 j observations) → définitive. Présentation au CA et transmission collectivité."
+      />
 
       <div className="grid grid-cols-3 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground">Total PV</p></CardContent></Card>

@@ -8,6 +8,7 @@ import { Plus, Trash2 } from 'lucide-react';
 import { PlanControleItem } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout } from '@/components/ModulePageLayout';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 const TYPES_CONTROLE_M96 = [
   { type: 'Contrôle de caisse et des valeurs inactives', ref: 'M9-6 2026 § 4.3.1 — Vérification de l\'existence et de la concordance des fonds' },
@@ -71,6 +72,11 @@ export default function PlanControle() {
         { code: "ODICé", label: "Outil de diagnostic" },
       ]}
     >
+      <DoctrineEPLE
+        theme="plan-controle"
+        titre="Plan de contrôle annuel — CICF"
+        resume="Hiérarchisation des contrôles par niveau de risque (Cartop@le) — fréquence, responsables, échéances."
+      />
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
