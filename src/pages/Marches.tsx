@@ -96,6 +96,7 @@ export default function MarchesPage() {
       completedChecks={(CONTROLES_MARCHES).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_MARCHES).length}
     >
+      <DoctrineEPLE theme="marches" titre="Commande publique & marchés" resume="Seuils CCP 2026 — procédure adaptée à la nature et au montant" />
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
