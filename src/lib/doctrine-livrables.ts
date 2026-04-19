@@ -10,13 +10,13 @@
 import {
   type Analyse5Etapes,
   type ThemeMetier,
-  type LivrableType,
   mailOrdonnateur,
   noteInterne,
   extraitRapportCA,
 } from '@/lib/doctrine-eple';
-// re-export du type pour les composants
-export type { LivrableType } from '@/lib/doctrine-eple';
+import type { LivrableType } from '@/components/LivrableCopiable';
+// re-export pour les composants consommateurs
+export type { LivrableType };
 
 interface Livrable {
   type: LivrableType;
