@@ -9,6 +9,7 @@ import { getSelectedEtablissement } from '@/lib/types';
 import { CONTROLES_ANNEXE } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /** Seuil prudentiel IGAENR 2016-071 : FRNG en jours de DRFN. */
 const SEUIL_FRNG_BAS = 30;   // < 30 jours = alerte
@@ -146,6 +147,7 @@ export default function AnnexeComptablePage() {
       completedChecks={(CONTROLES_ANNEXE).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_ANNEXE).length}
     >
+      <DoctrineEPLE theme="annexe-comptable" titre="Annexe au compte financier" resume="M9-6 Tome 1 — narratif, FRNG/BFR/CAF, faits marquants, événements postérieurs" />
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

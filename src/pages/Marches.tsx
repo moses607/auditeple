@@ -11,6 +11,7 @@ import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_MARCHES } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /* ═══ Détection saucissonnage : marchés de même nature dont le cumul 12 mois dépasse un seuil formalisé ═══ */
 const SEUIL_FORMALISE = 216000;            // € HT — seuil procédure formalisée fournitures/services (UE 2026-2027)

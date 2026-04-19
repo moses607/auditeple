@@ -12,6 +12,7 @@ import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_SUBVENTIONS } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 export default function Subventions() {
   const [items, setItems] = useState<SubventionItem[]>(() => loadState('subventions', []));
@@ -58,6 +59,7 @@ export default function Subventions() {
       completedChecks={(CONTROLES_SUBVENTIONS).filter(c => regChecks[c.id]).length}
       totalChecks={(CONTROLES_SUBVENTIONS).length}
     >
+      <DoctrineEPLE theme="subventions" titre="Subventions affectées" resume="Loi 68-1250 — prescription quadriennale, reversement du solde non employé" />
 
       {/* KPI */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-3">

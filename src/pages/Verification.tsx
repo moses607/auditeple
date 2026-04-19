@@ -7,6 +7,7 @@ import { ModulePageLayout, ModuleSection, ComplianceCheck, AnomalyAlert } from '
 import { ControlAlert } from '@/components/ControlAlert';
 import { RegRefBadge } from '@/components/RegRefBadge';
 import { VERIFICATION_QUOTIDIENNE } from '@/lib/regulatory-data';
+import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 
 /* ═══ Les 5 motifs légaux de suspension de paiement (Art. 38 GBCP) ═══ */
 const MOTIFS_SUSPENSION_PAIEMENT = [
@@ -86,6 +87,8 @@ export default function VerificationPage() {
       completedChecks={completedCount}
       totalChecks={ALL_ITEMS.length}
     >
+      <DoctrineEPLE theme="verification" titre="Vérification quotidienne" resume="Doctrine d'agent comptable EPLE — contrôles préalables au paiement" />
+
       {/* ─── KPI Row ─── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="shadow-card">
