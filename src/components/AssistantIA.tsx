@@ -75,6 +75,18 @@ export function AssistantIA() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  // Événement global : ouvre le drawer avec un prompt pré-rempli
+  // (déclenché depuis LivrableCopiable / AnalyseStructuree / autres modules).
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { prompt?: string } | undefined;
+      setOpen(true);
+      if (detail?.prompt) setInput(detail.prompt);
+    };
+    window.addEventListener('assistant-ia:open', handler);
+    return () => window.removeEventListener('assistant-ia:open', handler);
+  }, []);
+
   const send = async (text?: string) => {
     const content = (text ?? input).trim();
     if (!content || isLoading) return;
