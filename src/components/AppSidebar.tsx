@@ -83,10 +83,8 @@ export function AppSidebar() {
     return stats;
   }, [moduleById, auditProgress]);
 
-  const orphans = useMemo(() => {
-    const ids = getOrphanModuleIds(modules.map(m => m.id));
-    return ids.map(id => moduleById.get(id)).filter(Boolean) as typeof modules;
-  }, [modules, moduleById]);
+  // Tous les modules sont rattachés à une étape ou au Triptyque CICF (plus d'orphelins).
+  void getOrphanModuleIds;
 
   const renderModuleItem = (mod: typeof modules[number]) => {
     const Icon = ICON_MAP[mod.icon] || FileText;
