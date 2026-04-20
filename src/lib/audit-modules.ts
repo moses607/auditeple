@@ -56,10 +56,12 @@ const DEFAULT_MODULES: ModuleConfig[] = [
 
   // ═══ AUDIT & RESTITUTION ═══
   { id: 'calendrier-annuel', label: 'Calendrier annuel AC', path: '/calendrier-annuel', icon: 'CalendarDays', enabled: true, section: 'AUDIT & RESTITUTION' },
-  { id: 'pv-audit', label: 'Audit', path: '/pv-audit', icon: 'ClipboardList', enabled: true, section: 'AUDIT & RESTITUTION' },
+  { id: 'pv-audit', label: 'PV consolidé', path: '/pv-audit', icon: 'ClipboardList', enabled: true, section: 'AUDIT & RESTITUTION' },
   { id: 'annexe-comptable', label: 'Annexe Comptable', path: '/annexe-comptable', icon: 'BookOpen', enabled: true, section: 'AUDIT & RESTITUTION' },
   { id: 'piste-audit', label: "Piste d'Audit", path: '/piste-audit', icon: 'FileText', enabled: true, section: 'AUDIT & RESTITUTION' },
   { id: 'parametres', label: 'Paramètres & Équipe', path: '/parametres', icon: 'Settings', enabled: true, section: 'AUDIT & RESTITUTION' },
+  { id: 'audit-domaines', label: 'Vue d\'ensemble (8 domaines)', path: '/audit', icon: 'Calculator', enabled: true, section: 'CONTRÔLES SUR PLACE' },
+  { id: 'mentions-legales', label: 'Mentions légales', path: '/mentions-legales', icon: 'FileText', enabled: true, section: 'AUDIT & RESTITUTION' },
 ];
 
 export function getModules(): ModuleConfig[] {

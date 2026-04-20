@@ -46,6 +46,7 @@ const Bourses = lazy(() => import("./pages/Bourses"));
 const FondsSociaux = lazy(() => import("./pages/FondsSociaux"));
 const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
 const CalendrierAnnuel = lazy(() => import("./pages/CalendrierAnnuel"));
+const AuditDomaines = lazy(() => import("./pages/AuditDomaines"));
 
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
@@ -124,6 +125,7 @@ const App = () => (
                   <Route path="/annexe-comptable" element={<AnnexeComptable />} />
                   <Route path="/piste-audit" element={<PisteAudit />} />
                   <Route path="/calendrier-annuel" element={<CalendrierAnnuel />} />
+                  <Route path="/audit" element={<AuditDomaines />} />
                   <Route path="/mentions-legales" element={<MentionsLegales />} />
                   <Route path="/parametres" element={<Parametres />} />
                   <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
