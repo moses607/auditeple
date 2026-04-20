@@ -72,6 +72,7 @@ export const PARCOURS_ETAPES: EtapeParcours[] = [
     icon: Calculator,
     color: 'text-section-controles',
     moduleIds: [
+      'audit-domaines',
       // A. Cycle dépenses
       'depenses', 'marches',
       // B. Cycle recettes
