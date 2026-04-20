@@ -28,9 +28,14 @@ interface ActionItem {
 
 export default function PlanAction() {
   const risques: CartoRisque[] = loadState('cartographie', []);
+  const { params } = useAuditParams();
   const [actions, setActions] = useState<ActionItem[]>(() => loadState('plan_action', []));
+  const [signature, setSignature] = useState<{ dataUrl: string; nom: string; date: string; lieu: string }>(
+    () => loadState('plan_action_signature', { dataUrl: '', nom: params.agentComptable || '', date: '', lieu: '' })
+  );
   const [form, setForm] = useState<any>(null);
   const save = (d: ActionItem[]) => { setActions(d); saveState('plan_action', d); };
+  const saveSignature = (s: typeof signature) => { setSignature(s); saveState('plan_action_signature', s); };
 
   const submit = () => {
     if (!form || !form.risqueId) return;
