@@ -8,7 +8,7 @@
  */
 import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FileText, Pencil, Check, BarChart3, ChevronDown } from 'lucide-react';
+import { FileText, Pencil, Check, BarChart3, ChevronDown, ShieldCheck, Map as MapIcon, GitFork, ListChecks } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel,
