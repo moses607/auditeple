@@ -7,9 +7,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { CartoRisque } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, FileSignature } from 'lucide-react';
 import { ModulePageLayout } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
+import SignaturePad from '@/components/SignaturePad';
+import { useAuditParams } from '@/hooks/useAuditStore';
 
 interface ActionItem {
   id: string;
