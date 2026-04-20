@@ -158,6 +158,35 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* ═══ Triptyque CICF — Cartographie · Organigramme · Plan d'action ═══ */}
+        {(() => {
+          const triptyqueIds = ['cartographie', 'organigramme', 'plan-action'] as const;
+          const triptyqueMods = triptyqueIds
+            .map(id => moduleById.get(id))
+            .filter(Boolean) as typeof modules;
+          if (triptyqueMods.length === 0) return null;
+          return (
+            <SidebarGroup>
+              <SidebarGroupLabel asChild>
+                <div className={cn(
+                  'w-full flex items-center gap-2 px-2 py-1.5 rounded-md',
+                  'bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20',
+                )}>
+                  <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
+                  {!collapsed && (
+                    <span className="flex-1 text-left text-[11px] font-bold tracking-wide uppercase text-primary">
+                      Triptyque CICF
+                    </span>
+                  )}
+                </div>
+              </SidebarGroupLabel>
+              <SidebarGroupContent>
+                <SidebarMenu>{triptyqueMods.map(renderModuleItem)}</SidebarMenu>
+              </SidebarGroupContent>
+            </SidebarGroup>
+          );
+        })()}
+
         {/* ═══ Les 7 étapes du parcours ═══ */}
         {PARCOURS_ETAPES.map(etape => {
           const EtapeIcon = etape.icon;
