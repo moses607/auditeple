@@ -172,10 +172,10 @@ export function AppSidebar() {
                   'w-full flex items-center gap-2 px-2 py-1.5 rounded-md',
                   'bg-gradient-to-r from-primary/10 to-accent/10 border border-primary/20',
                 )}>
-                  <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
+                    <ShieldCheck className="h-3.5 w-3.5 text-primary shrink-0" />
                   {!collapsed && (
                     <span className="flex-1 text-left text-[11px] font-bold tracking-wide uppercase text-primary">
-                      Triptyque CICF
+                      Triptyque CICF · Organigramme · Risques · Plan
                     </span>
                   )}
                 </div>
@@ -248,17 +248,7 @@ export function AppSidebar() {
           );
         })}
 
-        {/* Modules orphelins (Mentions légales etc.) */}
-        {orphans.length > 0 && (
-          <SidebarGroup>
-            <SidebarGroupLabel className="text-[9px] font-extrabold tracking-widest uppercase text-sidebar-foreground/30 px-2">
-              {!collapsed && 'Autre'}
-            </SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>{orphans.map(renderModuleItem)}</SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        )}
+{/* Modules orphelins masqués : tous les modules sont désormais rattachés à une étape ou au Triptyque CICF. */}
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border">
