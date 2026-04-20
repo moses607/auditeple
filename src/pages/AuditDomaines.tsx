@@ -21,6 +21,7 @@ export default function AuditDomaines() {
   return (
     <ModulePageLayout
       title="AUDIT — 8 domaines du cycle comptable EPLE"
+      section="AUDIT & RESTITUTION"
       description="Audit structuré conforme M9-6 et décret GBCP 2012-1246. Chaque domaine regroupe les contrôles obligatoires, leur périodicité et leur référence réglementaire."
     >
       <div className="space-y-4">
