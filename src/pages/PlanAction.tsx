@@ -145,6 +145,64 @@ export default function PlanAction() {
           </Card>
         );
       })}
+
+      {/* ═══ Signature de l'agent comptable ═══ */}
+      <Card className="border-primary/30 bg-gradient-to-br from-primary/5 to-accent/5 mt-6 print:break-inside-avoid">
+        <CardContent className="pt-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <FileSignature className="h-5 w-5 text-primary" />
+            <div>
+              <h3 className="font-bold text-sm">Validation du plan d'action</h3>
+              <p className="text-xs text-muted-foreground">Signature de l'agent comptable engageant la mise en œuvre des actions correctives</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="space-y-1">
+              <Label className="text-xs">Nom de l'agent comptable</Label>
+              <Input
+                value={signature.nom}
+                onChange={e => saveSignature({ ...signature, nom: e.target.value })}
+                placeholder="Prénom NOM"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Fait à</Label>
+              <Input
+                value={signature.lieu}
+                onChange={e => saveSignature({ ...signature, lieu: e.target.value })}
+                placeholder="Ville"
+              />
+            </div>
+            <div className="space-y-1">
+              <Label className="text-xs">Le</Label>
+              <Input
+                type="date"
+                value={signature.date}
+                onChange={e => saveSignature({ ...signature, date: e.target.value })}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-4 items-start">
+            <SignaturePad
+              label="Signature manuscrite"
+              value={signature.dataUrl}
+              onChange={dataUrl => saveSignature({ ...signature, dataUrl })}
+              width={320}
+              height={130}
+            />
+            {signature.dataUrl && signature.nom && signature.date && (
+              <div className="flex-1 text-xs text-muted-foreground italic pt-2">
+                <p>« Le présent plan d'action, élaboré à partir de la cartographie des risques et de l'organigramme fonctionnel,
+                est arrêté par <strong className="not-italic text-foreground">{signature.nom}</strong>, agent comptable,
+                {signature.lieu && <> à <strong className="not-italic text-foreground">{signature.lieu}</strong></>},
+                le <strong className="not-italic text-foreground">{new Date(signature.date).toLocaleDateString('fr-FR')}</strong>. »</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
     </ModulePageLayout>
   );
 }
