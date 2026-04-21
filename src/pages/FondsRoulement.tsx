@@ -13,6 +13,7 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Ba
 import { CONTROLES_FDR } from '@/lib/regulatory-data';
 import { ModulePageLayout , ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
+import { FondsRoulementModule } from '@/components/FondsRoulementModule';
 
 const COLORS_CHART = {
   green: 'hsl(152, 60%, 40%)',
@@ -137,7 +138,13 @@ export default function FondsRoulementPage() {
     >
       <DoctrineEPLE theme="fonds-roulement" titre="Fonds de roulement (FDR)" resume="M9-6 § 4.5.3 — seuil prudentiel ≥ 30 jours de DRFN" />
 
-      {/* Paramètres CA */}
+      {/* ─── Module enrichi : import balance, double camembert, feu tricolore, avis motivé auto ─── */}
+      <ModuleSection title="Analyse automatisée depuis la balance Op@le" description="Auto-remplissage des agrégats M9-6, simulateur de prélèvement, double camembert avant/après PFR, avis motivé auto-généré, exports PDF / Word.">
+        <FondsRoulementModule />
+      </ModuleSection>
+
+      {/* ─── Saisie manuelle classique (méthode IGAENR 2016-071) ─── */}
+
       <Card className="shadow-card">
         <CardContent className="pt-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
