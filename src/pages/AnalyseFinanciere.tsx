@@ -99,34 +99,51 @@ export default function AnalyseFinanciere() {
               </div>
             </div>
 
-            {/* Import CSV Op@le */}
+            {/* Import balance Op@le */}
             <div className="pt-3 border-t border-border space-y-2">
-              <p className="text-xs font-semibold text-foreground">Import depuis Op@le (CSV balance)</p>
+              <p className="text-xs font-semibold text-foreground">Import depuis Op@le (CSV ou Excel)</p>
               <div className="flex items-center gap-2">
                 <label className="cursor-pointer">
-                  <input type="file" accept=".csv" className="hidden" onChange={async (e) => {
+                  <input type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
-                    const text = await file.text();
-                    const lines = text.split('\n').map(l => l.split(/[;,\t]/));
-                    let fdrVal = '', tresoVal = '';
-                    for (const cols of lines) {
-                      const compte = (cols[0] || '').replace(/"/g,'').trim().replace(/^C\//,'');
-                      const montant = (cols[cols.length - 1] || '').replace(/"/g,'').replace(',','.').trim();
-                      if (compte === '10' || compte === '1') fdrVal = montant;
-                      if (compte === '515') tresoVal = montant;
+                    try {
+                      let rows: string[][] = [];
+                      const ext = file.name.toLowerCase().split('.').pop();
+                      if (ext === 'xlsx' || ext === 'xls') {
+                        const buf = await file.arrayBuffer();
+                        const wb = XLSX.read(buf, { type: 'array' });
+                        const ws = wb.Sheets[wb.SheetNames[0]];
+                        const json = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: false, defval: '' });
+                        rows = json.map(r => (r as unknown[]).map(c => String(c ?? '')));
+                      } else {
+                        const text = await file.text();
+                        rows = text.split('\n').map(l => l.split(/[;,\t]/));
+                      }
+                      let fdrVal = '', tresoVal = '';
+                      for (const cols of rows) {
+                        const compte = (cols[0] || '').replace(/"/g, '').trim().replace(/^C\//, '');
+                        const montant = (cols[cols.length - 1] || '').replace(/"/g, '').replace(/\s/g, '').replace(',', '.').trim();
+                        if (compte === '10' || compte === '1') fdrVal = montant;
+                        if (compte === '515') tresoVal = montant;
+                      }
+                      if (tresoVal) { update('treso', tresoVal); toast.success('Trésorerie importée depuis Op@le'); }
+                      if (fdrVal) { update('fdr', fdrVal); }
+                      if (!tresoVal && !fdrVal) toast.warning('Aucun compte 515 ou 10 détecté dans le fichier');
+                    } catch (err) {
+                      console.error(err);
+                      toast.error('Erreur lors de la lecture du fichier');
+                    } finally {
+                      e.target.value = '';
                     }
-                    if (tresoVal) { update('treso', tresoVal); toast.success('Trésorerie importée depuis Op@le'); }
-                    if (fdrVal) { update('fdr', fdrVal); }
-                    e.target.value = '';
                   }} />
                   <Button type="button" variant="outline" size="sm" className="gap-2 text-xs pointer-events-none" tabIndex={-1}>
-                    <Upload className="h-3.5 w-3.5" />Importer balance Op@le (CSV)
+                    <Upload className="h-3.5 w-3.5" />Importer balance Op@le (CSV / Excel)
                   </Button>
                 </label>
               </div>
               <p className="text-[10px] text-muted-foreground">
-                Importe automatiquement les soldes des comptes 515 (trésorerie) et capitaux depuis la balance Op@le exportée en CSV.
+                Importe automatiquement les soldes des comptes 515 (trésorerie) et capitaux depuis la balance Op@le exportée en CSV ou Excel (.xlsx, .xls).
               </p>
             </div>
           </CardContent>
