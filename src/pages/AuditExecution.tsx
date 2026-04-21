@@ -34,6 +34,8 @@ interface PointRow {
   action_corrective: string | null;
   responsable_action: string | null;
   delai_action: string | null;
+  updated_at: string | null;
+  updated_by: string | null;
 }
 
 const STATUS_META: Record<PointStatus, { label: string; icon: any; color: string }> = {
