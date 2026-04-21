@@ -160,5 +160,5 @@ export function useCalendrierSync() {
     }
   }, [activeId]);
 
-  return { activites, setActivites: persist, loading, synced };
+  return { activites, setActivites: persist, loading, synced, remoteUpdateAt };
 }
