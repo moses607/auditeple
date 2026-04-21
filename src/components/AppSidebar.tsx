@@ -8,7 +8,7 @@
  */
 import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FileText, Pencil, Check, BarChart3, ChevronDown, ShieldCheck, Map as MapIcon, GitFork, ListChecks, Settings as SettingsIcon } from 'lucide-react';
+import { FileText, Pencil, Check, BarChart3, ChevronDown, ShieldCheck, Map as MapIcon, GitFork, ListChecks, Settings as SettingsIcon, Calculator } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel,
@@ -158,6 +158,15 @@ export function AppSidebar() {
                     activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
                     <BarChart3 className="h-4 w-4" />
                     {!collapsed && <span>Tableau de bord</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location.pathname.startsWith('/outils/calculateurs')}>
+                  <NavLink to="/outils/calculateurs" className="flex items-center gap-2"
+                    activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
+                    <Calculator className="h-4 w-4" />
+                    {!collapsed && <span>Calculateurs <span className="ml-1 text-[9px] text-muted-foreground">(15)</span></span>}
                   </NavLink>
                 </SidebarMenuButton>
               </SidebarMenuItem>
