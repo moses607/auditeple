@@ -184,8 +184,9 @@ export default function PlanAction() {
       {/* ═══ Toolbar ═══ */}
       <div className="flex flex-wrap gap-2 justify-end items-center">
         {activeId && (
-          <span className="text-xs text-muted-foreground inline-flex items-center gap-1 mr-auto">
+          <span className="text-xs text-muted-foreground inline-flex items-center gap-2 mr-auto">
             {synced ? <><Cloud className="h-3.5 w-3.5 text-emerald-600" /> Synchronisé avec le groupement</> : <><CloudOff className="h-3.5 w-3.5" /> Synchronisation…</>}
+            <RealtimePulse triggerAt={remoteUpdateAt} label="Action mise à jour par un collègue" />
           </span>
         )}
         <Button variant="outline" size="sm" onClick={regenerer}>
