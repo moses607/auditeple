@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Save, FileSignature, CheckCircle2, AlertTriangle, AlertOctagon, MinusCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Save, FileSignature, CheckCircle2, AlertTriangle, AlertOctagon, MinusCircle, RefreshCw } from 'lucide-react';
 import { DOMAINES_AUDIT } from '@/lib/audit-parcours';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
