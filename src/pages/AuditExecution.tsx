@@ -151,7 +151,10 @@ export default function AuditExecution() {
         <Card>
           <CardContent className="py-3 space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">Progression : {completed} / {points.length} points</span>
+              <span className="font-medium flex items-center gap-2">
+                Progression : {completed} / {points.length} points
+                <RealtimePulse triggerAt={remoteUpdateAt} label="Audit modifié en direct" />
+              </span>
               <span className="text-muted-foreground">{progress}%</span>
             </div>
             <Progress value={progress} className="h-2" />
