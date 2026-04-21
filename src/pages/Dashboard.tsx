@@ -207,6 +207,9 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* ─── ✨ COCKPIT MATURITÉ CICF — score, KPI animés, radar, export PDF ─── */}
+      <CockpitMaturiteCICF />
+
       {/* ─── 📚 DOCTRINE EPLE — pilotage CICF, cadre M9-6 / GBCP ─── */}
       <DoctrineEPLE
         theme="cockpit"
