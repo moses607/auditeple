@@ -65,6 +65,12 @@ export function usePlanActionsSync() {
   const [actions, setActions] = useState<ActionPlan[]>(() => loadActions());
   const [loading, setLoading] = useState(false);
   const [synced, setSynced] = useState(false);
+  const [remoteUpdateAt, setRemoteUpdateAt] = useState<number>(0);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id ?? null));
+  }, []);
 
   // Charge depuis Supabase quand le groupement change
   useEffect(() => {
