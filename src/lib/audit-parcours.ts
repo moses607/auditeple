@@ -46,10 +46,10 @@ export const PARCOURS_ETAPES: EtapeParcours[] = [
     label: 'Cartographie des risques',
     verbe: 'Cartographie',
     description:
-      "Constitution du dossier, équipe d'audit, organigramme fonctionnel, calendrier annuel de l'agence comptable. Référence : M9-6 § 1.2 — séparation des tâches.",
+      "Préparation du dossier d'audit : périmètre, équipe, organigramme fonctionnel. La cartographie des risques figure dans le Triptyque CICF. Le calendrier comptable annuel est désormais accessible dans la section Pilotage.",
     icon: Briefcase,
     color: 'text-section-controle-interne',
-    moduleIds: ['calendrier-annuel'],
+    moduleIds: [],
   },
   {
     id: 'cadrer',
