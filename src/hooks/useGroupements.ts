@@ -137,27 +137,104 @@ export function useGroupements() {
   }, [refresh]);
 
   const createGroupement = async (g: Omit<Groupement, 'id' | 'actif'> & { actif?: boolean }) => {
+    // 1. Récupérer l'utilisateur authentifié — sans cela, la liaison user_groupements
+    //    ne peut pas être créée et le groupement deviendrait invisible (RLS).
+    const { data: userData, error: userErr } = await supabase.auth.getUser();
+    if (userErr || !userData.user) {
+      console.error('[createGroupement] auth.getUser failed:', userErr);
+      toast({
+        title: 'Session expirée',
+        description: "Reconnectez-vous pour créer un groupement comptable.",
+        variant: 'destructive',
+      });
+      return null;
+    }
+
+    // 2. Insérer le groupement
+    console.log('[createGroupement] inserting groupement:', g.libelle);
     const { data, error } = await supabase
       .from('groupements_comptables')
       .insert({ ...g, actif: g.actif ?? true })
       .select()
       .single();
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return null; }
+    if (error || !data) {
+      console.error('[createGroupement] insert groupement failed:', error);
+      toast({
+        title: 'Création impossible',
+        description: friendlyError(error?.message, 'groupement'),
+        variant: 'destructive',
+      });
+      return null;
+    }
+
+    // 3. Créer immédiatement la liaison user_groupements (sinon le SELECT
+    //    refuserait l'accès à cause de la RLS user_belongs_to_groupement)
+    console.log('[createGroupement] linking user', userData.user.id, '→ groupement', data.id);
+    const { error: linkErr } = await supabase
+      .from('user_groupements')
+      .insert({ user_id: userData.user.id, groupement_id: data.id, est_admin: true });
+    if (linkErr) {
+      console.error('[createGroupement] link failed, rolling back:', linkErr);
+      await supabase.from('groupements_comptables').delete().eq('id', data.id);
+      toast({
+        title: 'Création impossible',
+        description: "Impossible d'associer le groupement à votre compte. Réessayez ou contactez le support.",
+        variant: 'destructive',
+      });
+      return null;
+    }
+
     toast({ title: 'Groupement créé', description: data.libelle });
     await refresh();
     setActiveGroupementId(data.id);
+    setActiveId(data.id);
     return data as Groupement;
   };
 
   const updateGroupement = async (id: string, patch: Partial<Groupement>) => {
     const { error } = await supabase.from('groupements_comptables').update(patch).eq('id', id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[updateGroupement] failed:', error);
+      toast({ title: 'Modification impossible', description: friendlyError(error.message, 'groupement'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Groupement mis à jour' });
     await refresh();
     return true;
   };
 
-  return { groupements, activeId, loading, refresh, createGroupement, updateGroupement, setActive: setActiveGroupementId };
+  const deleteGroupement = async (id: string) => {
+    const { error } = await supabase.from('groupements_comptables').delete().eq('id', id);
+    if (error) {
+      console.error('[deleteGroupement] failed:', error);
+      toast({ title: 'Suppression impossible', description: friendlyError(error.message, 'groupement'), variant: 'destructive' });
+      return false;
+    }
+    toast({ title: 'Groupement supprimé' });
+    if (activeId === id) {
+      setActiveGroupementId(null);
+      setActiveId(null);
+    }
+    await refresh();
+    return true;
+  };
+
+  return { groupements, activeId, loading, refresh, createGroupement, updateGroupement, deleteGroupement, setActive: (id: string | null) => { setActiveGroupementId(id); setActiveId(id); } };
+}
+
+/** Convertit les erreurs Postgres/Supabase brutes en messages lisibles côté UI. */
+function friendlyError(msg: string | undefined, entity: string): string {
+  if (!msg) return `Erreur inconnue lors de la création du ${entity}.`;
+  const m = msg.toLowerCase();
+  if (m.includes('duplicate') || m.includes('unique')) return `Ce ${entity} existe déjà (doublon).`;
+  if (m.includes('row-level security') || m.includes('rls') || m.includes('policy'))
+    return `Vous n'avez pas les droits pour cette opération sur le ${entity}. Vérifiez votre rattachement.`;
+  if (m.includes('foreign key')) return `Référence invalide : un élément lié n'existe pas.`;
+  if (m.includes('not null') || m.includes('null value'))
+    return `Champ obligatoire manquant. Remplissez tous les champs marqués *.`;
+  if (m.includes('jwt') || m.includes('expired') || m.includes('auth'))
+    return `Session expirée — reconnectez-vous.`;
+  return msg;
 }
 
 export function useEtablissements(groupementId: string | null) {
@@ -180,8 +257,13 @@ export function useEtablissements(groupementId: string | null) {
   useEffect(() => { refresh(); }, [refresh]);
 
   const create = async (e: Omit<EtablissementRow, 'id'>) => {
+    console.log('[etablissement.create]', e.nom, e.uai);
     const { error } = await supabase.from('etablissements').insert(e);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[etablissement.create] failed:', error);
+      toast({ title: 'Création impossible', description: friendlyError(error.message, 'établissement'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Établissement ajouté', description: e.nom });
     await refresh();
     return true;
@@ -189,7 +271,11 @@ export function useEtablissements(groupementId: string | null) {
 
   const update = async (id: string, patch: Partial<EtablissementRow>) => {
     const { error } = await supabase.from('etablissements').update(patch).eq('id', id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[etablissement.update] failed:', error);
+      toast({ title: 'Modification impossible', description: friendlyError(error.message, 'établissement'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Établissement mis à jour' });
     await refresh();
     return true;
@@ -197,7 +283,11 @@ export function useEtablissements(groupementId: string | null) {
 
   const remove = async (id: string) => {
     const { error } = await supabase.from('etablissements').delete().eq('id', id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[etablissement.remove] failed:', error);
+      toast({ title: 'Suppression impossible', description: friendlyError(error.message, 'établissement'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Établissement supprimé' });
     await refresh();
     return true;
@@ -226,8 +316,13 @@ export function useAgents(groupementId: string | null) {
   useEffect(() => { refresh(); }, [refresh]);
 
   const create = async (a: Omit<AgentRow, 'id'>) => {
+    console.log('[agent.create]', a.prenom, a.nom, a.role);
     const { error } = await supabase.from('agents').insert(a);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[agent.create] failed:', error);
+      toast({ title: 'Création impossible', description: friendlyError(error.message, 'agent'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Agent ajouté', description: `${a.prenom} ${a.nom}` });
     await refresh();
     return true;
@@ -235,7 +330,11 @@ export function useAgents(groupementId: string | null) {
 
   const update = async (id: string, patch: Partial<AgentRow>) => {
     const { error } = await supabase.from('agents').update(patch).eq('id', id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[agent.update] failed:', error);
+      toast({ title: 'Modification impossible', description: friendlyError(error.message, 'agent'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Agent mis à jour' });
     await refresh();
     return true;
@@ -243,7 +342,11 @@ export function useAgents(groupementId: string | null) {
 
   const remove = async (id: string) => {
     const { error } = await supabase.from('agents').delete().eq('id', id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[agent.remove] failed:', error);
+      toast({ title: 'Suppression impossible', description: friendlyError(error.message, 'agent'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Agent supprimé' });
     await refresh();
     return true;
