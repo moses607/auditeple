@@ -20,7 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { Rocket, Clock, ListChecks } from 'lucide-react';
 import { DOMAINES_AUDIT } from '@/lib/audit-parcours';
 import { AUDIT_PRESETS, AuditScope, countPoints, totalPoints } from '@/lib/audit-presets';
-import { useGroupements } from '@/hooks/useGroupements';
+import { useGroupements, useEtablissements, useAgents } from '@/hooks/useGroupements';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -28,7 +28,10 @@ const MIN_PER_POINT = 5;
 
 export default function AuditConfig() {
   const navigate = useNavigate();
-  const { groupementActif, etablissements, agents } = useGroupements();
+  const { groupements, activeId } = useGroupements();
+  const groupementActif = groupements.find(g => g.id === activeId) ?? null;
+  const { etablissements } = useEtablissements(activeId);
+  const { agents } = useAgents(activeId);
   const [scope, setScope] = useState<AuditScope>(() => AUDIT_PRESETS[0].build());
   const [libelle, setLibelle] = useState('Audit ' + new Date().toLocaleDateString('fr-FR'));
   const [etabId, setEtabId] = useState<string>('');
