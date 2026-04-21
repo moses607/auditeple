@@ -209,12 +209,23 @@ export default function AuditExecution() {
 
   const goNext = async () => {
     await saveCurrent();
-    if (cursor < points.length - 1) setCursor(cursor + 1);
+    if (filteredIndices.length === 0) return;
+    if (filteredPosition === -1) {
+      // Point courant hors filtre → aller au premier point du filtre
+      setCursor(filteredIndices[0]);
+    } else if (filteredPosition < filteredIndices.length - 1) {
+      setCursor(filteredIndices[filteredPosition + 1]);
+    }
   };
 
   const goPrev = async () => {
     await saveCurrent();
-    if (cursor > 0) setCursor(cursor - 1);
+    if (filteredIndices.length === 0) return;
+    if (filteredPosition === -1) {
+      setCursor(filteredIndices[0]);
+    } else if (filteredPosition > 0) {
+      setCursor(filteredIndices[filteredPosition - 1]);
+    }
   };
 
   const cloturer = async () => {
