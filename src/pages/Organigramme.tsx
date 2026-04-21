@@ -10,6 +10,7 @@ import { CONTROLES_ORGANIGRAMME } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { useAgents, useGroupements, getRoleLabel } from '@/hooks/useGroupements';
+import { AgentSelect } from '@/components/AgentSelect';
 import { toast } from '@/hooks/use-toast';
 
 // Mapping rôle agent → fonction comptable de l'organigramme + tâches Op@le typiques
