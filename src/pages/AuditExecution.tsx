@@ -56,6 +56,7 @@ export default function AuditExecution() {
   const [saving, setSaving] = useState(false);
   const [remoteUpdateAt, setRemoteUpdateAt] = useState(0);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [profilesMap, setProfilesMap] = useState<Record<string, string>>({});
 
   const fetchAll = async () => {
     if (!id) return;
@@ -64,7 +65,24 @@ export default function AuditExecution() {
       supabase.from('audit_points_results').select('*').eq('audit_id', id).order('domaine_id').order('point_index'),
     ]);
     setAudit(a);
-    setPoints((p as PointRow[]) ?? []);
+    const rows = (p as PointRow[]) ?? [];
+    setPoints(rows);
+
+    // Charger les noms d'auteurs manquants
+    const authorIds = Array.from(new Set(rows.map(r => r.updated_by).filter(Boolean) as string[]));
+    if (authorIds.length) {
+      const { data: profs } = await supabase
+        .from('profiles')
+        .select('user_id, display_name')
+        .in('user_id', authorIds);
+      if (profs) {
+        setProfilesMap(prev => {
+          const next = { ...prev };
+          profs.forEach((pr: any) => { next[pr.user_id] = pr.display_name || 'Collègue'; });
+          return next;
+        });
+      }
+    }
   };
 
   useEffect(() => {
@@ -76,15 +94,25 @@ export default function AuditExecution() {
     })();
   }, [id]);
 
+  const authorLabel = (userId: string | null | undefined) => {
+    if (!userId) return null;
+    if (userId === currentUserId) return 'Vous';
+    return profilesMap[userId] ?? 'Collègue';
+  };
+
   // Realtime — synchronisation collaborative sur les points d'audit & l'audit lui-même
   useEffect(() => {
     if (!id) return;
     const channel = supabase
       .channel(`audit-exec-${id}`)
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'audit_points_results', filter: `audit_id=eq.${id}` }, async () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'audit_points_results', filter: `audit_id=eq.${id}` }, async (payload) => {
+        const author = (payload.new as any)?.updated_by ?? null;
         await fetchAll();
-        setRemoteUpdateAt(Date.now());
-        toast.info('Point d\'audit mis à jour par un collègue');
+        if (author && author !== currentUserId) {
+          setRemoteUpdateAt(Date.now());
+          const name = profilesMap[author] ?? 'Un collègue';
+          toast.info(`${name} a mis à jour un point d'audit`);
+        }
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'audits', filter: `id=eq.${id}` }, async () => {
         await fetchAll();
@@ -92,7 +120,7 @@ export default function AuditExecution() {
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [id]);
+  }, [id, currentUserId, profilesMap]);
 
   const current = points[cursor];
   const completed = points.filter(p => p.status !== 'non_audite').length;
