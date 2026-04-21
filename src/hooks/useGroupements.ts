@@ -11,7 +11,8 @@ import { toast } from '@/hooks/use-toast';
 
 export type AgentRole =
   | 'agent_comptable' | 'fonde_pouvoir' | 'ordonnateur' | 'ordonnateur_suppleant'
-  | 'secretaire_general' | 'assistant_gestion' | 'regisseur_recettes' | 'regisseur_avances'
+  | 'secretaire_general' | 'secretaire_general_delegue' | 'adjoint_secretaire_general'
+  | 'assistant_gestion' | 'regisseur_recettes' | 'regisseur_avances'
   | 'suppleant_regisseur' | 'magasinier' | 'chef_cuisine' | 'secretaire_intendance'
   | 'gestionnaire_materiel' | 'responsable_cfa_greta' | 'correspondant_cicf' | 'archiviste_comptable';
 
