@@ -113,7 +113,10 @@ export function usePlanActionsSync() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'plan_actions', filter: `groupement_id=eq.${activeId}` },
-        async () => {
+        async (payload: any) => {
+          const row: any = payload.new ?? payload.old;
+          const authorId = row?.created_by ?? null;
+          const fromOther = authorId && currentUserId && authorId !== currentUserId;
           const { data } = await supabase
             .from('plan_actions')
             .select('*')
@@ -124,11 +127,16 @@ export function usePlanActionsSync() {
             setActions(remote);
             saveActions(remote);
           }
+          if (fromOther) {
+            setRemoteUpdateAt(Date.now());
+            const verb = payload.eventType === 'INSERT' ? 'créée' : payload.eventType === 'DELETE' ? 'supprimée' : 'mise à jour';
+            toast(`Action ${verb} par un collègue`, { duration: 2500, className: 'text-xs' });
+          }
         }
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [activeId]);
+  }, [activeId, currentUserId]);
 
   /** Persiste un set complet : upsert + delete des manquants. */
   const persist = useCallback(async (next: ActionPlan[]) => {
