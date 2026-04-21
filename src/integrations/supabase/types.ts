@@ -857,6 +857,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_groupement_with_link: {
+        Args: { _payload: Json }
+        Returns: {
+          academie: string
+          actif: boolean
+          couleur_principale: string | null
+          created_at: string
+          devise: string | null
+          email_agent_comptable: string | null
+          email_crc: string | null
+          email_rectorat_daf: string | null
+          email_rectorat_inspection: string | null
+          id: string
+          libelle: string
+          logo_url: string | null
+          lycee_siege_id: string | null
+          seuil_alerte_score: number | null
+          siege: string | null
+          signature_ac_url: string | null
+          telephone: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "groupements_comptables"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       user_belongs_to_groupement: {
         Args: { _groupement_id: string; _user_id: string }
         Returns: boolean
