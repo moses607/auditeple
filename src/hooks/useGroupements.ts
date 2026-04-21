@@ -22,6 +22,8 @@ export const AGENT_ROLES: { value: AgentRole; label: string; cycle?: string }[] 
   { value: 'ordonnateur', label: 'Ordonnateur (chef d\'établissement)', cycle: 'Gouvernance' },
   { value: 'ordonnateur_suppleant', label: 'Ordonnateur suppléant (adjoint)', cycle: 'Gouvernance' },
   { value: 'secretaire_general', label: 'Secrétaire général / Adjoint gestionnaire', cycle: 'Gouvernance' },
+  { value: 'secretaire_general_delegue', label: 'Secrétaire général délégué', cycle: 'Gouvernance' },
+  { value: 'adjoint_secretaire_general', label: 'Adjoint au secrétaire général', cycle: 'Gouvernance' },
   { value: 'assistant_gestion', label: 'Assistant de gestion', cycle: 'Gestion' },
   { value: 'regisseur_recettes', label: 'Régisseur de recettes', cycle: 'Trésorerie' },
   { value: 'regisseur_avances', label: 'Régisseur d\'avances', cycle: 'Trésorerie' },
