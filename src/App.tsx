@@ -47,6 +47,7 @@ const FondsSociaux = lazy(() => import("./pages/FondsSociaux"));
 const MentionsLegales = lazy(() => import("./pages/MentionsLegales"));
 const CalendrierAnnuel = lazy(() => import("./pages/CalendrierAnnuel"));
 const AuditDomaines = lazy(() => import("./pages/AuditDomaines"));
+const Calculateurs = lazy(() => import("./pages/Calculateurs"));
 
 const Auth = lazy(() => import("./pages/Auth"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
@@ -126,6 +127,8 @@ const App = () => (
                   <Route path="/piste-audit" element={<PisteAudit />} />
                   <Route path="/calendrier-annuel" element={<CalendrierAnnuel />} />
                   <Route path="/audit" element={<AuditDomaines />} />
+                  <Route path="/outils/calculateurs" element={<Calculateurs />} />
+                  <Route path="/outils/calculateurs/:id" element={<Calculateurs />} />
                   <Route path="/mentions-legales" element={<MentionsLegales />} />
                   <Route path="/parametres" element={<Parametres />} />
                   <Route path="/politique-confidentialite" element={<PolitiqueConfidentialite />} />
