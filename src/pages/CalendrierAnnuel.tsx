@@ -244,8 +244,9 @@ export default function CalendrierAnnuel() {
   const headerActions = (
     <div className="flex flex-wrap gap-2 items-center">
       {activeId && (
-        <span className="text-xs text-muted-foreground inline-flex items-center gap-1 mr-2">
+        <span className="text-xs text-muted-foreground inline-flex items-center gap-2 mr-2">
           {synced ? <><Cloud className="h-3.5 w-3.5 text-emerald-600" /> Synchronisé</> : <><CloudOff className="h-3.5 w-3.5" /> Sync…</>}
+          <RealtimePulse triggerAt={remoteUpdateAt} label="Activité mise à jour par un collègue" />
         </span>
       )}
       <DiffuserCalendrierDialog
