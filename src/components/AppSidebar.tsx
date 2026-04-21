@@ -8,7 +8,7 @@
  */
 import { useState, useMemo, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { FileText, Pencil, Check, BarChart3, ChevronDown, ShieldCheck, Map as MapIcon, GitFork, ListChecks } from 'lucide-react';
+import { FileText, Pencil, Check, BarChart3, ChevronDown, ShieldCheck, Map as MapIcon, GitFork, ListChecks, Settings as SettingsIcon } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
   Sidebar, SidebarContent, SidebarGroup, SidebarGroupLabel,
@@ -139,10 +139,19 @@ export function AppSidebar() {
       </SidebarHeader>
 
       <SidebarContent>
-        {/* Tableau de bord */}
+        {/* Paramètres (en tête — multi-groupements) */}
         <SidebarGroup>
           <SidebarGroupContent>
             <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={location.pathname === '/parametres'}>
+                  <NavLink to="/parametres" className="flex items-center gap-2"
+                    activeClassName="bg-sidebar-accent text-sidebar-accent-foreground font-medium">
+                    <SettingsIcon className="h-4 w-4" />
+                    {!collapsed && <span className="font-medium">Paramètres</span>}
+                  </NavLink>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild isActive={location.pathname === '/'}>
                   <NavLink to="/" className="flex items-center gap-2"
