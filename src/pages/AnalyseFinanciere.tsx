@@ -11,6 +11,7 @@ import { INDICATEURS_FINANCIERS_M96 } from '@/lib/regulatory-data';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { Upload } from 'lucide-react';
 import { toast } from 'sonner';
+import * as XLSX from 'xlsx';
 
 export default function AnalyseFinanciere() {
   const [data, setData] = useState(() => loadState('analyse_fin_v2', {
