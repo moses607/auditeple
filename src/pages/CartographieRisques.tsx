@@ -10,6 +10,7 @@ import { CARTOPALE_PROCESSUS } from '@/lib/regulatory-data';
 import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout, AnomalyAlert } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
+import { AgentSelect } from '@/components/AgentSelect';
 
 const PROCESSUS_LIST = CARTOPALE_PROCESSUS.map(p => `${p.code} — ${p.label}`);
 
