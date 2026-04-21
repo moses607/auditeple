@@ -15,7 +15,7 @@ import { loadState } from '@/lib/store';
 import { AgentSelect } from '@/components/AgentSelect';
 import {
   ActionPlan, StatutAction, CriticiteAction, PlanActionContext,
-  loadActions, saveActions, genererActions, computeStats, getActionsJ15, getActionsEnRetard,
+  genererActions, computeStats, getActionsJ15, getActionsEnRetard,
   STATUT_LABELS, CRITICITE_LABELS, calculerEcheance, LIBRARY_REGLES,
 } from '@/lib/plan-action-engine';
 import { PlanActionTableau } from '@/components/plan-action/PlanActionTableau';
@@ -24,15 +24,15 @@ import { PlanActionCalendrier } from '@/components/plan-action/PlanActionCalendr
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useGroupements } from '@/hooks/useGroupements';
+import { usePlanActionsSync } from '@/hooks/usePlanActionsSync';
+import { Cloud, CloudOff } from 'lucide-react';
 
 export default function PlanAction() {
-  const [actions, setActions] = useState<ActionPlan[]>(() => loadActions());
+  const { actions, setActions: persist, synced } = usePlanActionsSync();
   const [editing, setEditing] = useState<ActionPlan | null>(null);
   const { activeId } = useGroupements();
 
   const stats = useMemo(() => computeStats(actions), [actions]);
-
-  const persist = (next: ActionPlan[]) => { setActions(next); saveActions(next); };
 
   // ═══ Auto-génération depuis cartographie + PV audit ═══
   const regenerer = async () => {
