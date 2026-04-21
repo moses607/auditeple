@@ -244,15 +244,32 @@ export default function CalendrierAnnuel() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-2">
-      <Button onClick={exportMailMensuel} size="sm" className="gap-1.5">
-        <Mail className="h-4 w-4" /> Mail mensuel ER (.eml)
+      <DiffuserCalendrierDialog
+        activites={activites}
+        etablissementsRattaches={etablissementsRattaches}
+        agenceComptable={ac}
+        exercice={params.exercice}
+        agentComptable={params.agentComptable}
+        trigger={
+          <Button size="sm" className="gap-1.5">
+            <Send className="h-4 w-4" /> Diffuser aux ER
+          </Button>
+        }
+      />
+      <Button onClick={exportMailMensuel} size="sm" variant="outline" className="gap-1.5">
+        <Mail className="h-4 w-4" /> Mail mensuel (.eml)
       </Button>
       <Button onClick={exportPDF} size="sm" variant="secondary" className="gap-1.5">
-        <FileDown className="h-4 w-4" /> PDF paysage
+        <FileDown className="h-4 w-4" /> Tableau PDF
       </Button>
       <Button onClick={exportDOCX} size="sm" variant="secondary" className="gap-1.5">
-        <FileText className="h-4 w-4" /> Word paysage
+        <FileText className="h-4 w-4" /> Word
       </Button>
+      {activites.length > 0 && (
+        <Button onClick={dupliquerExerciceSuivant} size="sm" variant="ghost" className="gap-1.5">
+          <Copy className="h-4 w-4" /> Dupliquer N→N+1
+        </Button>
+      )}
     </div>
   );
 
