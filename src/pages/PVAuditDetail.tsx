@@ -184,6 +184,7 @@ export default function PVAuditDetail() {
           <CardContent className="space-y-4">
             {Object.entries(groupedByDomaine).map(([dId, list]) => {
               const d = DOMAINES_AUDIT.find(x => x.id === dId);
+              const arr = list as any[];
               return (
                 <div key={dId}>
                   <div className="flex items-center gap-2 mb-2">
