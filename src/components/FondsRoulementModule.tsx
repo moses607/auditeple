@@ -348,9 +348,20 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
       {hasBalance && (
         <div ref={printRef} className="space-y-6 bg-background p-4 rounded-lg">
           {/* En-tête imprimable */}
-          <div className="text-center border-b pb-3">
+          <div className="text-center border-b pb-3 space-y-1">
             <h2 className="text-lg font-bold">Analyse du fonds de roulement — {etabLabel}</h2>
-            <p className="text-xs text-muted-foreground">Période d'analyse : {stored.nbJoursPeriode} jours · Méthodologie M9-6 § 4.5.3</p>
+            <p className="text-xs text-muted-foreground">
+              Exercice : {stored.dateDebut && stored.dateFin
+                ? `du ${fmtDateFR(stored.dateDebut)} au ${fmtDateFR(stored.dateFin)} (${nbJoursCalcule} jours)`
+                : `${nbJoursCalcule} jours`}
+              {' · '}Méthodologie M9-6 § 4.5.3
+              {stored.datesAutoDetectees && <span className="ml-2 text-emerald-600">✓ Dates détectées depuis Op@le</span>}
+            </p>
+            {stored.dateCA && (
+              <p className="text-xs font-medium text-primary">
+                Conseil d'administration du {fmtDateFR(stored.dateCA)}
+              </p>
+            )}
           </div>
 
           {/* Contrôle d'identité */}
