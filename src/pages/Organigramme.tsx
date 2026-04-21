@@ -3,12 +3,34 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, Download } from 'lucide-react';
 import { EquipeMembre, FONCTIONS_COMPTABLES, TACHES_COMPTABLES } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_ORGANIGRAMME } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
+import { useAgents, useGroupements, getRoleLabel } from '@/hooks/useGroupements';
+import { toast } from '@/hooks/use-toast';
+
+// Mapping rôle agent → fonction comptable de l'organigramme + tâches Op@le typiques
+const ROLE_TO_FONCTION: Record<string, { fonction: string; taches: string[] }> = {
+  agent_comptable:        { fonction: 'Agent Comptable',          taches: ['Tenue comptabilité générale', 'Visa des paiements', 'Rapprochement bancaire', 'Compte financier'] },
+  fonde_pouvoir:          { fonction: 'Fondé de pouvoir',         taches: ['Visa des paiements', 'Suppléance AC'] },
+  ordonnateur:            { fonction: 'Ordonnateur',              taches: ['Engagement', 'Liquidation', 'Émission OR/DP'] },
+  ordonnateur_suppleant:  { fonction: 'Ordonnateur suppléant',    taches: ['Engagement (suppléance)', 'Liquidation (suppléance)'] },
+  secretaire_general:     { fonction: 'Adjoint gestionnaire',     taches: ['Préparation budget', 'Engagement', 'Liquidation', 'Suivi marchés'] },
+  assistant_gestion:      { fonction: 'Assistant de gestion',     taches: ['Saisie engagements', 'Suivi factures'] },
+  regisseur_recettes:     { fonction: 'Régisseur de recettes',    taches: ['Encaissement', 'Tenue caisse régie', 'Reversement AC'] },
+  regisseur_avances:      { fonction: 'Régisseur d\'avances',     taches: ['Décaissement avances', 'Justification mensuelle'] },
+  suppleant_regisseur:    { fonction: 'Suppléant régisseur',      taches: ['Suppléance régisseur'] },
+  magasinier:             { fonction: 'Magasinier',               taches: ['Entrées/sorties stocks', 'Inventaire'] },
+  chef_cuisine:           { fonction: 'Chef de cuisine',          taches: ['Commandes denrées', 'Sortie stock', 'Contrôle grammage'] },
+  secretaire_intendance:  { fonction: 'Secrétaire d\'intendance', taches: ['Appui administratif', 'Saisie OR'] },
+  gestionnaire_materiel:  { fonction: 'Gestionnaire matériel',    taches: ['Inventaire immobilisations'] },
+  responsable_cfa_greta:  { fonction: 'Responsable CFA / GRETA',  taches: ['Suivi BA', 'Conventions formation'] },
+  correspondant_cicf:     { fonction: 'Correspondant CICF',       taches: ['Cartographie risques', 'Suivi plan d\'action'] },
+  archiviste_comptable:   { fonction: 'Archiviste comptable',     taches: ['Archivage pièces', 'Conservation 10 ans'] },
+};
 
 export default function OrganigrammePage() {
   const [items, setItems] = useState<EquipeMembre[]>(() => loadState('organigramme', []));
@@ -16,6 +38,38 @@ export default function OrganigrammePage() {
   const toggleRegCheck = (id: string) => { const u = { ...regChecks, [id]: !regChecks[id] }; setRegChecks(u); saveState('organigramme_checks', u); };
   const [form, setForm] = useState<any>(null);
   const save = (d: EquipeMembre[]) => { setItems(d); saveState('organigramme', d); };
+
+  const { activeId } = useGroupements();
+  const { agents } = useAgents(activeId);
+
+  // Importe les agents Paramètres → organigramme (sans doublon de nom)
+  const importerDepuisParametres = () => {
+    if (agents.length === 0) {
+      toast({ title: 'Aucun agent à importer', description: 'Ajoutez des agents dans Paramètres → Agents.', variant: 'destructive' });
+      return;
+    }
+    const existingNames = new Set(items.map(i => i.nom.trim().toLowerCase()));
+    const newItems: EquipeMembre[] = [];
+    agents.filter(a => a.actif).forEach(a => {
+      const fullName = `${a.civilite ? a.civilite + ' ' : ''}${a.prenom} ${a.nom.toUpperCase()}`.trim();
+      if (existingNames.has(fullName.toLowerCase())) return;
+      const map = ROLE_TO_FONCTION[a.role] ?? { fonction: getRoleLabel(a.role as any), taches: [] };
+      newItems.push({
+        id: crypto.randomUUID(),
+        nom: fullName,
+        fonction: map.fonction,
+        telephone: a.telephone || '',
+        email: a.email || '',
+        taches: map.taches,
+      });
+    });
+    if (newItems.length === 0) {
+      toast({ title: 'Rien à importer', description: 'Tous les agents sont déjà dans l\'organigramme.' });
+      return;
+    }
+    save([...items, ...newItems]);
+    toast({ title: `${newItems.length} agent(s) importé(s)`, description: 'Pré-remplissage depuis Paramètres effectué.' });
+  };
 
   const submit = () => {
     if (!form || !form.nom) return;
@@ -47,8 +101,14 @@ export default function OrganigrammePage() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{[...new Set(items.flatMap(x => x.taches || []))].length}</p><p className="text-xs text-muted-foreground mt-0.5">Tâches assignées</p></CardContent></Card>
       </div>
 
-      <div className="flex justify-end">
-        <Button onClick={() => setForm({ nom: '', fonction: 'Agent Comptable', telephone: '', email: '', taches: [] })}><Plus className="h-4 w-4 mr-2" /> Membre</Button>
+      <div className="flex justify-end gap-2 flex-wrap">
+        <Button variant="outline" onClick={importerDepuisParametres} disabled={agents.length === 0}>
+          <Download className="h-4 w-4 mr-2" />
+          Importer depuis Paramètres ({agents.filter(a => a.actif).length})
+        </Button>
+        <Button onClick={() => setForm({ nom: '', fonction: 'Agent Comptable', telephone: '', email: '', taches: [] })}>
+          <Plus className="h-4 w-4 mr-2" /> Membre
+        </Button>
       </div>
 
       {form && (
