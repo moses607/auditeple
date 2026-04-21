@@ -18,6 +18,7 @@ import { ChevronLeft, ChevronRight, Save, FileSignature, CheckCircle2, AlertTria
 import { DOMAINES_AUDIT } from '@/lib/audit-parcours';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { RealtimePulse } from '@/components/RealtimePulse';
 
 type PointStatus = 'non_audite' | 'conforme' | 'anomalie_mineure' | 'anomalie_majeure' | 'non_applicable';
 
