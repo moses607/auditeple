@@ -316,6 +316,8 @@ export type Database = {
           groupement_id: string
           id: string
           nom: string
+          score_cicf_actuel: number | null
+          score_cicf_maj_at: string | null
           siret: string | null
           telephone: string | null
           type: Database["public"]["Enums"]["etablissement_type"]
@@ -334,6 +336,8 @@ export type Database = {
           groupement_id: string
           id?: string
           nom: string
+          score_cicf_actuel?: number | null
+          score_cicf_maj_at?: string | null
           siret?: string | null
           telephone?: string | null
           type?: Database["public"]["Enums"]["etablissement_type"]
@@ -352,6 +356,8 @@ export type Database = {
           groupement_id?: string
           id?: string
           nom?: string
+          score_cicf_actuel?: number | null
+          score_cicf_maj_at?: string | null
           siret?: string | null
           telephone?: string | null
           type?: Database["public"]["Enums"]["etablissement_type"]
@@ -375,11 +381,18 @@ export type Database = {
           actif: boolean
           couleur_principale: string | null
           created_at: string
+          devise: string | null
           email_agent_comptable: string | null
+          email_crc: string | null
+          email_rectorat_daf: string | null
+          email_rectorat_inspection: string | null
           id: string
           libelle: string
           logo_url: string | null
+          lycee_siege_id: string | null
+          seuil_alerte_score: number | null
           siege: string | null
+          signature_ac_url: string | null
           telephone: string | null
           updated_at: string
         }
@@ -388,11 +401,18 @@ export type Database = {
           actif?: boolean
           couleur_principale?: string | null
           created_at?: string
+          devise?: string | null
           email_agent_comptable?: string | null
+          email_crc?: string | null
+          email_rectorat_daf?: string | null
+          email_rectorat_inspection?: string | null
           id?: string
           libelle: string
           logo_url?: string | null
+          lycee_siege_id?: string | null
+          seuil_alerte_score?: number | null
           siege?: string | null
+          signature_ac_url?: string | null
           telephone?: string | null
           updated_at?: string
         }
@@ -401,13 +421,59 @@ export type Database = {
           actif?: boolean
           couleur_principale?: string | null
           created_at?: string
+          devise?: string | null
           email_agent_comptable?: string | null
+          email_crc?: string | null
+          email_rectorat_daf?: string | null
+          email_rectorat_inspection?: string | null
           id?: string
           libelle?: string
           logo_url?: string | null
+          lycee_siege_id?: string | null
+          seuil_alerte_score?: number | null
           siege?: string | null
+          signature_ac_url?: string | null
           telephone?: string | null
           updated_at?: string
+        }
+        Relationships: []
+      }
+      mapping_audit_risque: {
+        Row: {
+          created_at: string
+          domaine_id: string
+          groupement_id: string | null
+          id: string
+          point_index: number
+          point_libelle: string
+          ponderation: number
+          risque_libelle: string
+          risque_processus: string
+          rubrique: string
+        }
+        Insert: {
+          created_at?: string
+          domaine_id: string
+          groupement_id?: string | null
+          id?: string
+          point_index: number
+          point_libelle: string
+          ponderation?: number
+          risque_libelle: string
+          risque_processus: string
+          rubrique: string
+        }
+        Update: {
+          created_at?: string
+          domaine_id?: string
+          groupement_id?: string | null
+          id?: string
+          point_index?: number
+          point_libelle?: string
+          ponderation?: number
+          risque_libelle?: string
+          risque_processus?: string
+          rubrique?: string
         }
         Relationships: []
       }
@@ -603,6 +669,153 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      rapports_maturite: {
+        Row: {
+          accuse_reception: Json | null
+          created_at: string
+          destinataires: Json
+          envoye_at: string | null
+          envoye_par: string | null
+          etablissement_id: string | null
+          groupement_id: string
+          id: string
+          ip_envoi: string | null
+          message: string | null
+          objet: string | null
+          pdf_url: string | null
+          periode_debut: string
+          periode_fin: string
+          score_global: number
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accuse_reception?: Json | null
+          created_at?: string
+          destinataires?: Json
+          envoye_at?: string | null
+          envoye_par?: string | null
+          etablissement_id?: string | null
+          groupement_id: string
+          id?: string
+          ip_envoi?: string | null
+          message?: string | null
+          objet?: string | null
+          pdf_url?: string | null
+          periode_debut: string
+          periode_fin: string
+          score_global: number
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accuse_reception?: Json | null
+          created_at?: string
+          destinataires?: Json
+          envoye_at?: string | null
+          envoye_par?: string | null
+          etablissement_id?: string | null
+          groupement_id?: string
+          id?: string
+          ip_envoi?: string | null
+          message?: string | null
+          objet?: string | null
+          pdf_url?: string | null
+          periode_debut?: string
+          periode_fin?: string
+          score_global?: number
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      risque_ajustements: {
+        Row: {
+          created_at: string
+          criticite_actuelle: string
+          criticite_suggeree: string
+          decided_at: string | null
+          decided_by: string | null
+          etablissement_id: string | null
+          groupement_id: string
+          id: string
+          motif: string
+          risque_libelle: string
+          risque_processus: string
+          score_anomalies: number
+          source_audit_id: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          criticite_actuelle: string
+          criticite_suggeree: string
+          decided_at?: string | null
+          decided_by?: string | null
+          etablissement_id?: string | null
+          groupement_id: string
+          id?: string
+          motif: string
+          risque_libelle: string
+          risque_processus: string
+          score_anomalies: number
+          source_audit_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          criticite_actuelle?: string
+          criticite_suggeree?: string
+          decided_at?: string | null
+          decided_by?: string | null
+          etablissement_id?: string | null
+          groupement_id?: string
+          id?: string
+          motif?: string
+          risque_libelle?: string
+          risque_processus?: string
+          score_anomalies?: number
+          source_audit_id?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      scoring_snapshots: {
+        Row: {
+          created_at: string
+          details: Json
+          etablissement_id: string | null
+          groupement_id: string
+          id: string
+          periode: string
+          score_global: number
+          scores_rubriques: Json
+        }
+        Insert: {
+          created_at?: string
+          details?: Json
+          etablissement_id?: string | null
+          groupement_id: string
+          id?: string
+          periode: string
+          score_global: number
+          scores_rubriques?: Json
+        }
+        Update: {
+          created_at?: string
+          details?: Json
+          etablissement_id?: string | null
+          groupement_id?: string
+          id?: string
+          periode?: string
+          score_global?: number
+          scores_rubriques?: Json
+        }
+        Relationships: []
       }
       user_groupements: {
         Row: {

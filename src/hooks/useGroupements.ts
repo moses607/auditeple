@@ -57,6 +57,14 @@ export interface Groupement {
   logo_url: string | null;
   couleur_principale: string | null;
   actif: boolean;
+  // Chantier 3 — rapport maturité
+  lycee_siege_id?: string | null;
+  signature_ac_url?: string | null;
+  devise?: string | null;
+  email_rectorat_daf?: string | null;
+  email_rectorat_inspection?: string | null;
+  email_crc?: string | null;
+  seuil_alerte_score?: number | null;
 }
 
 export interface EtablissementRow {
