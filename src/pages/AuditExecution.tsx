@@ -58,6 +58,26 @@ export default function AuditExecution() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [profilesMap, setProfilesMap] = useState<Record<string, string>>({});
 
+  const reloadAuthors = async (rows?: PointRow[]) => {
+    const source = rows ?? pointsRef.current ?? [];
+    const authorIds = Array.from(new Set(source.map(r => r.updated_by).filter(Boolean) as string[]));
+    if (!authorIds.length) return;
+    const { data: profs, error } = await supabase
+      .from('profiles')
+      .select('user_id, display_name')
+      .in('user_id', authorIds);
+    if (error) {
+      toast.error('Impossible de recharger les auteurs');
+      return;
+    }
+    setProfilesMap(prev => {
+      const next = { ...prev };
+      profs?.forEach((pr: any) => { next[pr.user_id] = pr.display_name || 'Collègue'; });
+      return next;
+    });
+    if (rows === undefined) toast.success('Noms des auteurs rechargés');
+  };
+
   const fetchAll = async () => {
     if (!id) return;
     const [{ data: a }, { data: p }] = await Promise.all([
@@ -67,22 +87,7 @@ export default function AuditExecution() {
     setAudit(a);
     const rows = (p as PointRow[]) ?? [];
     setPoints(rows);
-
-    // Charger les noms d'auteurs manquants
-    const authorIds = Array.from(new Set(rows.map(r => r.updated_by).filter(Boolean) as string[]));
-    if (authorIds.length) {
-      const { data: profs } = await supabase
-        .from('profiles')
-        .select('user_id, display_name')
-        .in('user_id', authorIds);
-      if (profs) {
-        setProfilesMap(prev => {
-          const next = { ...prev };
-          profs.forEach((pr: any) => { next[pr.user_id] = pr.display_name || 'Collègue'; });
-          return next;
-        });
-      }
-    }
+    await reloadAuthors(rows);
   };
 
   useEffect(() => {
@@ -97,7 +102,7 @@ export default function AuditExecution() {
   const authorLabel = (userId: string | null | undefined) => {
     if (!userId) return null;
     if (userId === currentUserId) return 'Vous';
-    return profilesMap[userId] ?? 'Collègue';
+    return profilesMap[userId] ?? 'Auteur inconnu';
   };
 
   // Refs pour exposer le contexte courant au callback realtime sans le ré-abonner
