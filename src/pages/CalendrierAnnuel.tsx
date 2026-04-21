@@ -574,7 +574,13 @@ function ActiviteRow({
           <Button size="sm" variant="ghost" onClick={onEdit} className="h-7 w-7 p-0">
             <Pencil className="h-3.5 w-3.5" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={onRemove} className="h-7 w-7 p-0 text-destructive hover:text-destructive">
+          <Button
+            size="sm" variant="ghost"
+            onClick={onRemove}
+            disabled={isObligatoire(activite)}
+            title={isObligatoire(activite) ? 'Activité obligatoire — non supprimable' : 'Supprimer'}
+            className="h-7 w-7 p-0 text-destructive hover:text-destructive disabled:opacity-30"
+          >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
