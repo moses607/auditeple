@@ -102,6 +102,7 @@ export type Database = {
           responsable_action: string | null
           status: Database["public"]["Enums"]["point_result_status"]
           updated_at: string
+          updated_by: string | null
         }
         Insert: {
           action_corrective?: string | null
@@ -118,6 +119,7 @@ export type Database = {
           responsable_action?: string | null
           status?: Database["public"]["Enums"]["point_result_status"]
           updated_at?: string
+          updated_by?: string | null
         }
         Update: {
           action_corrective?: string | null
@@ -134,6 +136,7 @@ export type Database = {
           responsable_action?: string | null
           status?: Database["public"]["Enums"]["point_result_status"]
           updated_at?: string
+          updated_by?: string | null
         }
         Relationships: [
           {
