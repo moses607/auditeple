@@ -3,7 +3,7 @@
  * Sauvegarde auto à chaque modification, barre de progression, possibilité
  * de suspendre et reprendre.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ModulePageLayout } from '@/components/ModulePageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
