@@ -185,5 +185,5 @@ export function usePlanActionsSync() {
     }
   }, [actions, activeId]);
 
-  return { actions, setActions: persist, upsertOne, loading, synced };
+  return { actions, setActions: persist, upsertOne, loading, synced, remoteUpdateAt };
 }
