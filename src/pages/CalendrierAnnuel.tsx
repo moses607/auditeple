@@ -28,13 +28,21 @@ import {
 } from '@/components/ui/tooltip';
 import {
   FileDown, FileText, Plus, Trash2, AlertTriangle, Filter,
-  Building2, Pencil, Mail, CheckCircle2, Clock,
+  Building2, Pencil, Mail, CheckCircle2, Clock, Lock, Send, Copy,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
+import { CalendrierTimeline } from '@/components/CalendrierTimeline';
+import { DiffuserCalendrierDialog } from '@/components/DiffuserCalendrierDialog';
 
 const STORAGE_KEY = 'calendrier_annuel_v1';
+
+// Une activité issue de la bibliothèque ET de criticité haute est
+// considérée comme obligatoire réglementaire (cadenas, non supprimable)
+function isObligatoire(a: ActiviteCalendrier): boolean {
+  return !!a.modeleId && a.criticite === 'haute';
+}
 
 function buildFromModele(m: ActiviteModele, allEtabIds: string[]): ActiviteCalendrier {
   return {
