@@ -909,6 +909,8 @@ export type Database = {
         | "responsable_cfa_greta"
         | "correspondant_cicf"
         | "archiviste_comptable"
+        | "secretaire_general_delegue"
+        | "adjoint_secretaire_general"
       audit_status:
         | "en_cours"
         | "cloture"
@@ -1075,6 +1077,8 @@ export const Constants = {
         "responsable_cfa_greta",
         "correspondant_cicf",
         "archiviste_comptable",
+        "secretaire_general_delegue",
+        "adjoint_secretaire_general",
       ],
       audit_status: [
         "en_cours",

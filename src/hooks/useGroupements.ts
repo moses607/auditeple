@@ -11,7 +11,8 @@ import { toast } from '@/hooks/use-toast';
 
 export type AgentRole =
   | 'agent_comptable' | 'fonde_pouvoir' | 'ordonnateur' | 'ordonnateur_suppleant'
-  | 'secretaire_general' | 'assistant_gestion' | 'regisseur_recettes' | 'regisseur_avances'
+  | 'secretaire_general' | 'secretaire_general_delegue' | 'adjoint_secretaire_general'
+  | 'assistant_gestion' | 'regisseur_recettes' | 'regisseur_avances'
   | 'suppleant_regisseur' | 'magasinier' | 'chef_cuisine' | 'secretaire_intendance'
   | 'gestionnaire_materiel' | 'responsable_cfa_greta' | 'correspondant_cicf' | 'archiviste_comptable';
 
@@ -21,6 +22,8 @@ export const AGENT_ROLES: { value: AgentRole; label: string; cycle?: string }[] 
   { value: 'ordonnateur', label: 'Ordonnateur (chef d\'établissement)', cycle: 'Gouvernance' },
   { value: 'ordonnateur_suppleant', label: 'Ordonnateur suppléant (adjoint)', cycle: 'Gouvernance' },
   { value: 'secretaire_general', label: 'Secrétaire général / Adjoint gestionnaire', cycle: 'Gouvernance' },
+  { value: 'secretaire_general_delegue', label: 'Secrétaire général délégué', cycle: 'Gouvernance' },
+  { value: 'adjoint_secretaire_general', label: 'Adjoint au secrétaire général', cycle: 'Gouvernance' },
   { value: 'assistant_gestion', label: 'Assistant de gestion', cycle: 'Gestion' },
   { value: 'regisseur_recettes', label: 'Régisseur de recettes', cycle: 'Trésorerie' },
   { value: 'regisseur_avances', label: 'Régisseur d\'avances', cycle: 'Trésorerie' },
