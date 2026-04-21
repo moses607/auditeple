@@ -107,29 +107,115 @@ export default function AnalyseFinanciere() {
                   <input type="file" accept=".csv,.xlsx,.xls" className="hidden" onChange={async (e) => {
                     const file = e.target.files?.[0];
                     if (!file) return;
+                    // Normalise un nom d'onglet : minuscules + suppression des accents
+                    const norm = (s: string) => s
+                      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                      .toLowerCase().trim();
+                    // Convertit un montant FR/EN en number (gère "1 234,56", "1,234.56", "(123,45)" négatif)
+                    const toNum = (v: unknown): number => {
+                      if (v === null || v === undefined || v === '') return 0;
+                      if (typeof v === 'number') return v;
+                      let s = String(v).replace(/\s|\u00a0/g, '').replace(/"/g, '').trim();
+                      if (!s) return 0;
+                      let neg = false;
+                      if (/^\(.*\)$/.test(s)) { neg = true; s = s.slice(1, -1); }
+                      // Format FR : virgule décimale
+                      if (s.includes(',') && !s.includes('.')) s = s.replace(/\./g, '').replace(',', '.');
+                      else if (s.includes(',') && s.includes('.')) s = s.replace(/,/g, '');
+                      const n = parseFloat(s);
+                      if (isNaN(n)) return 0;
+                      return neg ? -n : n;
+                    };
                     try {
-                      let rows: string[][] = [];
                       const ext = file.name.toLowerCase().split('.').pop();
+                      let parsedSheet = '';
+                      let totalRows = 0;
+                      let comptesFound: string[] = [];
+                      let fdrSum = 0, tresoSum = 0;
+                      let fdrFound = false, tresoFound = false;
+
                       if (ext === 'xlsx' || ext === 'xls') {
                         const buf = await file.arrayBuffer();
                         const wb = XLSX.read(buf, { type: 'array' });
-                        const ws = wb.Sheets[wb.SheetNames[0]];
-                        const json = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: false, defval: '' });
-                        rows = json.map(r => (r as unknown[]).map(c => String(c ?? '')));
+                        // Sélection de l'onglet : priorité absolue à "Donnees/Données/Data*"
+                        const sheetNames = wb.SheetNames;
+                        let chosen = sheetNames.find(n => {
+                          const x = norm(n);
+                          return x.startsWith('donnees') || x.startsWith('data');
+                        });
+                        if (!chosen) chosen = sheetNames.length === 1 ? sheetNames[0] : (sheetNames.find(n => norm(n) !== 'balance') ?? sheetNames[0]);
+                        parsedSheet = chosen;
+                        const ws = wb.Sheets[chosen];
+
+                        // Op@le : lignes 1-2 = métadonnées, ligne 3 = en-têtes, ligne 4+ = données
+                        const matrix = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: '' }) as unknown[][];
+                        // Trouver la ligne d'en-tête (contient "Compte")
+                        let headerRowIdx = matrix.findIndex(r => Array.isArray(r) && r.some(c => norm(String(c ?? '')) === 'compte'));
+                        if (headerRowIdx < 0) headerRowIdx = 2; // fallback ligne 3
+                        const headers = (matrix[headerRowIdx] as unknown[]).map(h => String(h ?? '').trim());
+                        const idxOf = (label: string) => headers.findIndex(h => norm(h) === norm(label));
+                        const iCompte   = idxOf('Compte');
+                        const iSdeb     = idxOf('Solde débit');
+                        const iScred    = idxOf('Solde crédit');
+
+                        if (iCompte < 0) {
+                          toast.error(`Onglet « ${parsedSheet} » : colonne "Compte" introuvable.`);
+                          return;
+                        }
+
+                        for (let r = headerRowIdx + 1; r < matrix.length; r++) {
+                          const row = matrix[r] as unknown[];
+                          if (!row || row.length === 0) continue;
+                          const rawCompte = row[iCompte];
+                          if (rawCompte === null || rawCompte === undefined || rawCompte === '') continue;
+                          const compteStr = String(rawCompte).trim();
+                          // Doit être numérique (ignore "Total général" etc.)
+                          if (!/^\d+$/.test(compteStr)) continue;
+                          const compte = compteStr.padStart(6, '0');
+                          totalRows++;
+                          if (comptesFound.length < 3) comptesFound.push(compte);
+
+                          const sDeb  = iSdeb  >= 0 ? toNum(row[iSdeb])  : 0;
+                          const sCred = iScred >= 0 ? toNum(row[iScred]) : 0;
+                          const solde = sDeb - sCred; // convention : débiteur positif
+
+                          if (compte.startsWith('10')) {
+                            fdrSum += -solde; // capitaux : crédit normal → on prend l'opposé pour avoir un montant positif
+                            fdrFound = true;
+                          }
+                          if (compte.startsWith('515')) {
+                            tresoSum += solde; // trésorerie : débit normal
+                            tresoFound = true;
+                          }
+                        }
                       } else {
+                        // CSV : conserve le comportement historique (préfixe sur 1ère colonne, montant sur dernière)
+                        parsedSheet = 'CSV';
                         const text = await file.text();
-                        rows = text.split('\n').map(l => l.split(/[;,\t]/));
+                        const rows = text.split('\n').map(l => l.split(/[;,\t]/));
+                        for (const cols of rows) {
+                          const compteRaw = (cols[0] || '').replace(/"/g, '').trim().replace(/^C\//, '');
+                          if (!/^\d+$/.test(compteRaw)) continue;
+                          const compte = compteRaw.padStart(6, '0');
+                          totalRows++;
+                          if (comptesFound.length < 3) comptesFound.push(compte);
+                          const montant = toNum((cols[cols.length - 1] || ''));
+                          if (compte.startsWith('10')) { fdrSum += montant; fdrFound = true; }
+                          if (compte.startsWith('515')) { tresoSum += montant; tresoFound = true; }
+                        }
                       }
-                      let fdrVal = '', tresoVal = '';
-                      for (const cols of rows) {
-                        const compte = (cols[0] || '').replace(/"/g, '').trim().replace(/^C\//, '');
-                        const montant = (cols[cols.length - 1] || '').replace(/"/g, '').replace(/\s/g, '').replace(',', '.').trim();
-                        if (compte === '10' || compte === '1') fdrVal = montant;
-                        if (compte === '515') tresoVal = montant;
+
+                      if (tresoFound) { update('treso', String(Math.round(tresoSum))); }
+                      if (fdrFound)   { update('fdr',   String(Math.round(fdrSum))); }
+
+                      if (tresoFound || fdrFound) {
+                        toast.success(`Import Op@le réussi (onglet « ${parsedSheet} », ${totalRows} lignes)`);
+                      } else {
+                        toast.warning(
+                          `Aucun compte 515 ou 10 détecté. Onglet parsé : « ${parsedSheet} » — ${totalRows} lignes lues. ` +
+                          (comptesFound.length ? `Premiers comptes : ${comptesFound.join(', ')}.` : 'Aucun numéro de compte numérique trouvé.')
+                        );
                       }
-                      if (tresoVal) { update('treso', tresoVal); toast.success('Trésorerie importée depuis Op@le'); }
-                      if (fdrVal) { update('fdr', fdrVal); }
-                      if (!tresoVal && !fdrVal) toast.warning('Aucun compte 515 ou 10 détecté dans le fichier');
                     } catch (err) {
                       console.error(err);
                       toast.error('Erreur lors de la lecture du fichier');
