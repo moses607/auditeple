@@ -20,7 +20,7 @@ import { BalanceLigne } from '@/config/m96-plan-comptable';
 import { useFondsDeRoulement, fmtEur, genererAvisMotive, FdrIndicateur } from '@/hooks/useFondsDeRoulement';
 import { loadState, saveState } from '@/lib/store';
 import { getSelectedEtablissement } from '@/lib/types';
-import { useAuditParams } from '@/contexts/AuditParamsContext';
+import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 
 // ───────────────────── Couleurs (palette charte) ─────────────────────
 const COLORS = {
