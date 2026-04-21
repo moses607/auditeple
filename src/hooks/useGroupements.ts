@@ -257,8 +257,13 @@ export function useEtablissements(groupementId: string | null) {
   useEffect(() => { refresh(); }, [refresh]);
 
   const create = async (e: Omit<EtablissementRow, 'id'>) => {
+    console.log('[etablissement.create]', e.nom, e.uai);
     const { error } = await supabase.from('etablissements').insert(e);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[etablissement.create] failed:', error);
+      toast({ title: 'Création impossible', description: friendlyError(error.message, 'établissement'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Établissement ajouté', description: e.nom });
     await refresh();
     return true;
@@ -266,7 +271,11 @@ export function useEtablissements(groupementId: string | null) {
 
   const update = async (id: string, patch: Partial<EtablissementRow>) => {
     const { error } = await supabase.from('etablissements').update(patch).eq('id', id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[etablissement.update] failed:', error);
+      toast({ title: 'Modification impossible', description: friendlyError(error.message, 'établissement'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Établissement mis à jour' });
     await refresh();
     return true;
@@ -274,7 +283,11 @@ export function useEtablissements(groupementId: string | null) {
 
   const remove = async (id: string) => {
     const { error } = await supabase.from('etablissements').delete().eq('id', id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[etablissement.remove] failed:', error);
+      toast({ title: 'Suppression impossible', description: friendlyError(error.message, 'établissement'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Établissement supprimé' });
     await refresh();
     return true;
