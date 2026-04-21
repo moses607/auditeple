@@ -170,7 +170,17 @@ export default function AuditExecution() {
   const progress = points.length === 0 ? 0 : Math.round((completed / points.length) * 100);
 
   // Filtre par auteur — restreint la navigation aux points modifiés par cet utilisateur
-  const [authorFilter, setAuthorFilter] = useState<string>('all');
+  // Persisté dans sessionStorage par audit pour être restauré au retour sur la page
+  const filterStorageKey = id ? `audit_exec_author_filter_${id}` : '';
+  const [authorFilter, setAuthorFilter] = useState<string>(() => {
+    if (typeof window === 'undefined' || !filterStorageKey) return 'all';
+    return sessionStorage.getItem(filterStorageKey) ?? 'all';
+  });
+
+  useEffect(() => {
+    if (!filterStorageKey) return;
+    sessionStorage.setItem(filterStorageKey, authorFilter);
+  }, [authorFilter, filterStorageKey]);
 
   const distinctAuthors = useMemo(() => {
     const ids = Array.from(new Set(points.map(p => p.updated_by).filter(Boolean) as string[]));
