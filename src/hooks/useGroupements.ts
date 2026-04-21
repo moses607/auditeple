@@ -158,35 +158,17 @@ export function useGroupements() {
       return null;
     }
 
-    // 2. Insérer le groupement
-    console.log('[createGroupement] inserting groupement:', g.libelle);
-    const { data, error } = await supabase
-      .from('groupements_comptables')
-      .insert({ ...g, actif: g.actif ?? true })
-      .select()
-      .single();
+    // 2. Créer le groupement + lier le créateur en une seule opération RPC atomique
+    //    (évite les soucis d'ordre d'évaluation RLS sur le RETURNING post-insert)
+    console.log('[createGroupement] RPC create_groupement_with_link:', g.libelle);
+    const { data, error } = await (supabase as any).rpc('create_groupement_with_link', {
+      _payload: { ...g, actif: g.actif ?? true },
+    });
     if (error || !data) {
-      console.error('[createGroupement] insert groupement failed:', error);
+      console.error('[createGroupement] RPC failed:', error);
       toast({
         title: 'Création impossible',
         description: friendlyError(error?.message, 'groupement'),
-        variant: 'destructive',
-      });
-      return null;
-    }
-
-    // 3. Créer immédiatement la liaison user_groupements (sinon le SELECT
-    //    refuserait l'accès à cause de la RLS user_belongs_to_groupement)
-    console.log('[createGroupement] linking user', userData.user.id, '→ groupement', data.id);
-    const { error: linkErr } = await supabase
-      .from('user_groupements')
-      .insert({ user_id: userData.user.id, groupement_id: data.id, est_admin: true });
-    if (linkErr) {
-      console.error('[createGroupement] link failed, rolling back:', linkErr);
-      await supabase.from('groupements_comptables').delete().eq('id', data.id);
-      toast({
-        title: 'Création impossible',
-        description: "Impossible d'associer le groupement à votre compte. Réessayez ou contactez le support.",
         variant: 'destructive',
       });
       return null;
