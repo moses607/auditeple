@@ -71,7 +71,7 @@ export default function CalendrierAnnuel() {
   const ac = getAgenceComptable(params);
   const etablissementsRattaches = params.etablissements.filter(e => !e.isAgenceComptable);
   const { activeId } = useGroupements();
-  const { activites, setActivites, synced } = useCalendrierSync();
+  const { activites, setActivites, synced, remoteUpdateAt } = useCalendrierSync();
 
   const [filterCategorie, setFilterCategorie] = useState<string>('all');
   const [filterMois, setFilterMois] = useState<string>('all');
