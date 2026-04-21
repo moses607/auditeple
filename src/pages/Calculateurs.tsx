@@ -12,7 +12,20 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Search, History, Trash2, Calculator as CalcIcon } from 'lucide-react';
-import { ModulePageLayout } from '@/components/ModulePageLayout';
+
+function PageHeader({ title, subtitle, Icon }: { title: string; subtitle: string; Icon: any }) {
+  return (
+    <header className="mb-4 flex items-start gap-3 border-b pb-3">
+      <div className="h-10 w-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
+        <Icon className="h-5 w-5" />
+      </div>
+      <div className="min-w-0">
+        <h1 className="text-xl font-bold leading-tight">{title}</h1>
+        <p className="text-sm text-muted-foreground">{subtitle}</p>
+      </div>
+    </header>
+  );
+}
 
 // Composants calculateurs
 import { CalcCaisseRegie, CalcRapprochement } from '@/components/calculateurs/calc-tresorerie';
@@ -46,32 +59,6 @@ export default function Calculateurs() {
   const [cat, setCat] = useState<CalculateurCategorie | 'all'>('all');
   const [histoTick, setHistoTick] = useState(0);
 
-  // Vue détail
-  if (id) {
-    const meta = getCalculateur(id);
-    const Comp = REGISTRY[id];
-    if (!meta || !Comp) {
-      return (
-        <ModulePageLayout title="Calculateur introuvable" subtitle="Cet outil n'existe pas" icon={CalcIcon}>
-          <Button variant="outline" onClick={() => navigate('/outils/calculateurs')}>
-            <ArrowLeft className="h-4 w-4" /> Retour à la bibliothèque
-          </Button>
-        </ModulePageLayout>
-      );
-    }
-    return (
-      <ModulePageLayout title={meta.label} subtitle={meta.description} icon={meta.icon}>
-        <div className="mb-3">
-          <Button variant="outline" size="sm" onClick={() => navigate('/outils/calculateurs')}>
-            <ArrowLeft className="h-4 w-4" /> Tous les calculateurs
-          </Button>
-        </div>
-        <Comp />
-      </ModulePageLayout>
-    );
-  }
-
-  // Vue hub
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return CALCULATEURS.filter(c => {
