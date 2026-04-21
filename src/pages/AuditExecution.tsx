@@ -246,12 +246,25 @@ export default function AuditExecution() {
                   Point {cursor + 1} / {points.length} : {current.point_libelle}
                 </CardTitle>
                 {current.updated_by && current.updated_at && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Dernière modification : <span className="font-medium text-foreground">{authorLabel(current.updated_by)}</span>
-                    {' · '}
+                  <p className="text-xs text-muted-foreground mt-1 flex items-center flex-wrap gap-x-1 gap-y-0.5">
+                    <span>Dernière modification :</span>
+                    <span className="font-medium text-foreground">{authorLabel(current.updated_by)}</span>
+                    <span>·</span>
                     <time dateTime={current.updated_at}>
                       {new Date(current.updated_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}
                     </time>
+                    {authorLabel(current.updated_by) === 'Auteur inconnu' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 ml-1 text-xs"
+                        onClick={() => reloadAuthors()}
+                        title="Recharger les noms des auteurs depuis la base"
+                      >
+                        <RefreshCw className="h-3 w-3 mr-1" />
+                        Recharger
+                      </Button>
+                    )}
                   </p>
                 )}
               </div>
