@@ -115,7 +115,28 @@ export default function OrganigrammePage() {
       {form && (
         <Card className="border-primary"><CardContent className="pt-6 space-y-3">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div className="space-y-1"><Label className="text-xs">Nom complet</Label><Input value={form.nom} onChange={e => setForm({ ...form, nom: e.target.value })} /></div>
+            <div className="space-y-1">
+              <Label className="text-xs">Nom complet</Label>
+              <AgentSelect
+                value={form.nom}
+                onChange={(display, agent) => {
+                  if (agent) {
+                    const map = ROLE_TO_FONCTION[agent.role] ?? { fonction: getRoleLabel(agent.role as any), taches: [] };
+                    setForm({
+                      ...form,
+                      nom: display,
+                      fonction: FONCTIONS_COMPTABLES.includes(map.fonction as any) ? map.fonction : form.fonction,
+                      telephone: agent.telephone || form.telephone,
+                      email: agent.email || form.email,
+                      taches: form.taches?.length ? form.taches : map.taches,
+                    });
+                  } else {
+                    setForm({ ...form, nom: display });
+                  }
+                }}
+                placeholder="Choisir dans l'équipe…"
+              />
+            </div>
             <div className="space-y-1"><Label className="text-xs">Fonction</Label>
               <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.fonction} onChange={e => setForm({ ...form, fonction: e.target.value })}>
                 {FONCTIONS_COMPTABLES.map(f => <option key={f}>{f}</option>)}
