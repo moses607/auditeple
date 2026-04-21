@@ -94,12 +94,53 @@ export default function CalendrierAnnuel() {
   };
 
   const remove = (id: string) => {
+    const a = activites.find(x => x.id === id);
+    if (a && isObligatoire(a)) {
+      toast.error("Activité obligatoire réglementaire — non supprimable. Vous pouvez l'éditer ou la marquer comme réalisée.");
+      return;
+    }
     setActivites(prev => prev.filter(a => a.id !== id));
     toast.success('Activité supprimée');
   };
 
   const update = (id: string, patch: Partial<ActiviteCalendrier>) => {
     setActivites(prev => prev.map(a => a.id === id ? { ...a, ...patch } : a));
+  };
+
+  // Duplication N → N+1 : reset des dates d'échéance + statut réalisé
+  const dupliquerExerciceSuivant = () => {
+    if (activites.length === 0) {
+      toast.error('Aucune activité à dupliquer');
+      return;
+    }
+    const exNum = parseInt(params.exercice, 10);
+    const exSuivant = isNaN(exNum) ? '' : String(exNum + 1);
+    if (!confirm(
+      `Dupliquer ce calendrier vers l'exercice ${exSuivant || 'suivant'} ?\n\n` +
+      `• Les statuts « réalisé » seront réinitialisés\n` +
+      `• Les dates d'échéance seront décalées d'un an\n` +
+      `• Le calendrier actuel sera REMPLACÉ\n\n` +
+      `Pensez à exporter d'abord le calendrier actuel si besoin d'archive.`
+    )) return;
+
+    const dupliquees: ActiviteCalendrier[] = activites.map(a => {
+      let newDate: string | undefined;
+      if (a.dateEcheance) {
+        const d = new Date(a.dateEcheance);
+        d.setFullYear(d.getFullYear() + 1);
+        newDate = d.toISOString().slice(0, 10);
+      }
+      return {
+        ...a,
+        id: `${a.modeleId || 'custom'}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        dateEcheance: newDate,
+        realisee: false,
+        realiseeAt: undefined,
+        realiseePar: undefined,
+      };
+    });
+    setActivites(dupliquees);
+    toast.success(`Calendrier dupliqué vers ${exSuivant} (${dupliquees.length} activités). Pensez à mettre à jour l'exercice dans Paramètres.`);
   };
 
   const addBlank = () => {
