@@ -52,18 +52,44 @@ export default function AuditExecution() {
   const [cursor, setCursor] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [remoteUpdateAt, setRemoteUpdateAt] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  const fetchAll = async () => {
+    if (!id) return;
+    const [{ data: a }, { data: p }] = await Promise.all([
+      supabase.from('audits').select('*').eq('id', id).single(),
+      supabase.from('audit_points_results').select('*').eq('audit_id', id).order('domaine_id').order('point_index'),
+    ]);
+    setAudit(a);
+    setPoints((p as PointRow[]) ?? []);
+  };
 
   useEffect(() => {
     (async () => {
-      if (!id) return;
-      const [{ data: a }, { data: p }] = await Promise.all([
-        supabase.from('audits').select('*').eq('id', id).single(),
-        supabase.from('audit_points_results').select('*').eq('audit_id', id).order('domaine_id').order('point_index'),
-      ]);
-      setAudit(a);
-      setPoints((p as PointRow[]) ?? []);
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id ?? null);
+      await fetchAll();
       setLoading(false);
     })();
+  }, [id]);
+
+  // Realtime — synchronisation collaborative sur les points d'audit & l'audit lui-même
+  useEffect(() => {
+    if (!id) return;
+    const channel = supabase
+      .channel(`audit-exec-${id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'audit_points_results', filter: `audit_id=eq.${id}` }, async () => {
+        await fetchAll();
+        setRemoteUpdateAt(Date.now());
+        toast.info('Point d\'audit mis à jour par un collègue');
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'audits', filter: `id=eq.${id}` }, async () => {
+        await fetchAll();
+        setRemoteUpdateAt(Date.now());
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [id]);
 
   const current = points[cursor];
