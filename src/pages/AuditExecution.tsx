@@ -202,6 +202,15 @@ export default function AuditExecution() {
                 <CardTitle className="text-base">
                   Point {cursor + 1} / {points.length} : {current.point_libelle}
                 </CardTitle>
+                {current.updated_by && current.updated_at && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Dernière modification : <span className="font-medium text-foreground">{authorLabel(current.updated_by)}</span>
+                    {' · '}
+                    <time dateTime={current.updated_at}>
+                      {new Date(current.updated_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}
+                    </time>
+                  </p>
+                )}
               </div>
               <div className={`flex items-center gap-1 text-sm ${STATUS_META[current.status].color}`}>
                 <StatusIcon className="h-4 w-4" />
