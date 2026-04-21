@@ -433,6 +433,13 @@ export default function CalendrierAnnuel() {
             </div>
           </Card>
 
+          {/* ─── Timeline charge mensuelle ─── */}
+          <CalendrierTimeline
+            activites={activites}
+            selectedMois={filterMois !== 'all' ? parseInt(filterMois, 10) : null}
+            onMonthClick={(m) => setFilterMois(filterMois === String(m) ? 'all' : String(m))}
+          />
+
           {/* ─── Vue par mois ─── */}
           <div className="space-y-4">
             {Array.from({ length: 12 }, (_, i) => i + 1).map(m => {
