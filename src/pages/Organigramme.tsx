@@ -101,8 +101,14 @@ export default function OrganigrammePage() {
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{[...new Set(items.flatMap(x => x.taches || []))].length}</p><p className="text-xs text-muted-foreground mt-0.5">Tâches assignées</p></CardContent></Card>
       </div>
 
-      <div className="flex justify-end">
-        <Button onClick={() => setForm({ nom: '', fonction: 'Agent Comptable', telephone: '', email: '', taches: [] })}><Plus className="h-4 w-4 mr-2" /> Membre</Button>
+      <div className="flex justify-end gap-2 flex-wrap">
+        <Button variant="outline" onClick={importerDepuisParametres} disabled={agents.length === 0}>
+          <Download className="h-4 w-4 mr-2" />
+          Importer depuis Paramètres ({agents.filter(a => a.actif).length})
+        </Button>
+        <Button onClick={() => setForm({ nom: '', fonction: 'Agent Comptable', telephone: '', email: '', taches: [] })}>
+          <Plus className="h-4 w-4 mr-2" /> Membre
+        </Button>
       </div>
 
       {form && (
