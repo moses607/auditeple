@@ -559,3 +559,40 @@ function SynRow({ bloc, detail }: { bloc: string; detail: Record<string, { monta
     </>
   );
 }
+
+// Sous-composant : sélecteur de date FR avec popover (réutilisable dans le module)
+function DateField({ label, value, onChange, tip }: { label: string; value: string; onChange: (iso: string) => void; tip?: string }) {
+  const date = value ? new Date(value) : undefined;
+  return (
+    <div className="space-y-1">
+      <Label className="text-xs">
+        {label}
+        {tip && <InfoTip>{tip}</InfoTip>}
+      </Label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              'w-full h-10 justify-start text-left font-normal',
+              !value && 'text-muted-foreground',
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date ? format(date, 'dd MMM yyyy', { locale: fr }) : <span>Choisir…</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(d) => onChange(d ? format(d, 'yyyy-MM-dd') : '')}
+            initialFocus
+            locale={fr}
+            className={cn('p-3 pointer-events-auto')}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  );
+}
