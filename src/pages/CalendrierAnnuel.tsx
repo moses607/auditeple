@@ -520,12 +520,28 @@ function ActiviteRow({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
+            {isObligatoire(activite) && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Lock className="h-3.5 w-3.5 text-destructive shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent className="text-xs max-w-xs">
+                  Activité obligatoire réglementaire — non supprimable.
+                  Vous pouvez l'éditer (date, ER concernés, description) ou la marquer comme réalisée.
+                </TooltipContent>
+              </Tooltip>
+            )}
             <span className={cn('font-semibold text-sm', realisee && 'line-through text-muted-foreground')}>
               {activite.titre}
             </span>
             {realisee && (
               <Badge variant="outline" className="text-[10px] bg-emerald-100 text-emerald-900 border-emerald-300 gap-1">
                 <CheckCircle2 className="h-3 w-3" /> Réalisée
+              </Badge>
+            )}
+            {isObligatoire(activite) && (
+              <Badge variant="outline" className="text-[10px] bg-destructive/10 text-destructive border-destructive/40">
+                Obligatoire
               </Badge>
             )}
             <Badge variant="outline" className={cn('text-[10px]', CATEGORIES_COULEURS[activite.categorie])}>
