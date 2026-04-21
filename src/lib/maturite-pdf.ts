@@ -15,7 +15,7 @@ export async function exportMaturitePDF(data: MaturiteCICF, groupementLabel: str
   doc.setFillColor(30, 64, 175); // primary
   doc.rect(0, 0, W, 70, 'F');
 
-  doc.setTextColor(255);
+  doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
   doc.text('RAPPORT EXÉCUTIF', M, 20);
@@ -38,14 +38,14 @@ export async function exportMaturitePDF(data: MaturiteCICF, groupementLabel: str
 
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(10);
-  doc.setTextColor(100);
+  doc.setTextColor(100, 100, 100);
   doc.text('SCORE GLOBAL', M + 8, 102);
 
   doc.setFontSize(56);
   doc.setTextColor(30, 64, 175);
   doc.text(`${data.scoreGlobal}`, M + 8, 130);
   doc.setFontSize(14);
-  doc.setTextColor(100);
+  doc.setTextColor(100, 100, 100);
   doc.text('/ 100', M + 8 + doc.getTextWidth(`${data.scoreGlobal}`) + 4, 130);
 
   doc.setFontSize(14);
@@ -54,12 +54,12 @@ export async function exportMaturitePDF(data: MaturiteCICF, groupementLabel: str
   doc.text(`Niveau ${niveau.label}`, W - M - 8, 110, { align: 'right' });
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(9);
-  doc.setTextColor(80);
+  doc.setTextColor(80, 80, 80);
   const desc = doc.splitTextToSize(niveau.description, 80);
   doc.text(desc, W - M - 8, 120, { align: 'right' });
 
   // KPI synthèse
-  doc.setTextColor(40);
+  doc.setTextColor(40, 40, 40);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'bold');
   doc.text('Indicateurs clés', M, 170);
@@ -85,19 +85,19 @@ export async function exportMaturitePDF(data: MaturiteCICF, groupementLabel: str
 
   // Footer page 1
   doc.setFontSize(8);
-  doc.setTextColor(120);
+  doc.setTextColor(120, 120, 120);
   doc.text('Référentiel : Décret GBCP 2012-1246 · Instruction codificatrice M9-6 · CIC Expert Pro', W / 2, H - 10, { align: 'center' });
 
   // ─── Page 2 : axes & recommandations ─────────────────────
   doc.addPage();
   doc.setFillColor(30, 64, 175);
   doc.rect(0, 0, W, 18, 'F');
-  doc.setTextColor(255);
+  doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(12);
   doc.text(`Détail des 5 axes — ${groupementLabel}`, M, 12);
 
-  doc.setTextColor(40);
+  doc.setTextColor(40, 40, 40);
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(10);
 
@@ -129,7 +129,7 @@ export async function exportMaturitePDF(data: MaturiteCICF, groupementLabel: str
 
   // Footer page 2
   doc.setFontSize(8);
-  doc.setTextColor(120);
+  doc.setTextColor(120, 120, 120);
   doc.text(`Page 2/2 — Édité le ${new Date().toLocaleString('fr-FR')}`, W / 2, H - 10, { align: 'center' });
 
   doc.save(`maturite-cicf-${new Date().toISOString().slice(0, 10)}.pdf`);
