@@ -23,10 +23,10 @@ export async function exportMaturitePDF(data: MaturiteCICF, groupementLabel: str
   doc.text('Maturité CICF', M, 32);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text("Contrôle Interne Comptable et Financier — EPLE", M, 42);
-  doc.text(groupementLabel, M, 50);
+  doc.text('Contrôle Interne Comptable et Financier — EPLE', M, 42);
+  doc.text(String(groupementLabel), M, 50);
   doc.setFontSize(9);
-  doc.text(`Édité le ${new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}`, M, 58);
+  doc.text('Édité le ' + new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }), M, 58);
 
   // Bandeau score
   doc.setFillColor(255);
