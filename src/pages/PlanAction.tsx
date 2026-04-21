@@ -26,9 +26,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useGroupements } from '@/hooks/useGroupements';
 import { usePlanActionsSync } from '@/hooks/usePlanActionsSync';
 import { Cloud, CloudOff } from 'lucide-react';
+import { RealtimePulse } from '@/components/RealtimePulse';
 
 export default function PlanAction() {
-  const { actions, setActions: persist, synced } = usePlanActionsSync();
+  const { actions, setActions: persist, synced, remoteUpdateAt } = usePlanActionsSync();
   const [editing, setEditing] = useState<ActionPlan | null>(null);
   const { activeId } = useGroupements();
 
