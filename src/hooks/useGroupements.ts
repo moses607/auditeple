@@ -316,8 +316,13 @@ export function useAgents(groupementId: string | null) {
   useEffect(() => { refresh(); }, [refresh]);
 
   const create = async (a: Omit<AgentRow, 'id'>) => {
+    console.log('[agent.create]', a.prenom, a.nom, a.role);
     const { error } = await supabase.from('agents').insert(a);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[agent.create] failed:', error);
+      toast({ title: 'Création impossible', description: friendlyError(error.message, 'agent'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Agent ajouté', description: `${a.prenom} ${a.nom}` });
     await refresh();
     return true;
@@ -325,7 +330,11 @@ export function useAgents(groupementId: string | null) {
 
   const update = async (id: string, patch: Partial<AgentRow>) => {
     const { error } = await supabase.from('agents').update(patch).eq('id', id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[agent.update] failed:', error);
+      toast({ title: 'Modification impossible', description: friendlyError(error.message, 'agent'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Agent mis à jour' });
     await refresh();
     return true;
@@ -333,7 +342,11 @@ export function useAgents(groupementId: string | null) {
 
   const remove = async (id: string) => {
     const { error } = await supabase.from('agents').delete().eq('id', id);
-    if (error) { toast({ title: 'Erreur', description: error.message, variant: 'destructive' }); return false; }
+    if (error) {
+      console.error('[agent.remove] failed:', error);
+      toast({ title: 'Suppression impossible', description: friendlyError(error.message, 'agent'), variant: 'destructive' });
+      return false;
+    }
     toast({ title: 'Agent supprimé' });
     await refresh();
     return true;
