@@ -35,6 +35,9 @@ import { cn } from '@/lib/utils';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { CalendrierTimeline } from '@/components/CalendrierTimeline';
 import { DiffuserCalendrierDialog } from '@/components/DiffuserCalendrierDialog';
+import { useCalendrierSync } from '@/hooks/useCalendrierSync';
+import { useGroupements } from '@/hooks/useGroupements';
+import { Cloud, CloudOff } from 'lucide-react';
 
 const STORAGE_KEY = 'calendrier_annuel_v1';
 
@@ -66,19 +69,14 @@ export default function CalendrierAnnuel() {
   const { params } = useAuditParamsContext();
   const ac = getAgenceComptable(params);
   const etablissementsRattaches = params.etablissements.filter(e => !e.isAgenceComptable);
+  const { activeId } = useGroupements();
+  const { activites, setActivites, synced } = useCalendrierSync();
 
-  const [activites, setActivites] = useState<ActiviteCalendrier[]>(() =>
-    loadState<ActiviteCalendrier[]>(STORAGE_KEY, [])
-  );
   const [filterCategorie, setFilterCategorie] = useState<string>('all');
   const [filterMois, setFilterMois] = useState<string>('all');
   const [filterEtab, setFilterEtab] = useState<string>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
-
-  useEffect(() => {
-    saveState(STORAGE_KEY, activites);
-  }, [activites]);
 
   // Initialiser avec la bibliothèque si vide
   const initFromLibrary = () => {

@@ -181,7 +181,12 @@ export default function PlanAction() {
       </Card>
 
       {/* ═══ Toolbar ═══ */}
-      <div className="flex flex-wrap gap-2 justify-end">
+      <div className="flex flex-wrap gap-2 justify-end items-center">
+        {activeId && (
+          <span className="text-xs text-muted-foreground inline-flex items-center gap-1 mr-auto">
+            {synced ? <><Cloud className="h-3.5 w-3.5 text-emerald-600" /> Synchronisé avec le groupement</> : <><CloudOff className="h-3.5 w-3.5" /> Synchronisation…</>}
+          </span>
+        )}
         <Button variant="outline" size="sm" onClick={regenerer}>
           <RefreshCw className="h-4 w-4 mr-2" /> Régénérer depuis risques + PV
         </Button>
