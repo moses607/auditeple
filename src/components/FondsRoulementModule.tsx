@@ -304,7 +304,10 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
     { name: 'Part prélevée', value: partPrelevee, fill: COLORS.prelevePart },
   ].filter(x => x.value > 0);
 
-  const avisAuto = hasBalance ? genererAvisMotive(r, etabLabel, `${stored.nbJoursPeriode} jours`) : '';
+  const periodeLabel = stored.dateDebut && stored.dateFin
+    ? `du ${fmtDateFR(stored.dateDebut)} au ${fmtDateFR(stored.dateFin)} (${nbJoursCalcule} jours)`
+    : `${nbJoursCalcule} jours`;
+  const avisAuto = hasBalance ? genererAvisMotive(r, etabLabel, periodeLabel) : '';
 
   // ─── Rendu ───
   return (
