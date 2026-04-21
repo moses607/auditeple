@@ -2,6 +2,8 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/AppSidebar';
 import { useAuditParams } from '@/hooks/useAuditStore';
 import { getSelectedEtablissement } from '@/lib/types';
+import { useGroupements, useEtablissements } from '@/hooks/useGroupements';
+import { useMemo } from 'react';
 import { Building2, MapPin, LogOut, Moon, Sun } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import { RegulatoryUpdateBanner } from '@/components/RegulatoryUpdateBanner';
@@ -25,8 +27,28 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { params, update } = useAuditParams();
   const { signOut } = useAuth();
   const { theme, setTheme } = useTheme();
-  const current = getSelectedEtablissement(params);
-  const hasEtabs = params.etablissements.length > 0;
+  const { activeId } = useGroupements();
+  const { etablissements: dbEtabs } = useEtablissements(activeId);
+
+  // Fusionne les établissements DB (source de vérité multi-groupements) avec
+  // les anciens stockés en localStorage afin de garder la rétro-compatibilité.
+  const mergedEtabs = useMemo(() => {
+    const fromDb = dbEtabs.map(e => ({
+      id: e.id,
+      uai: e.uai,
+      nom: e.nom,
+      ville: e.ville ?? '',
+    }));
+    const seen = new Set(fromDb.map(e => e.uai));
+    const fromLocal = params.etablissements.filter(e => !seen.has(e.uai));
+    return [...fromDb, ...fromLocal];
+  }, [dbEtabs, params.etablissements]);
+
+  const hasEtabs = mergedEtabs.length > 0;
+  const current =
+    mergedEtabs.find(e => e.id === params.selectedEtablissementId) ??
+    mergedEtabs[0] ??
+    getSelectedEtablissement(params);
 
   return (
     <SidebarProvider defaultOpen={false}>
@@ -50,7 +72,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 )}
                 <div className="hidden md:flex items-center gap-2">
                 <Select
-                  value={params.selectedEtablissementId}
+                  value={current?.id ?? ''}
                   onValueChange={(id) => update({ selectedEtablissementId: id })}
                 >
                   <SelectTrigger className="h-8 w-auto min-w-[220px] max-w-[400px] bg-primary/5 border-primary/20 text-xs rounded-lg">
@@ -58,7 +80,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <SelectValue placeholder="Sélectionner un établissement" />
                   </SelectTrigger>
                   <SelectContent>
-                    {params.etablissements.map(e => (
+                    {mergedEtabs.map(e => (
                       <SelectItem key={e.id} value={e.id} className="text-xs">
                         <span className="font-semibold">{e.nom}</span>
                         <span className="text-muted-foreground ml-2">({e.uai})</span>
