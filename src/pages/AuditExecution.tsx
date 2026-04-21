@@ -3,7 +3,7 @@
  * Sauvegarde auto à chaque modification, barre de progression, possibilité
  * de suspendre et reprendre.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ModulePageLayout } from '@/components/ModulePageLayout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -100,18 +100,56 @@ export default function AuditExecution() {
     return profilesMap[userId] ?? 'Collègue';
   };
 
+  // Refs pour exposer le contexte courant au callback realtime sans le ré-abonner
+  const pointsRef = useRef<PointRow[]>([]);
+  const cursorRef = useRef(0);
+  useEffect(() => { pointsRef.current = points; }, [points]);
+  useEffect(() => { cursorRef.current = cursor; }, [cursor]);
+
   // Realtime — synchronisation collaborative sur les points d'audit & l'audit lui-même
   useEffect(() => {
     if (!id) return;
     const channel = supabase
       .channel(`audit-exec-${id}`)
       .on('postgres_changes', { event: '*', schema: 'public', table: 'audit_points_results', filter: `audit_id=eq.${id}` }, async (payload) => {
-        const author = (payload.new as any)?.updated_by ?? null;
+        const row = payload.new as any;
+        const author = row?.updated_by ?? null;
+        if (!author || author === currentUserId) {
+          await fetchAll();
+          return;
+        }
+
+        // Identifier le point AVANT rafraîchissement pour savoir si je l'ai actuellement ouvert
+        const pointId = row?.id;
+        const currentlyOpenId = pointsRef.current[cursorRef.current]?.id ?? null;
+        const isCurrentlyOpen = pointId && pointId === currentlyOpenId;
+
         await fetchAll();
-        if (author && author !== currentUserId) {
-          setRemoteUpdateAt(Date.now());
-          const name = profilesMap[author] ?? 'Un collègue';
-          toast.info(`${name} a mis à jour un point d'audit`);
+        setRemoteUpdateAt(Date.now());
+
+        const name = profilesMap[author] ?? 'Un collègue';
+        const libelle = row?.point_libelle ?? 'un point d\'audit';
+        const statusLabel = row?.status && STATUS_META[row.status as PointStatus]
+          ? ` → ${STATUS_META[row.status as PointStatus].label}`
+          : '';
+
+        if (isCurrentlyOpen) {
+          // Avertit que la fiche que je consulte vient d'être écrasée
+          toast.warning(`${name} a modifié le point en cours${statusLabel}`, {
+            description: `« ${libelle} » — l'affichage a été rafraîchi.`,
+          });
+        } else {
+          // Notification claire pour un point que je n'ai pas encore ouvert
+          toast.info(`${name} a mis à jour un point d'audit${statusLabel}`, {
+            description: `« ${libelle} »`,
+            action: pointId ? {
+              label: 'Ouvrir',
+              onClick: () => {
+                const idx = pointsRef.current.findIndex(p => p.id === pointId);
+                if (idx >= 0) setCursor(idx);
+              },
+            } : undefined,
+          });
         }
       })
       .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'audits', filter: `id=eq.${id}` }, async () => {
