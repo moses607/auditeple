@@ -18,6 +18,7 @@ import { ChevronLeft, ChevronRight, Save, FileSignature, CheckCircle2, AlertTria
 import { DOMAINES_AUDIT } from '@/lib/audit-parcours';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { RealtimePulse } from '@/components/RealtimePulse';
 
 type PointStatus = 'non_audite' | 'conforme' | 'anomalie_mineure' | 'anomalie_majeure' | 'non_applicable';
 
@@ -51,18 +52,44 @@ export default function AuditExecution() {
   const [cursor, setCursor] = useState(0);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [remoteUpdateAt, setRemoteUpdateAt] = useState(0);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  const fetchAll = async () => {
+    if (!id) return;
+    const [{ data: a }, { data: p }] = await Promise.all([
+      supabase.from('audits').select('*').eq('id', id).single(),
+      supabase.from('audit_points_results').select('*').eq('audit_id', id).order('domaine_id').order('point_index'),
+    ]);
+    setAudit(a);
+    setPoints((p as PointRow[]) ?? []);
+  };
 
   useEffect(() => {
     (async () => {
-      if (!id) return;
-      const [{ data: a }, { data: p }] = await Promise.all([
-        supabase.from('audits').select('*').eq('id', id).single(),
-        supabase.from('audit_points_results').select('*').eq('audit_id', id).order('domaine_id').order('point_index'),
-      ]);
-      setAudit(a);
-      setPoints((p as PointRow[]) ?? []);
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id ?? null);
+      await fetchAll();
       setLoading(false);
     })();
+  }, [id]);
+
+  // Realtime — synchronisation collaborative sur les points d'audit & l'audit lui-même
+  useEffect(() => {
+    if (!id) return;
+    const channel = supabase
+      .channel(`audit-exec-${id}`)
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'audit_points_results', filter: `audit_id=eq.${id}` }, async () => {
+        await fetchAll();
+        setRemoteUpdateAt(Date.now());
+        toast.info('Point d\'audit mis à jour par un collègue');
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'audits', filter: `id=eq.${id}` }, async () => {
+        await fetchAll();
+        setRemoteUpdateAt(Date.now());
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
   }, [id]);
 
   const current = points[cursor];
@@ -124,7 +151,10 @@ export default function AuditExecution() {
         <Card>
           <CardContent className="py-3 space-y-2">
             <div className="flex items-center justify-between text-sm">
-              <span className="font-medium">Progression : {completed} / {points.length} points</span>
+              <span className="font-medium flex items-center gap-2">
+                Progression : {completed} / {points.length} points
+                <RealtimePulse triggerAt={remoteUpdateAt} label="Audit modifié en direct" />
+              </span>
               <span className="text-muted-foreground">{progress}%</span>
             </div>
             <Progress value={progress} className="h-2" />
