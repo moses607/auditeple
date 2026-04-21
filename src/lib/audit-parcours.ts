@@ -49,7 +49,7 @@ export const PARCOURS_ETAPES: EtapeParcours[] = [
       "Constitution du dossier, équipe d'audit, organigramme fonctionnel, calendrier annuel de l'agence comptable. Référence : M9-6 § 1.2 — séparation des tâches.",
     icon: Briefcase,
     color: 'text-section-controle-interne',
-    moduleIds: ['parametres', 'calendrier-annuel'],
+    moduleIds: ['calendrier-annuel'],
   },
   {
     id: 'cadrer',
@@ -129,7 +129,7 @@ export const PARCOURS_ETAPES: EtapeParcours[] = [
       "Piste d'audit chronologique, suivi des recommandations, traçabilité des opérations (M9-6 § 5.1).",
     icon: CalendarClock,
     color: 'text-section-restitution',
-    moduleIds: ['piste-audit', 'mentions-legales'],
+    moduleIds: ['piste-audit'],
   },
 ];
 
