@@ -12,6 +12,9 @@ import { ModulePageLayout } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import SignaturePad from '@/components/SignaturePad';
 import { useAuditParams } from '@/hooks/useAuditStore';
+import { AgentSelect, formatAgentDisplay } from '@/components/AgentSelect';
+import { useAgents, useGroupements } from '@/hooks/useGroupements';
+import { useEffect } from 'react';
 
 interface ActionItem {
   id: string;
@@ -30,9 +33,21 @@ export default function PlanAction() {
   const risques: CartoRisque[] = loadState('cartographie', []);
   const { params } = useAuditParams();
   const [actions, setActions] = useState<ActionItem[]>(() => loadState('plan_action', []));
+  const { activeId } = useGroupements();
+  const { agents } = useAgents(activeId);
+  const acAgent = agents.find(a => a.role === 'agent_comptable' && a.actif);
   const [signature, setSignature] = useState<{ dataUrl: string; nom: string; date: string; lieu: string }>(
     () => loadState('plan_action_signature', { dataUrl: '', nom: params.agentComptable || '', date: '', lieu: '' })
   );
+  // Auto-pré-remplit le nom AC dès qu'il est connu (et que l'utilisateur n'a pas saisi à la main)
+  useEffect(() => {
+    if (acAgent && !signature.nom) {
+      const auto = formatAgentDisplay(acAgent);
+      setSignature(s => ({ ...s, nom: auto }));
+      saveState('plan_action_signature', { ...signature, nom: auto });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [acAgent?.id]);
   const [form, setForm] = useState<any>(null);
   const save = (d: ActionItem[]) => { setActions(d); saveState('plan_action', d); };
   const saveSignature = (s: typeof signature) => { setSignature(s); saveState('plan_action_signature', s); };
@@ -100,7 +115,10 @@ export default function PlanAction() {
                 {risques.map(r => <option key={r.id} value={r.id}>[{r.processus}] {r.risque} (score: {r.probabilite * r.impact * r.maitrise})</option>)}
               </select>
             </div>
-            <div className="space-y-1"><Label className="text-xs">Responsable</Label><Input value={form.responsable} onChange={e => setForm({ ...form, responsable: e.target.value })} /></div>
+            <div className="space-y-1">
+              <Label className="text-xs">Responsable (depuis Paramètres → Agents)</Label>
+              <AgentSelect value={form.responsable} onChange={(display) => setForm({ ...form, responsable: display })} />
+            </div>
             <div className="space-y-1"><Label className="text-xs">Date limite de mise en œuvre</Label><Input type="date" value={form.dateLimite} onChange={e => setForm({ ...form, dateLimite: e.target.value })} /></div>
             <div className="space-y-1"><Label className="text-xs">Statut</Label>
               <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.statut} onChange={e => setForm({ ...form, statut: e.target.value })}>
