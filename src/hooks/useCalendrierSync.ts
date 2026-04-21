@@ -61,6 +61,12 @@ export function useCalendrierSync() {
   );
   const [loading, setLoading] = useState(false);
   const [synced, setSynced] = useState(false);
+  const [remoteUpdateAt, setRemoteUpdateAt] = useState<number>(0);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => setCurrentUserId(data.user?.id ?? null));
+  }, []);
 
   useEffect(() => {
     if (!activeId) {
@@ -102,7 +108,10 @@ export function useCalendrierSync() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'calendrier_annuel', filter: `groupement_id=eq.${activeId}` },
-        async () => {
+        async (payload: any) => {
+          const row: any = payload.new ?? payload.old;
+          const authorId = row?.created_by ?? null;
+          const fromOther = authorId && currentUserId && authorId !== currentUserId;
           const { data } = await supabase
             .from('calendrier_annuel')
             .select('*')
@@ -113,11 +122,16 @@ export function useCalendrierSync() {
             setActivites(remote);
             saveState(STORAGE_KEY, remote);
           }
+          if (fromOther) {
+            setRemoteUpdateAt(Date.now());
+            const verb = payload.eventType === 'INSERT' ? 'ajoutée' : payload.eventType === 'DELETE' ? 'supprimée' : 'modifiée';
+            toast(`Activité ${verb} par un collègue`, { duration: 2500, className: 'text-xs' });
+          }
         }
       )
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [activeId]);
+  }, [activeId, currentUserId]);
 
   const persist = useCallback(async (next: ActiviteCalendrier[]) => {
     setActivites(next);
@@ -146,5 +160,5 @@ export function useCalendrierSync() {
     }
   }, [activeId]);
 
-  return { activites, setActivites: persist, loading, synced };
+  return { activites, setActivites: persist, loading, synced, remoteUpdateAt };
 }

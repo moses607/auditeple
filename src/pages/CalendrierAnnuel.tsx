@@ -38,6 +38,7 @@ import { DiffuserCalendrierDialog } from '@/components/DiffuserCalendrierDialog'
 import { useCalendrierSync } from '@/hooks/useCalendrierSync';
 import { useGroupements } from '@/hooks/useGroupements';
 import { Cloud, CloudOff } from 'lucide-react';
+import { RealtimePulse } from '@/components/RealtimePulse';
 
 const STORAGE_KEY = 'calendrier_annuel_v1';
 
@@ -70,7 +71,7 @@ export default function CalendrierAnnuel() {
   const ac = getAgenceComptable(params);
   const etablissementsRattaches = params.etablissements.filter(e => !e.isAgenceComptable);
   const { activeId } = useGroupements();
-  const { activites, setActivites, synced } = useCalendrierSync();
+  const { activites, setActivites, synced, remoteUpdateAt } = useCalendrierSync();
 
   const [filterCategorie, setFilterCategorie] = useState<string>('all');
   const [filterMois, setFilterMois] = useState<string>('all');
@@ -243,8 +244,9 @@ export default function CalendrierAnnuel() {
   const headerActions = (
     <div className="flex flex-wrap gap-2 items-center">
       {activeId && (
-        <span className="text-xs text-muted-foreground inline-flex items-center gap-1 mr-2">
+        <span className="text-xs text-muted-foreground inline-flex items-center gap-2 mr-2">
           {synced ? <><Cloud className="h-3.5 w-3.5 text-emerald-600" /> Synchronisé</> : <><CloudOff className="h-3.5 w-3.5" /> Sync…</>}
+          <RealtimePulse triggerAt={remoteUpdateAt} label="Activité mise à jour par un collègue" />
         </span>
       )}
       <DiffuserCalendrierDialog
