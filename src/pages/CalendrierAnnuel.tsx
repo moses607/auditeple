@@ -38,6 +38,7 @@ import { DiffuserCalendrierDialog } from '@/components/DiffuserCalendrierDialog'
 import { useCalendrierSync } from '@/hooks/useCalendrierSync';
 import { useGroupements } from '@/hooks/useGroupements';
 import { Cloud, CloudOff } from 'lucide-react';
+import { RealtimePulse } from '@/components/RealtimePulse';
 
 const STORAGE_KEY = 'calendrier_annuel_v1';
 
