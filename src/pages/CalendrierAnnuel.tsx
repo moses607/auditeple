@@ -28,13 +28,21 @@ import {
 } from '@/components/ui/tooltip';
 import {
   FileDown, FileText, Plus, Trash2, AlertTriangle, Filter,
-  Building2, Pencil, Mail, CheckCircle2, Clock,
+  Building2, Pencil, Mail, CheckCircle2, Clock, Lock, Send, Copy,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
+import { CalendrierTimeline } from '@/components/CalendrierTimeline';
+import { DiffuserCalendrierDialog } from '@/components/DiffuserCalendrierDialog';
 
 const STORAGE_KEY = 'calendrier_annuel_v1';
+
+// Une activité issue de la bibliothèque ET de criticité haute est
+// considérée comme obligatoire réglementaire (cadenas, non supprimable)
+function isObligatoire(a: ActiviteCalendrier): boolean {
+  return !!a.modeleId && a.criticite === 'haute';
+}
 
 function buildFromModele(m: ActiviteModele, allEtabIds: string[]): ActiviteCalendrier {
   return {
@@ -86,12 +94,53 @@ export default function CalendrierAnnuel() {
   };
 
   const remove = (id: string) => {
+    const a = activites.find(x => x.id === id);
+    if (a && isObligatoire(a)) {
+      toast.error("Activité obligatoire réglementaire — non supprimable. Vous pouvez l'éditer ou la marquer comme réalisée.");
+      return;
+    }
     setActivites(prev => prev.filter(a => a.id !== id));
     toast.success('Activité supprimée');
   };
 
   const update = (id: string, patch: Partial<ActiviteCalendrier>) => {
     setActivites(prev => prev.map(a => a.id === id ? { ...a, ...patch } : a));
+  };
+
+  // Duplication N → N+1 : reset des dates d'échéance + statut réalisé
+  const dupliquerExerciceSuivant = () => {
+    if (activites.length === 0) {
+      toast.error('Aucune activité à dupliquer');
+      return;
+    }
+    const exNum = parseInt(params.exercice, 10);
+    const exSuivant = isNaN(exNum) ? '' : String(exNum + 1);
+    if (!confirm(
+      `Dupliquer ce calendrier vers l'exercice ${exSuivant || 'suivant'} ?\n\n` +
+      `• Les statuts « réalisé » seront réinitialisés\n` +
+      `• Les dates d'échéance seront décalées d'un an\n` +
+      `• Le calendrier actuel sera REMPLACÉ\n\n` +
+      `Pensez à exporter d'abord le calendrier actuel si besoin d'archive.`
+    )) return;
+
+    const dupliquees: ActiviteCalendrier[] = activites.map(a => {
+      let newDate: string | undefined;
+      if (a.dateEcheance) {
+        const d = new Date(a.dateEcheance);
+        d.setFullYear(d.getFullYear() + 1);
+        newDate = d.toISOString().slice(0, 10);
+      }
+      return {
+        ...a,
+        id: `${a.modeleId || 'custom'}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        dateEcheance: newDate,
+        realisee: false,
+        realiseeAt: undefined,
+        realiseePar: undefined,
+      };
+    });
+    setActivites(dupliquees);
+    toast.success(`Calendrier dupliqué vers ${exSuivant} (${dupliquees.length} activités). Pensez à mettre à jour l'exercice dans Paramètres.`);
   };
 
   const addBlank = () => {
@@ -195,15 +244,32 @@ export default function CalendrierAnnuel() {
 
   const headerActions = (
     <div className="flex flex-wrap gap-2">
-      <Button onClick={exportMailMensuel} size="sm" className="gap-1.5">
-        <Mail className="h-4 w-4" /> Mail mensuel ER (.eml)
+      <DiffuserCalendrierDialog
+        activites={activites}
+        etablissementsRattaches={etablissementsRattaches}
+        agenceComptable={ac}
+        exercice={params.exercice}
+        agentComptable={params.agentComptable}
+        trigger={
+          <Button size="sm" className="gap-1.5">
+            <Send className="h-4 w-4" /> Diffuser aux ER
+          </Button>
+        }
+      />
+      <Button onClick={exportMailMensuel} size="sm" variant="outline" className="gap-1.5">
+        <Mail className="h-4 w-4" /> Mail mensuel (.eml)
       </Button>
       <Button onClick={exportPDF} size="sm" variant="secondary" className="gap-1.5">
-        <FileDown className="h-4 w-4" /> PDF paysage
+        <FileDown className="h-4 w-4" /> Tableau PDF
       </Button>
       <Button onClick={exportDOCX} size="sm" variant="secondary" className="gap-1.5">
-        <FileText className="h-4 w-4" /> Word paysage
+        <FileText className="h-4 w-4" /> Word
       </Button>
+      {activites.length > 0 && (
+        <Button onClick={dupliquerExerciceSuivant} size="sm" variant="ghost" className="gap-1.5">
+          <Copy className="h-4 w-4" /> Dupliquer N→N+1
+        </Button>
+      )}
     </div>
   );
 
@@ -367,6 +433,13 @@ export default function CalendrierAnnuel() {
             </div>
           </Card>
 
+          {/* ─── Timeline charge mensuelle ─── */}
+          <CalendrierTimeline
+            activites={activites}
+            selectedMois={filterMois !== 'all' ? parseInt(filterMois, 10) : null}
+            onMonthClick={(m) => setFilterMois(filterMois === String(m) ? 'all' : String(m))}
+          />
+
           {/* ─── Vue par mois ─── */}
           <div className="space-y-4">
             {Array.from({ length: 12 }, (_, i) => i + 1).map(m => {
@@ -447,12 +520,28 @@ function ActiviteRow({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
+            {isObligatoire(activite) && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Lock className="h-3.5 w-3.5 text-destructive shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent className="text-xs max-w-xs">
+                  Activité obligatoire réglementaire — non supprimable.
+                  Vous pouvez l'éditer (date, ER concernés, description) ou la marquer comme réalisée.
+                </TooltipContent>
+              </Tooltip>
+            )}
             <span className={cn('font-semibold text-sm', realisee && 'line-through text-muted-foreground')}>
               {activite.titre}
             </span>
             {realisee && (
               <Badge variant="outline" className="text-[10px] bg-emerald-100 text-emerald-900 border-emerald-300 gap-1">
                 <CheckCircle2 className="h-3 w-3" /> Réalisée
+              </Badge>
+            )}
+            {isObligatoire(activite) && (
+              <Badge variant="outline" className="text-[10px] bg-destructive/10 text-destructive border-destructive/40">
+                Obligatoire
               </Badge>
             )}
             <Badge variant="outline" className={cn('text-[10px]', CATEGORIES_COULEURS[activite.categorie])}>
@@ -485,7 +574,13 @@ function ActiviteRow({
           <Button size="sm" variant="ghost" onClick={onEdit} className="h-7 w-7 p-0">
             <Pencil className="h-3.5 w-3.5" />
           </Button>
-          <Button size="sm" variant="ghost" onClick={onRemove} className="h-7 w-7 p-0 text-destructive hover:text-destructive">
+          <Button
+            size="sm" variant="ghost"
+            onClick={onRemove}
+            disabled={isObligatoire(activite)}
+            title={isObligatoire(activite) ? 'Activité obligatoire — non supprimable' : 'Supprimer'}
+            className="h-7 w-7 p-0 text-destructive hover:text-destructive disabled:opacity-30"
+          >
             <Trash2 className="h-3.5 w-3.5" />
           </Button>
         </div>
