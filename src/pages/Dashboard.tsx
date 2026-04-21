@@ -18,6 +18,7 @@ import { CockpitIntelligent } from '@/components/CockpitIntelligent';
 import { AlertesConsolidees } from '@/components/AlertesConsolidees';
 import { ParcoursProgress } from '@/components/ParcoursProgress';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
+import { CockpitMaturiteCICF } from '@/components/CockpitMaturiteCICF';
 
 import heroImg from '@/assets/hero-audit.png';
 import sectionControles from '@/assets/section-controles.png';
