@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ChevronLeft, ChevronRight, Save, FileSignature, CheckCircle2, AlertTriangle, AlertOctagon, MinusCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Save, FileSignature, CheckCircle2, AlertTriangle, AlertOctagon, MinusCircle, RefreshCw } from 'lucide-react';
 import { DOMAINES_AUDIT } from '@/lib/audit-parcours';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -58,6 +58,26 @@ export default function AuditExecution() {
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [profilesMap, setProfilesMap] = useState<Record<string, string>>({});
 
+  const reloadAuthors = async (rows?: PointRow[]) => {
+    const source = rows ?? pointsRef.current ?? [];
+    const authorIds = Array.from(new Set(source.map(r => r.updated_by).filter(Boolean) as string[]));
+    if (!authorIds.length) return;
+    const { data: profs, error } = await supabase
+      .from('profiles')
+      .select('user_id, display_name')
+      .in('user_id', authorIds);
+    if (error) {
+      toast.error('Impossible de recharger les auteurs');
+      return;
+    }
+    setProfilesMap(prev => {
+      const next = { ...prev };
+      profs?.forEach((pr: any) => { next[pr.user_id] = pr.display_name || 'Collègue'; });
+      return next;
+    });
+    if (rows === undefined) toast.success('Noms des auteurs rechargés');
+  };
+
   const fetchAll = async () => {
     if (!id) return;
     const [{ data: a }, { data: p }] = await Promise.all([
@@ -67,22 +87,7 @@ export default function AuditExecution() {
     setAudit(a);
     const rows = (p as PointRow[]) ?? [];
     setPoints(rows);
-
-    // Charger les noms d'auteurs manquants
-    const authorIds = Array.from(new Set(rows.map(r => r.updated_by).filter(Boolean) as string[]));
-    if (authorIds.length) {
-      const { data: profs } = await supabase
-        .from('profiles')
-        .select('user_id, display_name')
-        .in('user_id', authorIds);
-      if (profs) {
-        setProfilesMap(prev => {
-          const next = { ...prev };
-          profs.forEach((pr: any) => { next[pr.user_id] = pr.display_name || 'Collègue'; });
-          return next;
-        });
-      }
-    }
+    await reloadAuthors(rows);
   };
 
   useEffect(() => {
@@ -97,7 +102,7 @@ export default function AuditExecution() {
   const authorLabel = (userId: string | null | undefined) => {
     if (!userId) return null;
     if (userId === currentUserId) return 'Vous';
-    return profilesMap[userId] ?? 'Collègue';
+    return profilesMap[userId] ?? 'Auteur inconnu';
   };
 
   // Refs pour exposer le contexte courant au callback realtime sans le ré-abonner
@@ -241,12 +246,25 @@ export default function AuditExecution() {
                   Point {cursor + 1} / {points.length} : {current.point_libelle}
                 </CardTitle>
                 {current.updated_by && current.updated_at && (
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Dernière modification : <span className="font-medium text-foreground">{authorLabel(current.updated_by)}</span>
-                    {' · '}
+                  <p className="text-xs text-muted-foreground mt-1 flex items-center flex-wrap gap-x-1 gap-y-0.5">
+                    <span>Dernière modification :</span>
+                    <span className="font-medium text-foreground">{authorLabel(current.updated_by)}</span>
+                    <span>·</span>
                     <time dateTime={current.updated_at}>
                       {new Date(current.updated_at).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}
                     </time>
+                    {authorLabel(current.updated_by) === 'Auteur inconnu' && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 px-2 ml-1 text-xs"
+                        onClick={() => reloadAuthors()}
+                        title="Recharger les noms des auteurs depuis la base"
+                      >
+                        <RefreshCw className="h-3 w-3 mr-1" />
+                        Recharger
+                      </Button>
+                    )}
                   </p>
                 )}
               </div>
