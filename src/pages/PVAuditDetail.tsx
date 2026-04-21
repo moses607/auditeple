@@ -192,7 +192,7 @@ export default function PVAuditDetail() {
                     <h4 className="font-semibold text-sm">{d?.label}</h4>
                   </div>
                   <ul className="space-y-2 pl-2">
-                    {list.map((p) => {
+                    {arr.map((p) => {
                       const meta = STATUS_META[p.status];
                       const Icon = meta.icon;
                       return (
