@@ -252,13 +252,34 @@ export default function AuditExecution() {
       <div className="space-y-4">
         <Card>
           <CardContent className="py-3 space-y-2">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm gap-3 flex-wrap">
               <span className="font-medium flex items-center gap-2">
                 Progression : {completed} / {points.length} points
                 <RealtimePulse triggerAt={remoteUpdateAt} label="Audit modifié en direct" />
               </span>
-              <span className="text-muted-foreground">{progress}%</span>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs text-muted-foreground">Filtrer par auteur :</Label>
+                <Select value={authorFilter} onValueChange={setAuthorFilter}>
+                  <SelectTrigger className="h-8 w-[180px] text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les auteurs</SelectItem>
+                    {distinctAuthors.map(a => (
+                      <SelectItem key={a.id} value={a.id}>{a.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-muted-foreground text-xs">{progress}%</span>
+              </div>
             </div>
+            {authorFilter !== 'all' && (
+              <p className="text-xs text-primary">
+                {filteredIndices.length} point{filteredIndices.length > 1 ? 's' : ''} modifié{filteredIndices.length > 1 ? 's' : ''} par{' '}
+                <span className="font-medium">{distinctAuthors.find(a => a.id === authorFilter)?.label}</span>
+                {filteredPosition >= 0 && ` · position ${filteredPosition + 1}/${filteredIndices.length}`}
+              </p>
+            )}
             <Progress value={progress} className="h-2" />
           </CardContent>
         </Card>
