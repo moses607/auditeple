@@ -99,6 +99,31 @@ export function usePlanActionsSync() {
     return () => { cancelled = true; };
   }, [activeId]);
 
+  // Realtime : recharge à chaque changement distant
+  useEffect(() => {
+    if (!activeId) return;
+    const channel = supabase
+      .channel(`plan_actions_${activeId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'plan_actions', filter: `groupement_id=eq.${activeId}` },
+        async () => {
+          const { data } = await supabase
+            .from('plan_actions')
+            .select('*')
+            .eq('groupement_id', activeId)
+            .order('created_at', { ascending: false });
+          if (data) {
+            const remote = data.map(rowToAction);
+            setActions(remote);
+            saveActions(remote);
+          }
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [activeId]);
+
   /** Persiste un set complet : upsert + delete des manquants. */
   const persist = useCallback(async (next: ActionPlan[]) => {
     setActions(next);
