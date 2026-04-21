@@ -172,7 +172,7 @@ export default function CartographieRisques() {
                 </select>
               </div>
               <div className="space-y-1"><Label className="text-xs">Action corrective</Label><Input value={form.action} onChange={e => setForm({ ...form, action: e.target.value })} /></div>
-              <div className="space-y-1"><Label className="text-xs">Responsable</Label><Input value={form.responsable} onChange={e => setForm({ ...form, responsable: e.target.value })} /></div>
+              <div className="space-y-1"><Label className="text-xs">Responsable</Label><AgentSelect value={form.responsable || ''} onChange={(display) => setForm({ ...form, responsable: display })} placeholder="Choisir dans l'équipe…" /></div>
               <div className="space-y-1">
                 <Label className="text-xs">Échéance</Label>
                 <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.echeance} onChange={e => setForm({ ...form, echeance: e.target.value })}>
