@@ -136,7 +136,7 @@ export interface FondsRoulementModuleProps {
 }
 
 export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
-  const { params } = useAuditParams();
+  const { params } = useAuditParamsContext();
   const etab = getSelectedEtablissement(params);
   const etabLabel = etab ? `${etab.nom} (${etab.uai})` : params.etablissements[0]?.nom || 'Établissement non sélectionné';
 
