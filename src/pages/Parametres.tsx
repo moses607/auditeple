@@ -19,7 +19,7 @@ export default function ParametresPage() {
   return (
     <ModulePageLayout
       title="Paramètres"
-      icon={SettingsIcon}
+      section="AUDIT & RESTITUTION"
       description="Gérez votre groupement comptable, vos établissements et vos agents. Ces données alimentent automatiquement tous les modules de l'application (zéro double saisie)."
     >
       <Tabs defaultValue="groupement" className="space-y-4">
