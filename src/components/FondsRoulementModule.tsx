@@ -7,7 +7,12 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts';
-import { Upload, FileDown, FileText, Info, AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
+import { Upload, FileDown, FileText, Info, AlertTriangle, CheckCircle2, XCircle, CalendarIcon } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { format, differenceInCalendarDays } from 'date-fns';
+import { fr } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
@@ -34,7 +39,7 @@ const COLORS = {
 const STORAGE_KEY = 'fdr_module_v3';
 
 // ───────────────────── Parseur balance Op@le (factorisé) ─────────────────────
-async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; sheetName: string; }> {
+async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; sheetName: string; dateDebut?: string; dateFin?: string; }> {
   const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
   const toNum = (v: unknown): number => {
     if (v === null || v === undefined || v === '') return 0;
@@ -49,8 +54,25 @@ async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; s
     return isNaN(n) ? 0 : (neg ? -n : n);
   };
 
+  // Extraction d'une date au format dd/mm/yyyy ou yyyy-mm-dd dans une cellule
+  const extractDate = (cell: unknown): string | undefined => {
+    if (cell === null || cell === undefined) return undefined;
+    // Date Excel native (number ou Date)
+    if (cell instanceof Date) return cell.toISOString().slice(0, 10);
+    if (typeof cell === 'number' && cell > 25000 && cell < 80000) {
+      const d = XLSX.SSF.parse_date_code(cell);
+      if (d) return `${d.y.toString().padStart(4, '0')}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+    }
+    const s = String(cell).trim();
+    let m = s.match(/(\d{2})[\/\-\.](\d{2})[\/\-\.](\d{4})/);
+    if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+    m = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+    return undefined;
+  };
+
   const buf = await file.arrayBuffer();
-  const wb = XLSX.read(buf, { type: 'array' });
+  const wb = XLSX.read(buf, { type: 'array', cellDates: true });
   const sheetNames = wb.SheetNames;
   let chosen = sheetNames.find(n => {
     const x = norm(n);
@@ -61,6 +83,29 @@ async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; s
   const matrix = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: '' }) as unknown[][];
   let headerRowIdx = matrix.findIndex(r => Array.isArray(r) && r.some(c => norm(String(c ?? '')) === 'compte'));
   if (headerRowIdx < 0) headerRowIdx = 2;
+
+  // ─── Recherche des dates d'exercice dans les lignes de méta (avant headers) ───
+  let dateDebut: string | undefined;
+  let dateFin: string | undefined;
+  const metaText = matrix.slice(0, headerRowIdx).flat().map(c => String(c ?? '')).join(' | ');
+  const datesTrouvees: string[] = [];
+  const reDate = /(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4})|(\d{4}-\d{2}-\d{2})/g;
+  let match;
+  while ((match = reDate.exec(metaText)) !== null) {
+    const d = extractDate(match[0]);
+    if (d) datesTrouvees.push(d);
+  }
+  // Détection contextuelle : "du ... au ..."
+  const ctxMatch = metaText.match(/du\s+(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4})\s+au\s+(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4})/i);
+  if (ctxMatch) {
+    dateDebut = extractDate(ctxMatch[1]);
+    dateFin = extractDate(ctxMatch[2]);
+  } else if (datesTrouvees.length >= 2) {
+    const sorted = [...datesTrouvees].sort();
+    dateDebut = sorted[0];
+    dateFin = sorted[sorted.length - 1];
+  }
+
   const headers = (matrix[headerRowIdx] as unknown[]).map(h => String(h ?? '').trim());
   const idx = (label: string) => headers.findIndex(h => norm(h) === norm(label));
   const iCompte = idx('Compte');
@@ -89,7 +134,7 @@ async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; s
       mCred: iMcred >= 0 ? toNum(row[iMcred]) : undefined,
     });
   }
-  return { lignes, sheetName: chosen };
+  return { lignes, sheetName: chosen, dateDebut, dateFin };
 }
 
 // ───────────────────── Composant Feu tricolore ─────────────────────
@@ -147,30 +192,63 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
     pfrMontant: 0,
     avisManuel: '',
     sheetName: '',
+    dateDebut: '' as string,           // YYYY-MM-DD
+    dateFin: '' as string,             // YYYY-MM-DD
+    dateCA: '' as string,              // YYYY-MM-DD : date du conseil d'administration
+    datesAutoDetectees: false,
   }));
   const persist = (next: typeof stored) => { setStored(next); saveState(STORAGE_KEY, next); };
+
+  // Recalcul automatique du nb de jours depuis les dates si présentes
+  const nbJoursCalcule = (() => {
+    if (stored.dateDebut && stored.dateFin) {
+      const d1 = new Date(stored.dateDebut);
+      const d2 = new Date(stored.dateFin);
+      const diff = differenceInCalendarDays(d2, d1) + 1;
+      if (diff > 0 && diff < 1000) return diff;
+    }
+    return stored.nbJoursPeriode || 365;
+  })();
 
   const r = useFondsDeRoulement({
     balance: stored.balance,
     pfrMontant: stored.pfrMontant,
-    nbJoursPeriode: stored.nbJoursPeriode,
+    nbJoursPeriode: nbJoursCalcule,
     chargesParJourManuel: stored.chargesParJourManuel || undefined,
   });
 
   const printRef = useRef<HTMLDivElement>(null);
+
+  const fmtDateFR = (iso: string) => {
+    if (!iso) return '';
+    try { return format(new Date(iso), 'dd MMMM yyyy', { locale: fr }); } catch { return iso; }
+  };
 
   // ─── Handlers ───
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const { lignes, sheetName } = await parseBalanceFile(file);
+      const { lignes, sheetName, dateDebut, dateFin } = await parseBalanceFile(file);
       if (lignes.length === 0) {
         toast.warning(`Aucune ligne exploitable dans l'onglet « ${sheetName} ».`);
         return;
       }
-      persist({ ...stored, balance: lignes, sheetName });
-      toast.success(`Balance importée : ${lignes.length} lignes (onglet « ${sheetName} »)`);
+      const next = {
+        ...stored,
+        balance: lignes,
+        sheetName,
+        dateDebut: dateDebut || stored.dateDebut,
+        dateFin: dateFin || stored.dateFin,
+        datesAutoDetectees: !!(dateDebut && dateFin),
+      };
+      persist(next);
+      if (dateDebut && dateFin) {
+        toast.success(`Balance importée : ${lignes.length} lignes — exercice détecté du ${fmtDateFR(dateDebut)} au ${fmtDateFR(dateFin)}`);
+      } else {
+        toast.success(`Balance importée : ${lignes.length} lignes (onglet « ${sheetName} »)`);
+        toast.info("Dates d'exercice non détectées — veuillez les saisir manuellement.");
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur de lecture du fichier');
     } finally {
@@ -226,7 +304,10 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
     { name: 'Part prélevée', value: partPrelevee, fill: COLORS.prelevePart },
   ].filter(x => x.value > 0);
 
-  const avisAuto = hasBalance ? genererAvisMotive(r, etabLabel, `${stored.nbJoursPeriode} jours`) : '';
+  const periodeLabel = stored.dateDebut && stored.dateFin
+    ? `du ${fmtDateFR(stored.dateDebut)} au ${fmtDateFR(stored.dateFin)} (${nbJoursCalcule} jours)`
+    : `${nbJoursCalcule} jours`;
+  const avisAuto = hasBalance ? genererAvisMotive(r, etabLabel, periodeLabel) : '';
 
   // ─── Rendu ───
   return (
@@ -267,9 +348,20 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
       {hasBalance && (
         <div ref={printRef} className="space-y-6 bg-background p-4 rounded-lg">
           {/* En-tête imprimable */}
-          <div className="text-center border-b pb-3">
+          <div className="text-center border-b pb-3 space-y-1">
             <h2 className="text-lg font-bold">Analyse du fonds de roulement — {etabLabel}</h2>
-            <p className="text-xs text-muted-foreground">Période d'analyse : {stored.nbJoursPeriode} jours · Méthodologie M9-6 § 4.5.3</p>
+            <p className="text-xs text-muted-foreground">
+              Exercice : {stored.dateDebut && stored.dateFin
+                ? `du ${fmtDateFR(stored.dateDebut)} au ${fmtDateFR(stored.dateFin)} (${nbJoursCalcule} jours)`
+                : `${nbJoursCalcule} jours`}
+              {' · '}Méthodologie M9-6 § 4.5.3
+              {stored.datesAutoDetectees && <span className="ml-2 text-emerald-600">✓ Dates détectées depuis Op@le</span>}
+            </p>
+            {stored.dateCA && (
+              <p className="text-xs font-medium text-primary">
+                Conseil d'administration du {fmtDateFR(stored.dateCA)}
+              </p>
+            )}
           </div>
 
           {/* Contrôle d'identité */}
@@ -297,13 +389,36 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
               <CardTitle className="text-base">Simulateur de prélèvement sur fonds de roulement (PFR)</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <DateField
+                  label="Début d'exercice"
+                  value={stored.dateDebut}
+                  onChange={(v) => persist({ ...stored, dateDebut: v, datesAutoDetectees: false })}
+                  tip="Date de début de la période couverte par la balance. Auto-détectée depuis l'export Op@le si possible."
+                />
+                <DateField
+                  label="Fin d'exercice"
+                  value={stored.dateFin}
+                  onChange={(v) => persist({ ...stored, dateFin: v, datesAutoDetectees: false })}
+                  tip="Date de fin de la période. Le nombre de jours est recalculé automatiquement."
+                />
+                <DateField
+                  label="Conseil d'administration"
+                  value={stored.dateCA}
+                  onChange={(v) => persist({ ...stored, dateCA: v })}
+                  tip="Date du CA devant statuer sur le prélèvement sur fonds de roulement. Sera reportée sur l'avis motivé et le PDF."
+                />
                 <div className="space-y-1">
-                  <Label className="text-xs">Période de référence (jours)<InfoTip>Nombre de jours couverts par la balance. Par défaut 365 (exercice complet).</InfoTip></Label>
-                  <Input type="number" value={stored.nbJoursPeriode} onChange={e => persist({ ...stored, nbJoursPeriode: parseInt(e.target.value) || 365 })} />
+                  <Label className="text-xs">Période calculée</Label>
+                  <div className="h-10 flex items-center px-3 rounded-md border bg-muted/30 text-sm font-bold">
+                    {nbJoursCalcule} jours
+                  </div>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <Label className="text-xs">Charges décaissables / jour (€)<InfoTip>Calculées automatiquement depuis les mouvements débit des classes 60-64. Saisir une valeur pour forcer.</InfoTip></Label>
+                  <Label className="text-xs">Charges décaissables / jour (€)<InfoTip>Calculées automatiquement depuis les mouvements débit des classes 60-64, divisés par le nombre de jours de la période. Saisir une valeur pour forcer.</InfoTip></Label>
                   <Input type="number" value={stored.chargesParJourManuel || ''} placeholder={r.chargesParJour.toFixed(2)} onChange={e => persist({ ...stored, chargesParJourManuel: parseFloat(e.target.value) || 0 })} />
                 </div>
                 <div className="space-y-1">
@@ -442,5 +557,42 @@ function SynRow({ bloc, detail }: { bloc: string; detail: Record<string, { monta
         </tr>
       ))}
     </>
+  );
+}
+
+// Sous-composant : sélecteur de date FR avec popover (réutilisable dans le module)
+function DateField({ label, value, onChange, tip }: { label: string; value: string; onChange: (iso: string) => void; tip?: string }) {
+  const date = value ? new Date(value) : undefined;
+  return (
+    <div className="space-y-1">
+      <Label className="text-xs">
+        {label}
+        {tip && <InfoTip>{tip}</InfoTip>}
+      </Label>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant="outline"
+            className={cn(
+              'w-full h-10 justify-start text-left font-normal',
+              !value && 'text-muted-foreground',
+            )}
+          >
+            <CalendarIcon className="mr-2 h-4 w-4" />
+            {date ? format(date, 'dd MMM yyyy', { locale: fr }) : <span>Choisir…</span>}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-auto p-0" align="start">
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={(d) => onChange(d ? format(d, 'yyyy-MM-dd') : '')}
+            initialFocus
+            locale={fr}
+            className={cn('p-3 pointer-events-auto')}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 }
