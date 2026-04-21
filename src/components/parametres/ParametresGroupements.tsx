@@ -8,12 +8,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Plus, CheckCircle2, Building } from 'lucide-react';
+import { Plus, CheckCircle2, Building, Trash2 } from 'lucide-react';
 import { useGroupements, type Groupement } from '@/hooks/useGroupements';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 
 export function ParametresGroupements() {
-  const { groupements, activeId, loading, createGroupement, updateGroupement, setActive } = useGroupements();
+  const { groupements, activeId, loading, createGroupement, updateGroupement, deleteGroupement, setActive } = useGroupements();
   const [openCreate, setOpenCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<Partial<Groupement>>({ academie: 'Guadeloupe' });
@@ -125,9 +125,19 @@ export function ParametresGroupements() {
                   </div>
                   <p className="text-xs text-muted-foreground mb-1">Académie : {g.academie}</p>
                   {g.email_agent_comptable && <p className="text-xs text-muted-foreground">{g.email_agent_comptable}</p>}
-                  <Button size="sm" variant="ghost" className="mt-3 h-7 text-xs" onClick={(e) => { e.stopPropagation(); editGroupement(g); }}>
-                    Modifier
-                  </Button>
+                  <div className="flex gap-2 mt-3">
+                    <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={(e) => { e.stopPropagation(); editGroupement(g); }}>
+                      Modifier
+                    </Button>
+                    <Button size="sm" variant="ghost" className="h-7 text-xs text-destructive hover:text-destructive" onClick={(e) => {
+                      e.stopPropagation();
+                      if (confirm(`Supprimer définitivement le groupement « ${g.libelle} » ?\n\nCette action est irréversible et supprimera tous les établissements et agents rattachés.`)) {
+                        deleteGroupement(g.id);
+                      }
+                    }}>
+                      <Trash2 className="h-3 w-3 mr-1" />Supprimer
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
