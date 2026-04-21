@@ -389,13 +389,36 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
               <CardTitle className="text-base">Simulateur de prélèvement sur fonds de roulement (PFR)</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <DateField
+                  label="Début d'exercice"
+                  value={stored.dateDebut}
+                  onChange={(v) => persist({ ...stored, dateDebut: v, datesAutoDetectees: false })}
+                  tip="Date de début de la période couverte par la balance. Auto-détectée depuis l'export Op@le si possible."
+                />
+                <DateField
+                  label="Fin d'exercice"
+                  value={stored.dateFin}
+                  onChange={(v) => persist({ ...stored, dateFin: v, datesAutoDetectees: false })}
+                  tip="Date de fin de la période. Le nombre de jours est recalculé automatiquement."
+                />
+                <DateField
+                  label="Conseil d'administration"
+                  value={stored.dateCA}
+                  onChange={(v) => persist({ ...stored, dateCA: v })}
+                  tip="Date du CA devant statuer sur le prélèvement sur fonds de roulement. Sera reportée sur l'avis motivé et le PDF."
+                />
                 <div className="space-y-1">
-                  <Label className="text-xs">Période de référence (jours)<InfoTip>Nombre de jours couverts par la balance. Par défaut 365 (exercice complet).</InfoTip></Label>
-                  <Input type="number" value={stored.nbJoursPeriode} onChange={e => persist({ ...stored, nbJoursPeriode: parseInt(e.target.value) || 365 })} />
+                  <Label className="text-xs">Période calculée</Label>
+                  <div className="h-10 flex items-center px-3 rounded-md border bg-muted/30 text-sm font-bold">
+                    {nbJoursCalcule} jours
+                  </div>
                 </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <Label className="text-xs">Charges décaissables / jour (€)<InfoTip>Calculées automatiquement depuis les mouvements débit des classes 60-64. Saisir une valeur pour forcer.</InfoTip></Label>
+                  <Label className="text-xs">Charges décaissables / jour (€)<InfoTip>Calculées automatiquement depuis les mouvements débit des classes 60-64, divisés par le nombre de jours de la période. Saisir une valeur pour forcer.</InfoTip></Label>
                   <Input type="number" value={stored.chargesParJourManuel || ''} placeholder={r.chargesParJour.toFixed(2)} onChange={e => persist({ ...stored, chargesParJourManuel: parseFloat(e.target.value) || 0 })} />
                 </div>
                 <div className="space-y-1">
