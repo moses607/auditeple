@@ -169,6 +169,24 @@ export default function AuditExecution() {
   const completed = points.filter(p => p.status !== 'non_audite').length;
   const progress = points.length === 0 ? 0 : Math.round((completed / points.length) * 100);
 
+  // Filtre par auteur — restreint la navigation aux points modifiés par cet utilisateur
+  const [authorFilter, setAuthorFilter] = useState<string>('all');
+
+  const distinctAuthors = useMemo(() => {
+    const ids = Array.from(new Set(points.map(p => p.updated_by).filter(Boolean) as string[]));
+    return ids.map(uid => ({
+      id: uid,
+      label: uid === currentUserId ? 'Vous' : (profilesMap[uid] ?? 'Auteur inconnu'),
+    }));
+  }, [points, currentUserId, profilesMap]);
+
+  const filteredIndices = useMemo(() => {
+    if (authorFilter === 'all') return points.map((_, i) => i);
+    return points.map((p, i) => p.updated_by === authorFilter ? i : -1).filter(i => i >= 0);
+  }, [points, authorFilter]);
+
+  const filteredPosition = filteredIndices.indexOf(cursor);
+
   const updateField = (field: keyof PointRow, value: any) => {
     setPoints(prev => prev.map((p, i) => i === cursor ? { ...p, [field]: value } : p));
   };
@@ -191,12 +209,23 @@ export default function AuditExecution() {
 
   const goNext = async () => {
     await saveCurrent();
-    if (cursor < points.length - 1) setCursor(cursor + 1);
+    if (filteredIndices.length === 0) return;
+    if (filteredPosition === -1) {
+      // Point courant hors filtre → aller au premier point du filtre
+      setCursor(filteredIndices[0]);
+    } else if (filteredPosition < filteredIndices.length - 1) {
+      setCursor(filteredIndices[filteredPosition + 1]);
+    }
   };
 
   const goPrev = async () => {
     await saveCurrent();
-    if (cursor > 0) setCursor(cursor - 1);
+    if (filteredIndices.length === 0) return;
+    if (filteredPosition === -1) {
+      setCursor(filteredIndices[0]);
+    } else if (filteredPosition > 0) {
+      setCursor(filteredIndices[filteredPosition - 1]);
+    }
   };
 
   const cloturer = async () => {
@@ -223,13 +252,34 @@ export default function AuditExecution() {
       <div className="space-y-4">
         <Card>
           <CardContent className="py-3 space-y-2">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-sm gap-3 flex-wrap">
               <span className="font-medium flex items-center gap-2">
                 Progression : {completed} / {points.length} points
                 <RealtimePulse triggerAt={remoteUpdateAt} label="Audit modifié en direct" />
               </span>
-              <span className="text-muted-foreground">{progress}%</span>
+              <div className="flex items-center gap-2">
+                <Label className="text-xs text-muted-foreground">Filtrer par auteur :</Label>
+                <Select value={authorFilter} onValueChange={setAuthorFilter}>
+                  <SelectTrigger className="h-8 w-[180px] text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">Tous les auteurs</SelectItem>
+                    {distinctAuthors.map(a => (
+                      <SelectItem key={a.id} value={a.id}>{a.label}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <span className="text-muted-foreground text-xs">{progress}%</span>
+              </div>
             </div>
+            {authorFilter !== 'all' && (
+              <p className="text-xs text-primary">
+                {filteredIndices.length} point{filteredIndices.length > 1 ? 's' : ''} modifié{filteredIndices.length > 1 ? 's' : ''} par{' '}
+                <span className="font-medium">{distinctAuthors.find(a => a.id === authorFilter)?.label}</span>
+                {filteredPosition >= 0 && ` · position ${filteredPosition + 1}/${filteredIndices.length}`}
+              </p>
+            )}
             <Progress value={progress} className="h-2" />
           </CardContent>
         </Card>
