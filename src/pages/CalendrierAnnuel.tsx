@@ -35,6 +35,9 @@ import { cn } from '@/lib/utils';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { CalendrierTimeline } from '@/components/CalendrierTimeline';
 import { DiffuserCalendrierDialog } from '@/components/DiffuserCalendrierDialog';
+import { useCalendrierSync } from '@/hooks/useCalendrierSync';
+import { useGroupements } from '@/hooks/useGroupements';
+import { Cloud, CloudOff } from 'lucide-react';
 
 const STORAGE_KEY = 'calendrier_annuel_v1';
 
@@ -66,19 +69,14 @@ export default function CalendrierAnnuel() {
   const { params } = useAuditParamsContext();
   const ac = getAgenceComptable(params);
   const etablissementsRattaches = params.etablissements.filter(e => !e.isAgenceComptable);
+  const { activeId } = useGroupements();
+  const { activites, setActivites, synced } = useCalendrierSync();
 
-  const [activites, setActivites] = useState<ActiviteCalendrier[]>(() =>
-    loadState<ActiviteCalendrier[]>(STORAGE_KEY, [])
-  );
   const [filterCategorie, setFilterCategorie] = useState<string>('all');
   const [filterMois, setFilterMois] = useState<string>('all');
   const [filterEtab, setFilterEtab] = useState<string>('all');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showLibrary, setShowLibrary] = useState(false);
-
-  useEffect(() => {
-    saveState(STORAGE_KEY, activites);
-  }, [activites]);
 
   // Initialiser avec la bibliothèque si vide
   const initFromLibrary = () => {
@@ -89,7 +87,7 @@ export default function CalendrierAnnuel() {
 
   const addFromModele = (m: ActiviteModele) => {
     const allIds = etablissementsRattaches.map(e => e.id);
-    setActivites(prev => [...prev, buildFromModele(m, allIds)]);
+    setActivites([...activites, buildFromModele(m, allIds)]);
     toast.success('Activité ajoutée');
   };
 
@@ -99,12 +97,12 @@ export default function CalendrierAnnuel() {
       toast.error("Activité obligatoire réglementaire — non supprimable. Vous pouvez l'éditer ou la marquer comme réalisée.");
       return;
     }
-    setActivites(prev => prev.filter(a => a.id !== id));
+    setActivites(activites.filter(a => a.id !== id));
     toast.success('Activité supprimée');
   };
 
   const update = (id: string, patch: Partial<ActiviteCalendrier>) => {
-    setActivites(prev => prev.map(a => a.id === id ? { ...a, ...patch } : a));
+    setActivites(activites.map(a => a.id === id ? { ...a, ...patch } : a));
   };
 
   // Duplication N → N+1 : reset des dates d'échéance + statut réalisé
@@ -145,7 +143,7 @@ export default function CalendrierAnnuel() {
 
   const addBlank = () => {
     const id = `custom-${Date.now()}`;
-    setActivites(prev => [...prev, {
+    setActivites([...activites, {
       id, titre: 'Nouvelle activité', categorie: 'Pilotage / Conseil AC',
       periodicite: 'annuelle', moisDebut: new Date().getMonth() + 1, description: '',
       responsable: 'AC', criticite: 'moyenne',
@@ -164,7 +162,7 @@ export default function CalendrierAnnuel() {
       toast.info('Toutes les activités de la bibliothèque sont déjà ajoutées');
       return;
     }
-    setActivites(prev => [...prev, ...toAdd.map(m => buildFromModele(m, allIds))]);
+    setActivites([...activites, ...toAdd.map(m => buildFromModele(m, allIds))]);
     toast.success(`${toAdd.length} activité(s) ajoutée(s)`);
   };
 
@@ -243,7 +241,12 @@ export default function CalendrierAnnuel() {
   };
 
   const headerActions = (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 items-center">
+      {activeId && (
+        <span className="text-xs text-muted-foreground inline-flex items-center gap-1 mr-2">
+          {synced ? <><Cloud className="h-3.5 w-3.5 text-emerald-600" /> Synchronisé</> : <><CloudOff className="h-3.5 w-3.5" /> Sync…</>}
+        </span>
+      )}
       <DiffuserCalendrierDialog
         activites={activites}
         etablissementsRattaches={etablissementsRattaches}

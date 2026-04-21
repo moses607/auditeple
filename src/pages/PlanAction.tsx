@@ -15,7 +15,7 @@ import { loadState } from '@/lib/store';
 import { AgentSelect } from '@/components/AgentSelect';
 import {
   ActionPlan, StatutAction, CriticiteAction, PlanActionContext,
-  loadActions, saveActions, genererActions, computeStats, getActionsJ15, getActionsEnRetard,
+  genererActions, computeStats, getActionsJ15, getActionsEnRetard,
   STATUT_LABELS, CRITICITE_LABELS, calculerEcheance, LIBRARY_REGLES,
 } from '@/lib/plan-action-engine';
 import { PlanActionTableau } from '@/components/plan-action/PlanActionTableau';
@@ -24,15 +24,15 @@ import { PlanActionCalendrier } from '@/components/plan-action/PlanActionCalendr
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 import { useGroupements } from '@/hooks/useGroupements';
+import { usePlanActionsSync } from '@/hooks/usePlanActionsSync';
+import { Cloud, CloudOff } from 'lucide-react';
 
 export default function PlanAction() {
-  const [actions, setActions] = useState<ActionPlan[]>(() => loadActions());
+  const { actions, setActions: persist, synced } = usePlanActionsSync();
   const [editing, setEditing] = useState<ActionPlan | null>(null);
   const { activeId } = useGroupements();
 
   const stats = useMemo(() => computeStats(actions), [actions]);
-
-  const persist = (next: ActionPlan[]) => { setActions(next); saveActions(next); };
 
   // ═══ Auto-génération depuis cartographie + PV audit ═══
   const regenerer = async () => {
@@ -181,7 +181,12 @@ export default function PlanAction() {
       </Card>
 
       {/* ═══ Toolbar ═══ */}
-      <div className="flex flex-wrap gap-2 justify-end">
+      <div className="flex flex-wrap gap-2 justify-end items-center">
+        {activeId && (
+          <span className="text-xs text-muted-foreground inline-flex items-center gap-1 mr-auto">
+            {synced ? <><Cloud className="h-3.5 w-3.5 text-emerald-600" /> Synchronisé avec le groupement</> : <><CloudOff className="h-3.5 w-3.5" /> Synchronisation…</>}
+          </span>
+        )}
         <Button variant="outline" size="sm" onClick={regenerer}>
           <RefreshCw className="h-4 w-4 mr-2" /> Régénérer depuis risques + PV
         </Button>
