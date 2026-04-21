@@ -169,6 +169,24 @@ export default function AuditExecution() {
   const completed = points.filter(p => p.status !== 'non_audite').length;
   const progress = points.length === 0 ? 0 : Math.round((completed / points.length) * 100);
 
+  // Filtre par auteur — restreint la navigation aux points modifiés par cet utilisateur
+  const [authorFilter, setAuthorFilter] = useState<string>('all');
+
+  const distinctAuthors = useMemo(() => {
+    const ids = Array.from(new Set(points.map(p => p.updated_by).filter(Boolean) as string[]));
+    return ids.map(uid => ({
+      id: uid,
+      label: uid === currentUserId ? 'Vous' : (profilesMap[uid] ?? 'Auteur inconnu'),
+    }));
+  }, [points, currentUserId, profilesMap]);
+
+  const filteredIndices = useMemo(() => {
+    if (authorFilter === 'all') return points.map((_, i) => i);
+    return points.map((p, i) => p.updated_by === authorFilter ? i : -1).filter(i => i >= 0);
+  }, [points, authorFilter]);
+
+  const filteredPosition = filteredIndices.indexOf(cursor);
+
   const updateField = (field: keyof PointRow, value: any) => {
     setPoints(prev => prev.map((p, i) => i === cursor ? { ...p, [field]: value } : p));
   };
