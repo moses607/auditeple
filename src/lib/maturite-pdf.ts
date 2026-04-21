@@ -29,7 +29,7 @@ export async function exportMaturitePDF(data: MaturiteCICF, groupementLabel: str
   doc.text('Édité le ' + new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }), M, 58);
 
   // Bandeau score
-  doc.setFillColor(255);
+  doc.setFillColor(255, 255, 255);
   doc.setTextColor(30, 64, 175);
   doc.roundedRect(M, 90, W - 2 * M, 60, 4, 4, 'F');
   doc.setDrawColor(30, 64, 175);
