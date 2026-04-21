@@ -39,7 +39,7 @@ const COLORS = {
 const STORAGE_KEY = 'fdr_module_v3';
 
 // ───────────────────── Parseur balance Op@le (factorisé) ─────────────────────
-async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; sheetName: string; }> {
+async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; sheetName: string; dateDebut?: string; dateFin?: string; }> {
   const norm = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
   const toNum = (v: unknown): number => {
     if (v === null || v === undefined || v === '') return 0;
@@ -54,8 +54,25 @@ async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; s
     return isNaN(n) ? 0 : (neg ? -n : n);
   };
 
+  // Extraction d'une date au format dd/mm/yyyy ou yyyy-mm-dd dans une cellule
+  const extractDate = (cell: unknown): string | undefined => {
+    if (cell === null || cell === undefined) return undefined;
+    // Date Excel native (number ou Date)
+    if (cell instanceof Date) return cell.toISOString().slice(0, 10);
+    if (typeof cell === 'number' && cell > 25000 && cell < 80000) {
+      const d = XLSX.SSF.parse_date_code(cell);
+      if (d) return `${d.y.toString().padStart(4, '0')}-${String(d.m).padStart(2, '0')}-${String(d.d).padStart(2, '0')}`;
+    }
+    const s = String(cell).trim();
+    let m = s.match(/(\d{2})[\/\-\.](\d{2})[\/\-\.](\d{4})/);
+    if (m) return `${m[3]}-${m[2]}-${m[1]}`;
+    m = s.match(/(\d{4})-(\d{2})-(\d{2})/);
+    if (m) return `${m[1]}-${m[2]}-${m[3]}`;
+    return undefined;
+  };
+
   const buf = await file.arrayBuffer();
-  const wb = XLSX.read(buf, { type: 'array' });
+  const wb = XLSX.read(buf, { type: 'array', cellDates: true });
   const sheetNames = wb.SheetNames;
   let chosen = sheetNames.find(n => {
     const x = norm(n);
@@ -66,6 +83,29 @@ async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; s
   const matrix = XLSX.utils.sheet_to_json<unknown[]>(ws, { header: 1, raw: true, defval: '' }) as unknown[][];
   let headerRowIdx = matrix.findIndex(r => Array.isArray(r) && r.some(c => norm(String(c ?? '')) === 'compte'));
   if (headerRowIdx < 0) headerRowIdx = 2;
+
+  // ─── Recherche des dates d'exercice dans les lignes de méta (avant headers) ───
+  let dateDebut: string | undefined;
+  let dateFin: string | undefined;
+  const metaText = matrix.slice(0, headerRowIdx).flat().map(c => String(c ?? '')).join(' | ');
+  const datesTrouvees: string[] = [];
+  const reDate = /(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4})|(\d{4}-\d{2}-\d{2})/g;
+  let match;
+  while ((match = reDate.exec(metaText)) !== null) {
+    const d = extractDate(match[0]);
+    if (d) datesTrouvees.push(d);
+  }
+  // Détection contextuelle : "du ... au ..."
+  const ctxMatch = metaText.match(/du\s+(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4})\s+au\s+(\d{2}[\/\-\.]\d{2}[\/\-\.]\d{4})/i);
+  if (ctxMatch) {
+    dateDebut = extractDate(ctxMatch[1]);
+    dateFin = extractDate(ctxMatch[2]);
+  } else if (datesTrouvees.length >= 2) {
+    const sorted = [...datesTrouvees].sort();
+    dateDebut = sorted[0];
+    dateFin = sorted[sorted.length - 1];
+  }
+
   const headers = (matrix[headerRowIdx] as unknown[]).map(h => String(h ?? '').trim());
   const idx = (label: string) => headers.findIndex(h => norm(h) === norm(label));
   const iCompte = idx('Compte');
@@ -94,7 +134,7 @@ async function parseBalanceFile(file: File): Promise<{ lignes: BalanceLigne[]; s
       mCred: iMcred >= 0 ? toNum(row[iMcred]) : undefined,
     });
   }
-  return { lignes, sheetName: chosen };
+  return { lignes, sheetName: chosen, dateDebut, dateFin };
 }
 
 // ───────────────────── Composant Feu tricolore ─────────────────────
