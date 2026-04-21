@@ -192,30 +192,63 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
     pfrMontant: 0,
     avisManuel: '',
     sheetName: '',
+    dateDebut: '' as string,           // YYYY-MM-DD
+    dateFin: '' as string,             // YYYY-MM-DD
+    dateCA: '' as string,              // YYYY-MM-DD : date du conseil d'administration
+    datesAutoDetectees: false,
   }));
   const persist = (next: typeof stored) => { setStored(next); saveState(STORAGE_KEY, next); };
+
+  // Recalcul automatique du nb de jours depuis les dates si présentes
+  const nbJoursCalcule = (() => {
+    if (stored.dateDebut && stored.dateFin) {
+      const d1 = new Date(stored.dateDebut);
+      const d2 = new Date(stored.dateFin);
+      const diff = differenceInCalendarDays(d2, d1) + 1;
+      if (diff > 0 && diff < 1000) return diff;
+    }
+    return stored.nbJoursPeriode || 365;
+  })();
 
   const r = useFondsDeRoulement({
     balance: stored.balance,
     pfrMontant: stored.pfrMontant,
-    nbJoursPeriode: stored.nbJoursPeriode,
+    nbJoursPeriode: nbJoursCalcule,
     chargesParJourManuel: stored.chargesParJourManuel || undefined,
   });
 
   const printRef = useRef<HTMLDivElement>(null);
+
+  const fmtDateFR = (iso: string) => {
+    if (!iso) return '';
+    try { return format(new Date(iso), 'dd MMMM yyyy', { locale: fr }); } catch { return iso; }
+  };
 
   // ─── Handlers ───
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const { lignes, sheetName } = await parseBalanceFile(file);
+      const { lignes, sheetName, dateDebut, dateFin } = await parseBalanceFile(file);
       if (lignes.length === 0) {
         toast.warning(`Aucune ligne exploitable dans l'onglet « ${sheetName} ».`);
         return;
       }
-      persist({ ...stored, balance: lignes, sheetName });
-      toast.success(`Balance importée : ${lignes.length} lignes (onglet « ${sheetName} »)`);
+      const next = {
+        ...stored,
+        balance: lignes,
+        sheetName,
+        dateDebut: dateDebut || stored.dateDebut,
+        dateFin: dateFin || stored.dateFin,
+        datesAutoDetectees: !!(dateDebut && dateFin),
+      };
+      persist(next);
+      if (dateDebut && dateFin) {
+        toast.success(`Balance importée : ${lignes.length} lignes — exercice détecté du ${fmtDateFR(dateDebut)} au ${fmtDateFR(dateFin)}`);
+      } else {
+        toast.success(`Balance importée : ${lignes.length} lignes (onglet « ${sheetName} »)`);
+        toast.info("Dates d'exercice non détectées — veuillez les saisir manuellement.");
+      }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Erreur de lecture du fichier');
     } finally {
