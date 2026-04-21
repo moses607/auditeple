@@ -94,6 +94,31 @@ export function useCalendrierSync() {
     return () => { cancelled = true; };
   }, [activeId]);
 
+  // Realtime : recharge la liste à chaque changement distant sur ce groupement
+  useEffect(() => {
+    if (!activeId) return;
+    const channel = supabase
+      .channel(`calendrier_annuel_${activeId}`)
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'calendrier_annuel', filter: `groupement_id=eq.${activeId}` },
+        async () => {
+          const { data } = await supabase
+            .from('calendrier_annuel')
+            .select('*')
+            .eq('groupement_id', activeId)
+            .order('mois', { ascending: true });
+          if (data) {
+            const remote = data.map(rowToActivite);
+            setActivites(remote);
+            saveState(STORAGE_KEY, remote);
+          }
+        }
+      )
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [activeId]);
+
   const persist = useCallback(async (next: ActiviteCalendrier[]) => {
     setActivites(next);
     saveState(STORAGE_KEY, next);
