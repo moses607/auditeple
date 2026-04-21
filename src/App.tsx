@@ -102,6 +102,8 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 
+                <Route path="/pv-contradictoire" element={<PVContradictoirePublic />} />
+
                 <Route element={<ProtectedLayout />}>
                   <Route index element={<Dashboard />} />
                   <Route path="/controle-caisse" element={<ControleCaisse />} />
