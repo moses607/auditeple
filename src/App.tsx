@@ -40,7 +40,11 @@ const CartographieRisques = lazy(() => import("./pages/CartographieRisques"));
 const OrganigrammePage = lazy(() => import("./pages/Organigramme"));
 const PlanAction = lazy(() => import("./pages/PlanAction"));
 const PlanControle = lazy(() => import("./pages/PlanControle"));
-const PVAudit = lazy(() => import("./pages/PVAudit"));
+const PVAuditList = lazy(() => import("./pages/PVAuditList"));
+const PVAuditDetail = lazy(() => import("./pages/PVAuditDetail"));
+const AuditConfig = lazy(() => import("./pages/AuditConfig"));
+const AuditExecution = lazy(() => import("./pages/AuditExecution"));
+const PVContradictoirePublic = lazy(() => import("./pages/PVContradictoirePublic"));
 const PisteAudit = lazy(() => import("./pages/PisteAudit"));
 const Bourses = lazy(() => import("./pages/Bourses"));
 const FondsSociaux = lazy(() => import("./pages/FondsSociaux"));
@@ -98,6 +102,8 @@ const App = () => (
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 
+                <Route path="/pv-contradictoire" element={<PVContradictoirePublic />} />
+
                 <Route element={<ProtectedLayout />}>
                   <Route index element={<Dashboard />} />
                   <Route path="/controle-caisse" element={<ControleCaisse />} />
@@ -122,7 +128,10 @@ const App = () => (
                   <Route path="/organigramme" element={<OrganigrammePage />} />
                   <Route path="/plan-action" element={<PlanAction />} />
                   <Route path="/plan-controle" element={<PlanControle />} />
-                  <Route path="/pv-audit" element={<PVAudit />} />
+                  <Route path="/pv-audit" element={<PVAuditList />} />
+                  <Route path="/pv-audit/:id" element={<PVAuditDetail />} />
+                  <Route path="/audit-config" element={<AuditConfig />} />
+                  <Route path="/audit-execution/:id" element={<AuditExecution />} />
                   <Route path="/annexe-comptable" element={<AnnexeComptable />} />
                   <Route path="/piste-audit" element={<PisteAudit />} />
                   <Route path="/calendrier-annuel" element={<CalendrierAnnuel />} />

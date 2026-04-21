@@ -2,3 +2,12 @@ project_id = "mpexzicaotykelgogdwv"
 
 [functions.ai-assistant]
 verify_jwt = false
+
+[functions.send-pv-contradictoire]
+verify_jwt = false
+
+[functions.validate-pv-token]
+verify_jwt = false
+
+[functions.submit-pv-observations]
+verify_jwt = false

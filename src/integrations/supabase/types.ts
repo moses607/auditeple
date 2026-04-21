@@ -86,6 +86,122 @@ export type Database = {
           },
         ]
       }
+      audit_points_results: {
+        Row: {
+          action_corrective: string | null
+          anomalies: string | null
+          audit_id: string
+          constat: string | null
+          created_at: string
+          delai_action: string | null
+          domaine_id: string
+          id: string
+          pieces_jointes: Json | null
+          point_index: number
+          point_libelle: string
+          responsable_action: string | null
+          status: Database["public"]["Enums"]["point_result_status"]
+          updated_at: string
+        }
+        Insert: {
+          action_corrective?: string | null
+          anomalies?: string | null
+          audit_id: string
+          constat?: string | null
+          created_at?: string
+          delai_action?: string | null
+          domaine_id: string
+          id?: string
+          pieces_jointes?: Json | null
+          point_index: number
+          point_libelle: string
+          responsable_action?: string | null
+          status?: Database["public"]["Enums"]["point_result_status"]
+          updated_at?: string
+        }
+        Update: {
+          action_corrective?: string | null
+          anomalies?: string | null
+          audit_id?: string
+          constat?: string | null
+          created_at?: string
+          delai_action?: string | null
+          domaine_id?: string
+          id?: string
+          pieces_jointes?: Json | null
+          point_index?: number
+          point_libelle?: string
+          responsable_action?: string | null
+          status?: Database["public"]["Enums"]["point_result_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_points_results_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "audits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audits: {
+        Row: {
+          agent_comptable_id: string | null
+          created_at: string
+          date_audit: string
+          etablissement_id: string
+          groupement_id: string
+          id: string
+          libelle: string
+          notes: string | null
+          ordonnateur_id: string | null
+          periode_debut: string
+          periode_fin: string
+          scope: Json
+          status: Database["public"]["Enums"]["audit_status"]
+          type_audit: Database["public"]["Enums"]["audit_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agent_comptable_id?: string | null
+          created_at?: string
+          date_audit?: string
+          etablissement_id: string
+          groupement_id: string
+          id?: string
+          libelle: string
+          notes?: string | null
+          ordonnateur_id?: string | null
+          periode_debut: string
+          periode_fin: string
+          scope?: Json
+          status?: Database["public"]["Enums"]["audit_status"]
+          type_audit?: Database["public"]["Enums"]["audit_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agent_comptable_id?: string | null
+          created_at?: string
+          date_audit?: string
+          etablissement_id?: string
+          groupement_id?: string
+          id?: string
+          libelle?: string
+          notes?: string | null
+          ordonnateur_id?: string | null
+          periode_debut?: string
+          periode_fin?: string
+          scope?: Json
+          status?: Database["public"]["Enums"]["audit_status"]
+          type_audit?: Database["public"]["Enums"]["audit_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       etablissement_agents: {
         Row: {
           agent_id: string
@@ -259,6 +375,103 @@ export type Database = {
         }
         Relationships: []
       }
+      pv_access_tokens: {
+        Row: {
+          created_at: string
+          email_destinataire: string
+          expires_at: string
+          id: string
+          pv_id: string
+          token: string
+          used_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email_destinataire: string
+          expires_at: string
+          id?: string
+          pv_id: string
+          token: string
+          used_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email_destinataire?: string
+          expires_at?: string
+          id?: string
+          pv_id?: string
+          token?: string
+          used_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pv_access_tokens_pv_id_fkey"
+            columns: ["pv_id"]
+            isOneToOne: false
+            referencedRelation: "pv_contradictoires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pv_contradictoires: {
+        Row: {
+          audit_id: string
+          created_at: string
+          delai_jours: number
+          email_ordonnateur: string | null
+          envoye_at: string | null
+          finalise_at: string | null
+          groupement_id: string
+          id: string
+          observation_globale: string | null
+          observations_ordonnateur: Json | null
+          signature_ordonnateur_at: string | null
+          signature_ordonnateur_ip: string | null
+          status: Database["public"]["Enums"]["pv_status"]
+          updated_at: string
+        }
+        Insert: {
+          audit_id: string
+          created_at?: string
+          delai_jours?: number
+          email_ordonnateur?: string | null
+          envoye_at?: string | null
+          finalise_at?: string | null
+          groupement_id: string
+          id?: string
+          observation_globale?: string | null
+          observations_ordonnateur?: Json | null
+          signature_ordonnateur_at?: string | null
+          signature_ordonnateur_ip?: string | null
+          status?: Database["public"]["Enums"]["pv_status"]
+          updated_at?: string
+        }
+        Update: {
+          audit_id?: string
+          created_at?: string
+          delai_jours?: number
+          email_ordonnateur?: string | null
+          envoye_at?: string | null
+          finalise_at?: string | null
+          groupement_id?: string
+          id?: string
+          observation_globale?: string | null
+          observations_ordonnateur?: Json | null
+          signature_ordonnateur_at?: string | null
+          signature_ordonnateur_ip?: string | null
+          status?: Database["public"]["Enums"]["pv_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pv_contradictoires_audit_id_fkey"
+            columns: ["audit_id"]
+            isOneToOne: false
+            referencedRelation: "audits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_groupements: {
         Row: {
           created_at: string
@@ -319,6 +532,12 @@ export type Database = {
         | "responsable_cfa_greta"
         | "correspondant_cicf"
         | "archiviste_comptable"
+      audit_status:
+        | "en_cours"
+        | "cloture"
+        | "envoye_contradiction"
+        | "contradictoire_clos"
+      audit_type: "periodique" | "thematique" | "inopine" | "prise_fonction"
       etablissement_type:
         | "EPLE"
         | "LYCEE"
@@ -328,6 +547,13 @@ export type Database = {
         | "GRETA"
         | "EREA"
         | "SEGPA"
+      point_result_status:
+        | "non_audite"
+        | "conforme"
+        | "anomalie_mineure"
+        | "anomalie_majeure"
+        | "non_applicable"
+      pv_status: "brouillon" | "envoye" | "observe" | "finalise"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -473,6 +699,13 @@ export const Constants = {
         "correspondant_cicf",
         "archiviste_comptable",
       ],
+      audit_status: [
+        "en_cours",
+        "cloture",
+        "envoye_contradiction",
+        "contradictoire_clos",
+      ],
+      audit_type: ["periodique", "thematique", "inopine", "prise_fonction"],
       etablissement_type: [
         "EPLE",
         "LYCEE",
@@ -483,6 +716,14 @@ export const Constants = {
         "EREA",
         "SEGPA",
       ],
+      point_result_status: [
+        "non_audite",
+        "conforme",
+        "anomalie_mineure",
+        "anomalie_majeure",
+        "non_applicable",
+      ],
+      pv_status: ["brouillon", "envoye", "observe", "finalise"],
     },
   },
 } as const
