@@ -202,6 +202,69 @@ export type Database = {
         }
         Relationships: []
       }
+      calendrier_annuel: {
+        Row: {
+          activite_ref: string
+          categorie: string | null
+          created_at: string
+          created_by: string | null
+          criticite: string
+          custom: boolean
+          date_limite: string | null
+          description: string | null
+          groupement_id: string
+          id: string
+          libelle: string
+          mois: number
+          notes: string | null
+          reference_reglementaire: string | null
+          responsable_agent_id: string | null
+          responsable_role: string | null
+          statut: string
+          updated_at: string
+        }
+        Insert: {
+          activite_ref: string
+          categorie?: string | null
+          created_at?: string
+          created_by?: string | null
+          criticite?: string
+          custom?: boolean
+          date_limite?: string | null
+          description?: string | null
+          groupement_id: string
+          id?: string
+          libelle: string
+          mois: number
+          notes?: string | null
+          reference_reglementaire?: string | null
+          responsable_agent_id?: string | null
+          responsable_role?: string | null
+          statut?: string
+          updated_at?: string
+        }
+        Update: {
+          activite_ref?: string
+          categorie?: string | null
+          created_at?: string
+          created_by?: string | null
+          criticite?: string
+          custom?: boolean
+          date_limite?: string | null
+          description?: string | null
+          groupement_id?: string
+          id?: string
+          libelle?: string
+          mois?: number
+          notes?: string | null
+          reference_reglementaire?: string | null
+          responsable_agent_id?: string | null
+          responsable_role?: string | null
+          statut?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       etablissement_agents: {
         Row: {
           agent_id: string
@@ -344,6 +407,75 @@ export type Database = {
           logo_url?: string | null
           siege?: string | null
           telephone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      plan_actions: {
+        Row: {
+          alerte_envoyee: string | null
+          commentaires: string | null
+          created_at: string
+          created_by: string | null
+          criticite: string
+          cycle: string | null
+          description: string | null
+          echeance: string | null
+          groupement_id: string
+          id: string
+          libelle: string
+          origine: string
+          origine_label: string
+          origine_ref: string
+          reference: string | null
+          responsable: string | null
+          responsable_agent_id: string | null
+          responsable_role: string | null
+          statut: string
+          updated_at: string
+        }
+        Insert: {
+          alerte_envoyee?: string | null
+          commentaires?: string | null
+          created_at?: string
+          created_by?: string | null
+          criticite?: string
+          cycle?: string | null
+          description?: string | null
+          echeance?: string | null
+          groupement_id: string
+          id?: string
+          libelle: string
+          origine: string
+          origine_label: string
+          origine_ref: string
+          reference?: string | null
+          responsable?: string | null
+          responsable_agent_id?: string | null
+          responsable_role?: string | null
+          statut?: string
+          updated_at?: string
+        }
+        Update: {
+          alerte_envoyee?: string | null
+          commentaires?: string | null
+          created_at?: string
+          created_by?: string | null
+          criticite?: string
+          cycle?: string | null
+          description?: string | null
+          echeance?: string | null
+          groupement_id?: string
+          id?: string
+          libelle?: string
+          origine?: string
+          origine_label?: string
+          origine_ref?: string
+          reference?: string | null
+          responsable?: string | null
+          responsable_agent_id?: string | null
+          responsable_role?: string | null
+          statut?: string
           updated_at?: string
         }
         Relationships: []
