@@ -39,6 +39,7 @@ const DEFAULT_MODULES: ModuleConfig[] = [
   // ═══ GESTION COMPTABLE ═══
   { id: 'voyages', label: 'Voyages Scolaires', path: '/voyages', icon: 'Plane', enabled: true, section: 'GESTION COMPTABLE' },
   { id: 'restauration', label: 'Restauration', path: '/restauration', icon: 'UtensilsCrossed', enabled: true, section: 'GESTION COMPTABLE' },
+  { id: 'salaires', label: 'Salaires & vacations', path: '/salaires', icon: 'Wallet', enabled: true, section: 'VÉRIFICATION & ORDONNATEUR' },
 
   // ═══ FINANCES & BUDGET ═══
   { id: 'analyse-financiere', label: 'Analyse Financière', path: '/analyse-financiere', icon: 'TrendingUp', enabled: true, section: 'FINANCES & BUDGET' },

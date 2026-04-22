@@ -441,6 +441,48 @@ export type Database = {
         }
         Relationships: []
       }
+      historique_calculs: {
+        Row: {
+          calculateur_id: string
+          calculateur_label: string
+          contexte: string | null
+          created_at: string
+          created_by: string | null
+          etablissement_id: string | null
+          groupement_id: string
+          id: string
+          params: Json
+          resultat: Json
+          resume: string | null
+        }
+        Insert: {
+          calculateur_id: string
+          calculateur_label: string
+          contexte?: string | null
+          created_at?: string
+          created_by?: string | null
+          etablissement_id?: string | null
+          groupement_id: string
+          id?: string
+          params?: Json
+          resultat?: Json
+          resume?: string | null
+        }
+        Update: {
+          calculateur_id?: string
+          calculateur_label?: string
+          contexte?: string | null
+          created_at?: string
+          created_by?: string | null
+          etablissement_id?: string | null
+          groupement_id?: string
+          id?: string
+          params?: Json
+          resultat?: Json
+          resume?: string | null
+        }
+        Relationships: []
+      }
       mapping_audit_risque: {
         Row: {
           created_at: string
