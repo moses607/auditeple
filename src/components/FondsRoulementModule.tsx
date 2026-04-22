@@ -388,6 +388,27 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
             <FeuCard ind={r.indCoherenceDettes} />
           </div>
 
+          {/* Historique des prélèvements antérieurs (mémorisés, déduits du FdR mobilisable) */}
+          <Card className="shadow-card">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <History className="h-4 w-4" />
+                Prélèvements antérieurs sur fonds de roulement
+                <InfoTip>Mémorisés par établissement (UAI). Le total est déduit du FdR mobilisable disponible, comme dans le document de l'académie de Marseille. Ainsi, vous n'avez plus à ressaisir cette information à chaque exercice.</InfoTip>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <PfrHistoryEditor
+                items={stored.pfrHistorique}
+                onChange={(items) => persist({ ...stored, pfrHistorique: items })}
+              />
+              <div className="flex items-center justify-between text-sm pt-2 border-t">
+                <span className="text-muted-foreground">Total des prélèvements antérieurs cumulés :</span>
+                <span className="font-bold text-primary font-mono">{fmtEur(pfrAnterieursTotal)}</span>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Paramètres simulateur */}
           <Card className="shadow-card">
             <CardHeader className="pb-3">
