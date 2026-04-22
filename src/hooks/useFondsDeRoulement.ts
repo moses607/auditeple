@@ -123,9 +123,9 @@ export function useFondsDeRoulement(params: UseFdrParams): FdrResult {
       .filter(l => l.compte.startsWith('1068'))
       .reduce((s, l) => s + Math.max(0, l.sCred - l.sDeb), 0);
 
-    const fdrMobilisable = fdr - seuilPlancher - reservesAffectees;
+    const fdrMobilisable = fdr - seuilPlancher - reservesAffectees - pfrAnterieursTotal;
     const fdrMobilisableApres = fdrMobilisable - pfrMontant;
-    const rongeSurPlancher = (fdr - pfrMontant) < seuilPlancher;
+    const rongeSurPlancher = (fdr - pfrAnterieursTotal - pfrMontant) < seuilPlancher;
 
     // Dettes classe 4 créditrices (pour ratio)
     const dettes4 = balance
