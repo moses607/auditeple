@@ -3,7 +3,7 @@ import {
   Plane, FileText, Calculator, BookOpen, TrendingUp,
   Landmark, Package, Scale, GraduationCap, Heart, UtensilsCrossed,
   AlertTriangle, Target, Building, Building2, Map, GitFork, ListChecks,
-  Calendar, CalendarDays, ClipboardList, BarChart3,
+  Calendar, CalendarDays, ClipboardList, BarChart3, Wallet,
 } from 'lucide-react';
 
 export const ICON_MAP: Record<string, React.ElementType> = {
@@ -11,5 +11,5 @@ export const ICON_MAP: Record<string, React.ElementType> = {
   Plane, FileText, Calculator, BookOpen, TrendingUp,
   Landmark, Package, Scale, GraduationCap, Heart, UtensilsCrossed,
   AlertTriangle, Target, Building, Building2, Map, GitFork, ListChecks,
-  Calendar, CalendarDays, ClipboardList, BarChart3,
+  Calendar, CalendarDays, ClipboardList, BarChart3, Wallet,
 };
