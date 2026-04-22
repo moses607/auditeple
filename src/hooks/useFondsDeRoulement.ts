@@ -201,7 +201,7 @@ export function useFondsDeRoulement(params: UseFdrParams): FdrResult {
       indAutonomie,
       indCoherenceDettes,
     };
-  }, [balance, pfrMontant, nbJoursPeriode, chargesParJourManuel]);
+  }, [balance, pfrMontant, nbJoursPeriode, chargesParJourManuel, pfrAnterieursTotal]);
 }
 
 // ─── Utilitaires de formatage ───
