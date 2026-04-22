@@ -196,6 +196,7 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
     dateFin: '' as string,             // YYYY-MM-DD
     dateCA: '' as string,              // YYYY-MM-DD : date du conseil d'administration
     datesAutoDetectees: false,
+    pfrHistorique: [] as Array<{ id: string; date: string; exercice: string; montant: number; libelle: string }>,
   }));
   const persist = (next: typeof stored) => { setStored(next); saveState(STORAGE_KEY, next); };
 
@@ -210,11 +211,15 @@ export function FondsRoulementModule(_props: FondsRoulementModuleProps) {
     return stored.nbJoursPeriode || 365;
   })();
 
+  // Somme des prélèvements antérieurs (mémorisés) — déduite du FdR mobilisable disponible
+  const pfrAnterieursTotal = (stored.pfrHistorique || []).reduce((s, p) => s + (Number(p.montant) || 0), 0);
+
   const r = useFondsDeRoulement({
     balance: stored.balance,
     pfrMontant: stored.pfrMontant,
     nbJoursPeriode: nbJoursCalcule,
     chargesParJourManuel: stored.chargesParJourManuel || undefined,
+    pfrAnterieursTotal,
   });
 
   const printRef = useRef<HTMLDivElement>(null);
