@@ -5,7 +5,6 @@
  * /outils/calculateurs        → cette page d'index avec liens vers chaque destination
  * /outils/calculateurs/:id    → ouvre le calculateur en standalone (rétro-compatibilité)
  */
-import { useMemo, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import { CALCULATEURS, getCalculateur } from '@/lib/calculateurs';
 import { Card, CardContent } from '@/components/ui/card';
