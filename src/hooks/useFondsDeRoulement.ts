@@ -70,10 +70,11 @@ export interface UseFdrParams {
   pfrMontant: number;
   nbJoursPeriode: number; // ex: 365 si exercice complet
   chargesParJourManuel?: number; // override si fourni
+  pfrAnterieursTotal?: number;   // somme des prélèvements déjà décidés/engagés (mémoire)
 }
 
 export function useFondsDeRoulement(params: UseFdrParams): FdrResult {
-  const { balance, pfrMontant, nbJoursPeriode, chargesParJourManuel } = params;
+  const { balance, pfrMontant, nbJoursPeriode, chargesParJourManuel, pfrAnterieursTotal = 0 } = params;
 
   return useMemo(() => {
     // Agrégats
@@ -122,9 +123,9 @@ export function useFondsDeRoulement(params: UseFdrParams): FdrResult {
       .filter(l => l.compte.startsWith('1068'))
       .reduce((s, l) => s + Math.max(0, l.sCred - l.sDeb), 0);
 
-    const fdrMobilisable = fdr - seuilPlancher - reservesAffectees;
+    const fdrMobilisable = fdr - seuilPlancher - reservesAffectees - pfrAnterieursTotal;
     const fdrMobilisableApres = fdrMobilisable - pfrMontant;
-    const rongeSurPlancher = (fdr - pfrMontant) < seuilPlancher;
+    const rongeSurPlancher = (fdr - pfrAnterieursTotal - pfrMontant) < seuilPlancher;
 
     // Dettes classe 4 créditrices (pour ratio)
     const dettes4 = balance
@@ -200,7 +201,7 @@ export function useFondsDeRoulement(params: UseFdrParams): FdrResult {
       indAutonomie,
       indCoherenceDettes,
     };
-  }, [balance, pfrMontant, nbJoursPeriode, chargesParJourManuel]);
+  }, [balance, pfrMontant, nbJoursPeriode, chargesParJourManuel, pfrAnterieursTotal]);
 }
 
 // ─── Utilitaires de formatage ───
