@@ -83,6 +83,8 @@ export const PARCOURS_ETAPES: EtapeParcours[] = [
       'verification',
       // E. Stocks & immobilisations
       'stocks',
+      // F. Paie & RH — salaires & vacations GRETA/CFA, HSA/HSE, surrémunération DOM
+      'salaires',
       // G. Services spéciaux & budgets annexes
       'restauration', 'voyages', 'budgets-annexes',
     ],
@@ -258,7 +260,7 @@ export const DOMAINES_AUDIT: DomaineAudit[] = [
     description: "Liquidation des rémunérations des personnels payés sur budget de l'établissement.",
     reference: "Décret 86-83 (contractuels) ; circulaire IFSE/CIA ; Code Sécurité sociale",
     periodicite: 'Mensuel',
-    moduleIds: [],
+    moduleIds: ['salaires'],
     checklist: [
       "Vérifier la liquidation des rémunérations agents contractuels (décret 86-83)",
       "Contrôler les indemnités IFSE, CIA, NBI, heures supplémentaires",
