@@ -622,3 +622,84 @@ function DateField({ label, value, onChange, tip }: { label: string; value: stri
     </div>
   );
 }
+
+// ───────────────────── Éditeur d'historique des PFR antérieurs ─────────────────────
+type PfrItem = { id: string; date: string; exercice: string; montant: number; libelle: string };
+
+function PfrHistoryEditor({ items, onChange }: { items: PfrItem[]; onChange: (items: PfrItem[]) => void }) {
+  const [draft, setDraft] = useState<PfrItem>({ id: '', date: '', exercice: '', montant: 0, libelle: '' });
+
+  const addItem = () => {
+    if (!draft.exercice.trim() && !draft.date && !draft.montant) {
+      toast.error('Renseignez au moins un exercice ou un montant.');
+      return;
+    }
+    const next = [...items, { ...draft, id: crypto.randomUUID() }];
+    onChange(next);
+    setDraft({ id: '', date: '', exercice: '', montant: 0, libelle: '' });
+    toast.success('Prélèvement antérieur ajouté');
+  };
+
+  const removeItem = (id: string) => {
+    onChange(items.filter(i => i.id !== id));
+  };
+
+  const sorted = [...items].sort((a, b) => (b.exercice || b.date || '').localeCompare(a.exercice || a.date || ''));
+
+  return (
+    <div className="space-y-3">
+      {sorted.length > 0 && (
+        <div className="overflow-x-auto rounded-md border">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/50">
+              <tr className="text-left">
+                <th className="p-2">Exercice</th>
+                <th className="p-2">Date CA</th>
+                <th className="p-2">Libellé / objet</th>
+                <th className="p-2 text-right">Montant prélevé</th>
+                <th className="p-2 w-10" />
+              </tr>
+            </thead>
+            <tbody>
+              {sorted.map(it => (
+                <tr key={it.id} className="border-t">
+                  <td className="p-2 font-medium">{it.exercice || '—'}</td>
+                  <td className="p-2 text-muted-foreground">{it.date ? format(new Date(it.date), 'dd/MM/yyyy', { locale: fr }) : '—'}</td>
+                  <td className="p-2">{it.libelle || <span className="text-muted-foreground italic">non précisé</span>}</td>
+                  <td className="p-2 text-right font-mono">{fmtEur(it.montant)}</td>
+                  <td className="p-2 text-right">
+                    <Button size="icon" variant="ghost" onClick={() => removeItem(it.id)} aria-label="Supprimer">
+                      <Trash2 className="h-3 w-3 text-destructive" />
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-end p-3 rounded-md bg-muted/30">
+        <div className="md:col-span-2 space-y-1">
+          <Label className="text-xs">Exercice</Label>
+          <Input placeholder="2024" value={draft.exercice} onChange={e => setDraft({ ...draft, exercice: e.target.value })} />
+        </div>
+        <div className="md:col-span-3 space-y-1">
+          <Label className="text-xs">Date du CA</Label>
+          <Input type="date" value={draft.date} onChange={e => setDraft({ ...draft, date: e.target.value })} />
+        </div>
+        <div className="md:col-span-4 space-y-1">
+          <Label className="text-xs">Libellé / objet</Label>
+          <Input placeholder="Ex. Travaux toiture, équipement informatique…" value={draft.libelle} onChange={e => setDraft({ ...draft, libelle: e.target.value })} />
+        </div>
+        <div className="md:col-span-2 space-y-1">
+          <Label className="text-xs">Montant (€)</Label>
+          <Input type="number" placeholder="0" value={draft.montant || ''} onChange={e => setDraft({ ...draft, montant: parseFloat(e.target.value) || 0 })} />
+        </div>
+        <div className="md:col-span-1">
+          <Button onClick={addItem} size="sm" className="w-full gap-1"><Plus className="h-3 w-3" /></Button>
+        </div>
+      </div>
+    </div>
+  );
+}
