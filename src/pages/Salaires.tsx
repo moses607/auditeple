@@ -16,7 +16,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertTriangle, CheckCircle2, Wallet, Sun, Timer, GraduationCap } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, Sun, Timer, GraduationCap } from 'lucide-react';
 import { CalcSurremDOM, CalcHeuresSup } from '@/components/calculateurs/calc-paie-pilotage';
 import { fmtEur } from '@/lib/calculateurs';
 import { cn } from '@/lib/utils';
@@ -133,9 +133,14 @@ export default function Salaires() {
   return (
     <ModulePageLayout
       title="Salaires & vacations"
-      subtitle="Vérification des rémunérations payées sur budget — agents contractuels, vacataires GRETA / CFA, surrémunération DOM, heures supplémentaires"
-      icon={<Wallet className="h-5 w-5" />}
-      reference="Décret 86-83 (contractuels) · Décret 50-1253 (HSA/HSE) · Décret 53-1266 (DOM) · L6241-1 (CFA)"
+      section="VÉRIFICATION & ORDONNATEUR"
+      description="Vérification des rémunérations payées sur budget — agents contractuels, vacataires GRETA / CFA, surrémunération DOM, heures supplémentaires"
+      refs={[
+        { code: 'Décret 86-83', label: 'contractuels' },
+        { code: 'Décret 50-1253', label: 'HSA/HSE' },
+        { code: 'Décret 53-1266', label: 'surrémunération DOM' },
+        { code: 'L6241-1', label: 'CFA' },
+      ]}
     >
       <div className="mb-3 flex flex-wrap gap-2">
         <Badge variant="outline" className="gap-1">
