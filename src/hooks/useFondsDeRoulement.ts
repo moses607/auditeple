@@ -70,10 +70,11 @@ export interface UseFdrParams {
   pfrMontant: number;
   nbJoursPeriode: number; // ex: 365 si exercice complet
   chargesParJourManuel?: number; // override si fourni
+  pfrAnterieursTotal?: number;   // somme des prélèvements déjà décidés/engagés (mémoire)
 }
 
 export function useFondsDeRoulement(params: UseFdrParams): FdrResult {
-  const { balance, pfrMontant, nbJoursPeriode, chargesParJourManuel } = params;
+  const { balance, pfrMontant, nbJoursPeriode, chargesParJourManuel, pfrAnterieursTotal = 0 } = params;
 
   return useMemo(() => {
     // Agrégats
