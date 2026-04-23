@@ -165,8 +165,8 @@ export const REGLES_BASE: RegleArticle[] = [
     source: 'DÉCRET',
     reference: 'Décret 2019-798 du 26 juillet 2019',
     titre: 'Régies de recettes et d\'avances — cadre général',
-    resume: "Plafonds : avances fonctionnement 2 000 €, restauration 3 000 €, encaisse régie de recettes 10 000 €. Délai de versement au comptable : 7 jours. Cautionnement obligatoire au-delà de 1 220 € de fonds maniés.",
-    motsCles: ['régie', 'plafond', 'avance', 'recette', 'cautionnement'],
+    resume: "Plafonds : avances fonctionnement 2 000 €, restauration 3 000 €, encaisse régie de recettes 10 000 €. Délai de versement au comptable : 7 jours. Indemnité de responsabilité (IR) due au régisseur dès lors que le plafond d'encaisse / d'avance dépasse 1 220 € (le cautionnement est supprimé depuis le 1er janvier 2023 — Ord. 2022-408 + Décret 2022-1605).",
+    motsCles: ['régie', 'plafond', 'avance', 'recette', 'IR', 'indemnité'],
   },
   {
     id: 'reg-acte-constitutif',
