@@ -171,13 +171,15 @@ function fromRegies(): CockpitAlerte[] {
     }
   });
 
-  if (!nomination?.cautionnement) {
+  // Cautionnement supprimé par Ord. 2022-408 + Décret 2022-1605 (au 1er janvier 2023).
+  // Contrôle remplacé par : indemnité de responsabilité (IR) due si plafond > 1 220 €.
+  if (nomination?.plafondEncaisse > 1220 && !nomination?.indemniteResponsabilite) {
     out.push({
-      id: 'regie-caut',
-      titre: 'Cautionnement régisseur non vérifié',
+      id: 'regie-ir',
+      titre: 'Indemnité de responsabilité régisseur non versée (plafond > 1 220 €)',
       severity: 'majeur',
       source: 'Régies',
-      reference: 'Décret 2008-227',
+      reference: 'Arrêté 28/05/1993 modifié — Ord. 2022-408 (RGP)',
       modulePath: '/regies',
     });
   }

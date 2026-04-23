@@ -140,14 +140,14 @@ const DOCTRINE: Partial<Record<ThemeMetier, Builder>> = {
   regies: (etab) => ({
     analyse: {
       reformulation:
-        "Contrôle de la régularité des régies de recettes et d'avances : actes constitutifs, cautionnement, plafonds, contrôles inopinés, reversements.",
+        "Contrôle de la régularité des régies de recettes et d'avances : actes constitutifs, nomination du régisseur, plafonds, contrôles inopinés, reversements, indemnité de responsabilité (IR).",
       cadre:
-        "Décret 2019-798 du 26 juillet 2019 modernisé par 2020-128 : régime unifié des régies. Arrêté du 28 mai 1993 modifié : indemnités de responsabilité et cautionnement. Obligation de contrôle au moins une fois par an par l'agent comptable.",
+        "Décret 2019-798 du 26 juillet 2019 modernisé par 2020-128 : régime unifié des régies. Arrêté du 28 mai 1993 modifié : indemnités de responsabilité du régisseur. Ordonnance 2022-408 + Décret 2022-1605 du 22/12/2022 : suppression du cautionnement (régisseurs et comptables publics) et instauration du Régime de responsabilité des gestionnaires publics (RGP) au 1er janvier 2023. Obligation de contrôle au moins une fois par an par l'agent comptable.",
       analyse:
-        "Pour chaque régie : vérifier l'arrêté constitutif, l'acte de nomination du régisseur, le cautionnement souscrit, le plafond d'encaisse et de la régie d'avances, la fréquence des reversements (≥ 1/mois), la concordance comptabilité régisseur / comptabilité du comptable, la tenue des journaux et bordereaux.",
+        "Pour chaque régie : vérifier l'arrêté constitutif, l'acte de nomination du régisseur, le plafond d'encaisse et de la régie d'avances, la fréquence des reversements (≥ 1/mois), la concordance comptabilité régisseur / comptabilité du comptable, la tenue des journaux et bordereaux, et le versement de l'indemnité de responsabilité (IR) due dès lors que le plafond dépasse 1 220 €.",
       conclusion:
-        "Toute irrégularité (régie sans acte constitutif, plafond dépassé, défaut de cautionnement, reversement tardif) doit faire l'objet d'un PV de contrôle et d'une mise en demeure. Le régisseur engage sa responsabilité personnelle et pécuniaire (Ordonnance 2022-408).",
-      source: 'Décret 2019-798 ; Décret 2020-128 ; Arrêté du 28 mai 1993 modifié ; Ordonnance 2022-408.',
+        "Toute irrégularité (régie sans acte constitutif, plafond dépassé, IR non versée, reversement tardif) doit faire l'objet d'un PV de contrôle et d'une mise en demeure. Le régisseur relève désormais du RGP (Régime de responsabilité des gestionnaires publics — Ord. 2022-408) jugé par la Cour des comptes : le cautionnement n'est plus exigé.",
+      source: 'Décret 2019-798 ; Décret 2020-128 ; Arrêté du 28 mai 1993 modifié ; Ordonnance 2022-408 ; Décret 2022-1605.',
     },
     livrables: [
       {

@@ -126,7 +126,8 @@ export const REFS_PAR_THEME: Record<ThemeMetier, RefDoctrine[]> = {
   regies: [
     { ref: 'Décret 2019-798 du 26 juillet 2019', citation: 'Régime modernisé des régies de recettes et d\'avances des organismes publics.' },
     { ref: 'Décret 2020-128', citation: 'Modifications du régime des régies (cumul, plafonds, contrôles).' },
-    { ref: 'Arrêté du 28 mai 1993 modifié', citation: 'Indemnités de responsabilité des régisseurs et cautionnement.' },
+    { ref: 'Arrêté du 28 mai 1993 modifié', citation: 'Indemnités de responsabilité (IR) des régisseurs.' },
+    { ref: 'Ord. 2022-408 + Décret 2022-1605', citation: 'Suppression du cautionnement des régisseurs et des comptables publics au 1er janvier 2023 — instauration du RGP (jugé par la Cour des comptes).' },
   ],
   bourses: [
     { ref: 'Code éducation art. R.531-13 et s.', citation: 'Conditions d\'attribution des bourses nationales de lycée et collège.' },
