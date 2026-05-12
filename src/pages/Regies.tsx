@@ -529,6 +529,25 @@ export default function RegiesPage() {
                 </div>
               </div>
 
+              {/* ═══ Contrôle inopiné AC — Art. 18 Décret 2019-798 (annuel obligatoire) ═══ */}
+              <div className={`p-3 rounded-lg border ${
+                joursDepuisInopine === null ? 'border-orange-400 bg-orange-50'
+                : joursDepuisInopine > 365 ? 'border-destructive bg-destructive/10'
+                : joursDepuisInopine > 300 ? 'border-amber-400 bg-amber-50'
+                : 'border-green-500 bg-green-50'
+              }`}>
+                <p className="text-xs font-bold mb-2">Dernier contrôle inopiné par l'AC <span className="font-normal text-muted-foreground">(Art. 18 Décret 2019-798 — annuel obligatoire)</span></p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Input type="date" value={nomination.dateDernierControleInopine || ''} onChange={e => updateNom('dateDernierControleInopine', e.target.value)} />
+                  <div className="text-xs flex items-center">
+                    {joursDepuisInopine === null && <span className="text-orange-700 font-semibold">Aucun contrôle inopiné renseigné</span>}
+                    {joursDepuisInopine !== null && joursDepuisInopine <= 300 && <span className="text-green-700 font-semibold">✓ Conforme — il y a {joursDepuisInopine} jour{joursDepuisInopine > 1 ? 's' : ''}</span>}
+                    {joursDepuisInopine !== null && joursDepuisInopine > 300 && joursDepuisInopine <= 365 && <span className="text-amber-800 font-semibold">⚠ Approche de l'échéance annuelle ({joursDepuisInopine} jours)</span>}
+                    {joursDepuisInopine !== null && joursDepuisInopine > 365 && <span className="text-destructive font-bold">✗ Hors délai réglementaire ({joursDepuisInopine} jours)</span>}
+                  </div>
+                </div>
+              </div>
+
               {/* ═══ Indemnité de responsabilité (IR) — cautionnement supprimé Ord. 2022-408 ═══ */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-3 rounded-lg border border-border bg-muted/30">
