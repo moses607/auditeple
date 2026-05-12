@@ -193,6 +193,33 @@ export default function RegiesPage() {
     >
       <DoctrineEPLE theme="regies" titre="Régies de recettes et d'avances" resume="Décret 2019-798 — contrôle annuel obligatoire, plafonds, IR (cautionnement supprimé — Ord. 2022-408)" />
 
+      {demo && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 flex items-center gap-2 text-sm text-amber-900 dark:text-amber-200">
+          <Sparkles className="h-4 w-4" />
+          <span><strong>Mode démonstration actif</strong> — données fictives Lycée Baimbridge (Pointe-à-Pitre). Aucune écriture en base. Désactivez via ⌘K → « Mode démo ».</span>
+        </div>
+      )}
+
+      {/* Synthèse de conformité M9-6 — alertes globales en tête */}
+      {joursDepuisInopine !== null && joursDepuisInopine > 365 && (
+        <ControlAlert
+          level="critique"
+          title={`Contrôle inopiné AC > ${Math.floor(joursDepuisInopine / 30)} mois — obligation annuelle non tenue`}
+          description="L'agent comptable doit procéder à un contrôle inopiné de la régie au moins une fois par an (Art. 18 du Décret 2019-798 — M9-6 § 3.2). Au-delà de 12 mois, l'obligation réglementaire n'est plus respectée."
+          refKey="reg-controle-inopine"
+          action="Programmer immédiatement un contrôle inopiné de la régie et établir un PV signé conjointement (régisseur + AC)."
+        />
+      )}
+      {plafondDepasse && (
+        <ControlAlert
+          level="critique"
+          title={`Plafond réglementaire dépassé — ${fmt(acte.montantPlafond)} > ${fmt(plafondReglementaire)}`}
+          description={`Le plafond fixé dans l'acte constitutif dépasse le seuil maximal autorisé par l'Art. 4 du Décret 2019-798 (avances fonctionnement : 2 000 €, restauration : 3 000 €, recettes : 10 000 €).`}
+          refKey="reg-2019-798"
+          action="Réduire le plafond dans l'acte constitutif ou justifier d'une dérogation expresse de l'autorité de tutelle."
+        />
+      )}
+
       <Tabs defaultValue="comptage" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="comptage">Comptage caisse</TabsTrigger>
