@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, Sparkles } from 'lucide-react';
 import { BILLETS, PIECES, fmt, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +14,7 @@ import { REGIES_REGLEMENTATION } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
+import { isDemoMode, DEMO_REGIES } from '@/lib/demo-mode';
 
 /* ═══ SEUILS RÉGLEMENTAIRES ═══ */
 /* Cautionnement SUPPRIMÉ depuis l'Ord. 2022-408 + Décret 2022-1605 (entrée en vigueur 1er janvier 2023) */
