@@ -108,6 +108,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 <span className="text-xs text-muted-foreground">Aucun établissement — Saisir un UAI</span>
               </NavLink>
             )}
+            <DemoModeToggle />
             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="ml-2 text-muted-foreground hover:text-foreground" title="Basculer le thème">
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
