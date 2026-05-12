@@ -18,6 +18,8 @@ import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { SmartBreadcrumb } from '@/components/SmartBreadcrumb';
 import { OnboardingWizard } from '@/components/OnboardingWizard';
 import { EtapeSuivante } from '@/components/EtapeSuivante';
+import { DemoModeToggle } from '@/components/DemoModeToggle';
+import { isDemoMode } from '@/lib/demo-mode';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -106,6 +108,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                 <span className="text-xs text-muted-foreground">Aucun établissement — Saisir un UAI</span>
               </NavLink>
             )}
+            <DemoModeToggle />
             <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="ml-2 text-muted-foreground hover:text-foreground" title="Basculer le thème">
               {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </Button>
@@ -114,6 +117,12 @@ export function AppLayout({ children }: AppLayoutProps) {
               <LogOut className="h-4 w-4" />
             </Button>
           </header>
+          {isDemoMode() && (
+            <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs px-4 py-1.5 flex items-center justify-center gap-2 no-print">
+              <span className="font-semibold">⚡ MODE DÉMONSTRATION</span>
+              <span className="opacity-80">— Données fictives (Lycée Baimbridge, Guadeloupe). Aucune écriture en base.</span>
+            </div>
+          )}
           <RegulatoryUpdateBanner />
           <SmartBreadcrumb />
           <main className="flex-1 overflow-auto p-4 md:p-6 bg-background pb-20 md:pb-6">
