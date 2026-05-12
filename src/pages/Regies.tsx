@@ -74,7 +74,7 @@ export default function RegiesPage() {
   const [nomination, setNomination] = useState<NominationRegisseur>(() => loadState('regies_nomination', {
     nom: '', prenom: '', fonction: '', dateNomination: '', referenceArrete: '',
     suppleant: '', dateSuppleance: '', formationRegie: false, dateFormation: '', observations: '',
-    irMontantAnnuel: 0, irVersee: false,
+    irMontantAnnuel: 0, irVersee: false, dateDernierControleInopine: '',
   }));
 
   // ═══ DFT ═══
@@ -84,11 +84,46 @@ export default function RegiesPage() {
   const [regChecks, setRegChecks] = useState<Record<string, boolean>>(() => loadState('regies_reg_checks', {}));
   const toggleRegCheck = (id: string) => { const u = { ...regChecks, [id]: !regChecks[id] }; setRegChecks(u); saveState('regies_reg_checks', u); };
 
-  const saveControles = (d: ControleCaisseItem[]) => { setControles(d); saveState('ctrl_caisse', d); };
-  const saveCheques = (d: ChequesCoffre[]) => { setCheques(d); saveState('regies_cheques', d); };
-  const saveValeurs = (d: ValeurInactive[]) => { setValeurs(d); saveState('regies_valeurs_inactives', d); };
-  const updateActe = (k: string, v: any) => { const n = { ...acte, [k]: v }; setActe(n); saveState('regies_acte_constitutif', n); };
-  const updateNom = (k: string, v: any) => { const n = { ...nomination, [k]: v }; setNomination(n); saveState('regies_nomination', n); };
+  // ═══ MODE DÉMO — hydrate les états avec un dataset Guadeloupe fictif (in-memory only) ═══
+  const [demo, setDemo] = useState(isDemoMode());
+  useEffect(() => {
+    const onChange = () => setDemo(isDemoMode());
+    window.addEventListener('demo-mode-changed', onChange);
+    return () => window.removeEventListener('demo-mode-changed', onChange);
+  }, []);
+  useEffect(() => {
+    if (!demo) return;
+    setControles(DEMO_REGIES.controles as ControleCaisseItem[]);
+    setCheques(DEMO_REGIES.cheques as ChequesCoffre[]);
+    setValeurs(DEMO_REGIES.valeurs as ValeurInactive[]);
+    setActe(DEMO_REGIES.acte as ActeConstitutif);
+    setNomination(DEMO_REGIES.nomination as NominationRegisseur);
+    setDftMontant(DEMO_REGIES.dftMontant);
+    setDftDateEncaissement(DEMO_REGIES.dftDateEncaissement);
+    setDftDateVersement(DEMO_REGIES.dftDateVersement);
+    setRegChecks(DEMO_REGIES.regChecks);
+  }, [demo]);
+
+  const saveControles = (d: ControleCaisseItem[]) => { setControles(d); if (!demo) saveState('ctrl_caisse', d); };
+  const saveCheques = (d: ChequesCoffre[]) => { setCheques(d); if (!demo) saveState('regies_cheques', d); };
+  const saveValeurs = (d: ValeurInactive[]) => { setValeurs(d); if (!demo) saveState('regies_valeurs_inactives', d); };
+  const updateActe = (k: string, v: any) => { const n = { ...acte, [k]: v }; setActe(n); if (!demo) saveState('regies_acte_constitutif', n); };
+  const updateNom = (k: string, v: any) => { const n = { ...nomination, [k]: v }; setNomination(n); if (!demo) saveState('regies_nomination', n); };
+
+  // ═══ Conformité M9-6 — Contrôle inopiné annuel obligatoire (Art. 18 Décret 2019-798) ═══
+  const joursDepuisInopine = useMemo(() => {
+    if (!nomination.dateDernierControleInopine) return null;
+    const d = new Date(nomination.dateDernierControleInopine);
+    return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+  }, [nomination.dateDernierControleInopine]);
+
+  // ═══ Conformité M9-6 — Plafonds réglementaires Art. 4 Décret 2019-798 ═══
+  const plafondReglementaire = useMemo(() => {
+    if (acte.typeRegie === 'Recettes') return REGIES_REGLEMENTATION.plafonds.recettes.montant; // 10 000 €
+    if (acte.objetRegie?.toLowerCase().includes('restaur')) return REGIES_REGLEMENTATION.plafonds.avances_restauration.montant; // 3 000 €
+    return REGIES_REGLEMENTATION.plafonds.avances_fonctionnement.montant; // 2 000 €
+  }, [acte.typeRegie, acte.objetRegie]);
+  const plafondDepasse = acte.montantPlafond > 0 && acte.montantPlafond > plafondReglementaire;
 
   const billetageTotal = (b: Record<string, number>) => {
     let t = 0;
