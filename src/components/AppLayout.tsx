@@ -18,6 +18,8 @@ import { MobileBottomNav } from '@/components/MobileBottomNav';
 import { SmartBreadcrumb } from '@/components/SmartBreadcrumb';
 import { OnboardingWizard } from '@/components/OnboardingWizard';
 import { EtapeSuivante } from '@/components/EtapeSuivante';
+import { DemoModeToggle } from '@/components/DemoModeToggle';
+import { isDemoMode } from '@/lib/demo-mode';
 
 interface AppLayoutProps {
   children: React.ReactNode;
