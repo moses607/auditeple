@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { Plus, Trash2, Pencil } from 'lucide-react';
+import { Plus, Trash2, Pencil, Sparkles } from 'lucide-react';
 import { BILLETS, PIECES, fmt, fmtDate } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -14,6 +14,7 @@ import { REGIES_REGLEMENTATION } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { ControlAlert } from '@/components/ControlAlert';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
+import { isDemoMode, DEMO_REGIES } from '@/lib/demo-mode';
 
 /* ═══ SEUILS RÉGLEMENTAIRES ═══ */
 /* Cautionnement SUPPRIMÉ depuis l'Ord. 2022-408 + Décret 2022-1605 (entrée en vigueur 1er janvier 2023) */
@@ -46,6 +47,8 @@ interface NominationRegisseur {
   referenceArrete: string; suppleant: string; dateSuppleance: string;
   formationRegie: boolean; dateFormation: string; observations: string;
   irMontantAnnuel: number; irVersee: boolean;
+  /** Date du dernier contrôle inopiné par l'AC — Art. 18 Décret 2019-798 (annuel obligatoire) */
+  dateDernierControleInopine?: string;
 }
 
 export default function RegiesPage() {
@@ -71,7 +74,7 @@ export default function RegiesPage() {
   const [nomination, setNomination] = useState<NominationRegisseur>(() => loadState('regies_nomination', {
     nom: '', prenom: '', fonction: '', dateNomination: '', referenceArrete: '',
     suppleant: '', dateSuppleance: '', formationRegie: false, dateFormation: '', observations: '',
-    irMontantAnnuel: 0, irVersee: false,
+    irMontantAnnuel: 0, irVersee: false, dateDernierControleInopine: '',
   }));
 
   // ═══ DFT ═══
@@ -81,11 +84,46 @@ export default function RegiesPage() {
   const [regChecks, setRegChecks] = useState<Record<string, boolean>>(() => loadState('regies_reg_checks', {}));
   const toggleRegCheck = (id: string) => { const u = { ...regChecks, [id]: !regChecks[id] }; setRegChecks(u); saveState('regies_reg_checks', u); };
 
-  const saveControles = (d: ControleCaisseItem[]) => { setControles(d); saveState('ctrl_caisse', d); };
-  const saveCheques = (d: ChequesCoffre[]) => { setCheques(d); saveState('regies_cheques', d); };
-  const saveValeurs = (d: ValeurInactive[]) => { setValeurs(d); saveState('regies_valeurs_inactives', d); };
-  const updateActe = (k: string, v: any) => { const n = { ...acte, [k]: v }; setActe(n); saveState('regies_acte_constitutif', n); };
-  const updateNom = (k: string, v: any) => { const n = { ...nomination, [k]: v }; setNomination(n); saveState('regies_nomination', n); };
+  // ═══ MODE DÉMO — hydrate les états avec un dataset Guadeloupe fictif (in-memory only) ═══
+  const [demo, setDemo] = useState(isDemoMode());
+  useEffect(() => {
+    const onChange = () => setDemo(isDemoMode());
+    window.addEventListener('demo-mode-changed', onChange);
+    return () => window.removeEventListener('demo-mode-changed', onChange);
+  }, []);
+  useEffect(() => {
+    if (!demo) return;
+    setControles(DEMO_REGIES.controles as ControleCaisseItem[]);
+    setCheques(DEMO_REGIES.cheques as ChequesCoffre[]);
+    setValeurs(DEMO_REGIES.valeurs as ValeurInactive[]);
+    setActe(DEMO_REGIES.acte as ActeConstitutif);
+    setNomination(DEMO_REGIES.nomination as NominationRegisseur);
+    setDftMontant(DEMO_REGIES.dftMontant);
+    setDftDateEncaissement(DEMO_REGIES.dftDateEncaissement);
+    setDftDateVersement(DEMO_REGIES.dftDateVersement);
+    setRegChecks(DEMO_REGIES.regChecks);
+  }, [demo]);
+
+  const saveControles = (d: ControleCaisseItem[]) => { setControles(d); if (!demo) saveState('ctrl_caisse', d); };
+  const saveCheques = (d: ChequesCoffre[]) => { setCheques(d); if (!demo) saveState('regies_cheques', d); };
+  const saveValeurs = (d: ValeurInactive[]) => { setValeurs(d); if (!demo) saveState('regies_valeurs_inactives', d); };
+  const updateActe = (k: string, v: any) => { const n = { ...acte, [k]: v }; setActe(n); if (!demo) saveState('regies_acte_constitutif', n); };
+  const updateNom = (k: string, v: any) => { const n = { ...nomination, [k]: v }; setNomination(n); if (!demo) saveState('regies_nomination', n); };
+
+  // ═══ Conformité M9-6 — Contrôle inopiné annuel obligatoire (Art. 18 Décret 2019-798) ═══
+  const joursDepuisInopine = useMemo(() => {
+    if (!nomination.dateDernierControleInopine) return null;
+    const d = new Date(nomination.dateDernierControleInopine);
+    return Math.floor((Date.now() - d.getTime()) / (1000 * 60 * 60 * 24));
+  }, [nomination.dateDernierControleInopine]);
+
+  // ═══ Conformité M9-6 — Plafonds réglementaires Art. 4 Décret 2019-798 ═══
+  const plafondReglementaire = useMemo(() => {
+    if (acte.typeRegie === 'Recettes') return REGIES_REGLEMENTATION.plafonds.recettes.montant; // 10 000 €
+    if (acte.objetRegie?.toLowerCase().includes('restaur')) return REGIES_REGLEMENTATION.plafonds.avances_restauration.montant; // 3 000 €
+    return REGIES_REGLEMENTATION.plafonds.avances_fonctionnement.montant; // 2 000 €
+  }, [acte.typeRegie, acte.objetRegie]);
+  const plafondDepasse = acte.montantPlafond > 0 && acte.montantPlafond > plafondReglementaire;
 
   const billetageTotal = (b: Record<string, number>) => {
     let t = 0;
@@ -154,6 +192,33 @@ export default function RegiesPage() {
       totalChecks={(REGIES_REGLEMENTATION.controles_obligatoires).length}
     >
       <DoctrineEPLE theme="regies" titre="Régies de recettes et d'avances" resume="Décret 2019-798 — contrôle annuel obligatoire, plafonds, IR (cautionnement supprimé — Ord. 2022-408)" />
+
+      {demo && (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/30 p-3 flex items-center gap-2 text-sm text-amber-900 dark:text-amber-200">
+          <Sparkles className="h-4 w-4" />
+          <span><strong>Mode démonstration actif</strong> — données fictives Lycée Baimbridge (Pointe-à-Pitre). Aucune écriture en base. Désactivez via ⌘K → « Mode démo ».</span>
+        </div>
+      )}
+
+      {/* Synthèse de conformité M9-6 — alertes globales en tête */}
+      {joursDepuisInopine !== null && joursDepuisInopine > 365 && (
+        <ControlAlert
+          level="critique"
+          title={`Contrôle inopiné AC > ${Math.floor(joursDepuisInopine / 30)} mois — obligation annuelle non tenue`}
+          description="L'agent comptable doit procéder à un contrôle inopiné de la régie au moins une fois par an (Art. 18 du Décret 2019-798 — M9-6 § 3.2). Au-delà de 12 mois, l'obligation réglementaire n'est plus respectée."
+          refKey="reg-controle-inopine"
+          action="Programmer immédiatement un contrôle inopiné de la régie et établir un PV signé conjointement (régisseur + AC)."
+        />
+      )}
+      {plafondDepasse && (
+        <ControlAlert
+          level="critique"
+          title={`Plafond réglementaire dépassé — ${fmt(acte.montantPlafond)} > ${fmt(plafondReglementaire)}`}
+          description={`Le plafond fixé dans l'acte constitutif dépasse le seuil maximal autorisé par l'Art. 4 du Décret 2019-798 (avances fonctionnement : 2 000 €, restauration : 3 000 €, recettes : 10 000 €).`}
+          refKey="reg-2019-798"
+          action="Réduire le plafond dans l'acte constitutif ou justifier d'une dérogation expresse de l'autorité de tutelle."
+        />
+      )}
 
       <Tabs defaultValue="comptage" className="w-full">
         <TabsList className="grid w-full grid-cols-5">
@@ -461,6 +526,25 @@ export default function RegiesPage() {
                   {nomination.formationRegie && (
                     <div className="mt-2 space-y-1"><Label className="text-xs">Date de formation</Label><Input type="date" value={nomination.dateFormation} onChange={e => updateNom('dateFormation', e.target.value)} /></div>
                   )}
+                </div>
+              </div>
+
+              {/* ═══ Contrôle inopiné AC — Art. 18 Décret 2019-798 (annuel obligatoire) ═══ */}
+              <div className={`p-3 rounded-lg border ${
+                joursDepuisInopine === null ? 'border-orange-400 bg-orange-50'
+                : joursDepuisInopine > 365 ? 'border-destructive bg-destructive/10'
+                : joursDepuisInopine > 300 ? 'border-amber-400 bg-amber-50'
+                : 'border-green-500 bg-green-50'
+              }`}>
+                <p className="text-xs font-bold mb-2">Dernier contrôle inopiné par l'AC <span className="font-normal text-muted-foreground">(Art. 18 Décret 2019-798 — annuel obligatoire)</span></p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <Input type="date" value={nomination.dateDernierControleInopine || ''} onChange={e => updateNom('dateDernierControleInopine', e.target.value)} />
+                  <div className="text-xs flex items-center">
+                    {joursDepuisInopine === null && <span className="text-orange-700 font-semibold">Aucun contrôle inopiné renseigné</span>}
+                    {joursDepuisInopine !== null && joursDepuisInopine <= 300 && <span className="text-green-700 font-semibold">✓ Conforme — il y a {joursDepuisInopine} jour{joursDepuisInopine > 1 ? 's' : ''}</span>}
+                    {joursDepuisInopine !== null && joursDepuisInopine > 300 && joursDepuisInopine <= 365 && <span className="text-amber-800 font-semibold">⚠ Approche de l'échéance annuelle ({joursDepuisInopine} jours)</span>}
+                    {joursDepuisInopine !== null && joursDepuisInopine > 365 && <span className="text-destructive font-bold">✗ Hors délai réglementaire ({joursDepuisInopine} jours)</span>}
+                  </div>
                 </div>
               </div>
 
