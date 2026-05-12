@@ -47,6 +47,8 @@ interface NominationRegisseur {
   referenceArrete: string; suppleant: string; dateSuppleance: string;
   formationRegie: boolean; dateFormation: string; observations: string;
   irMontantAnnuel: number; irVersee: boolean;
+  /** Date du dernier contrôle inopiné par l'AC — Art. 18 Décret 2019-798 (annuel obligatoire) */
+  dateDernierControleInopine?: string;
 }
 
 export default function RegiesPage() {
