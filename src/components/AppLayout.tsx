@@ -117,6 +117,12 @@ export function AppLayout({ children }: AppLayoutProps) {
               <LogOut className="h-4 w-4" />
             </Button>
           </header>
+          {isDemoMode() && (
+            <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs px-4 py-1.5 flex items-center justify-center gap-2 no-print">
+              <span className="font-semibold">⚡ MODE DÉMONSTRATION</span>
+              <span className="opacity-80">— Données fictives (Lycée Baimbridge, Guadeloupe). Aucune écriture en base.</span>
+            </div>
+          )}
           <RegulatoryUpdateBanner />
           <SmartBreadcrumb />
           <main className="flex-1 overflow-auto p-4 md:p-6 bg-background pb-20 md:pb-6">
