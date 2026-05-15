@@ -111,7 +111,38 @@ export default function PVAuditDetail() {
       // 2. Mettre à jour l'audit
       await supabase.from('audits').update({ status: 'envoye_contradiction' }).eq('id', id);
 
-      // 3. Appeler l'edge function pour générer token + envoyer email
+      // 3. Construire la liste des constats (anomalies PV + risques cartographiés)
+      const anomaliesPV = points
+        .filter(p => p.status === 'anomalie_mineure' || p.status === 'anomalie_majeure')
+        .map(p => ({
+          type: p.status === 'anomalie_majeure' ? 'Anomalie majeure' : 'Anomalie mineure',
+          libelle: p.point_libelle,
+          domaine: DOMAINES_AUDIT.find(d => d.id === p.domaine_id)?.libelle ?? p.domaine_id,
+          constat: p.constat ?? '',
+          action: p.action_corrective ?? '',
+        }));
+
+      let risquesCarto: Array<{ type: string; libelle: string; domaine: string; constat: string; action: string }> = [];
+      try {
+        const { data: pa } = await supabase
+          .from('plan_actions')
+          .select('libelle, description, criticite, origine, origine_label, cycle, statut')
+          .eq('groupement_id', audit.groupement_id)
+          .neq('statut', 'archive');
+        risquesCarto = (pa ?? [])
+          .filter(a => a.origine === 'risque')
+          .map(a => ({
+            type: `Risque ${a.criticite}`,
+            libelle: a.origine_label || a.libelle,
+            domaine: a.cycle || 'Cartographie',
+            constat: a.description ?? '',
+            action: a.libelle ?? '',
+          }));
+      } catch (_) { /* offline-friendly */ }
+
+      const constats = [...anomaliesPV, ...risquesCarto];
+
+      // 4. Appeler l'edge function pour générer token + envoyer email
       const { error: fnError } = await supabase.functions.invoke('send-pv-contradictoire', {
         body: {
           pv_id: pvId,
@@ -121,6 +152,7 @@ export default function PVAuditDetail() {
           etablissement_nom: etab?.nom ?? '',
           ordonnateur_nom: ordo ? `${ordo.civilite ?? ''} ${ordo.prenom} ${ordo.nom}`.trim() : '',
           ac_nom: ac ? `${ac.civilite ?? ''} ${ac.prenom} ${ac.nom}`.trim() : '',
+          constats,
         },
       });
       if (fnError) throw fnError;
