@@ -203,25 +203,133 @@ export default function OrganigrammePage() {
         </CardContent></Card>
       )}
 
-      {items.length === 0 && !form && <Card><CardContent className="py-12 text-center text-muted-foreground">Aucun membre enregistré.</CardContent></Card>}
-      {items.map(m => (
-        <Card key={m.id}>
-          <CardContent className="pt-6">
-            <div className="flex items-start gap-4">
-              <div className="w-11 h-11 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm shrink-0">{m.nom.charAt(0)}</div>
-              <div className="flex-1 min-w-0">
-                <p className="font-bold text-lg">{m.nom}</p>
-                <p className="text-sm text-primary font-semibold">{m.fonction}</p>
-                <div className="flex flex-wrap gap-1 mt-2">{m.taches.map(t => <span key={t} className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">{t}</span>)}</div>
-              </div>
-              <div className="flex gap-1">
-                <Button variant="ghost" size="icon" onClick={() => setForm({ ...m })}><Pencil className="h-4 w-4" /></Button>
-                <Button variant="ghost" size="icon" onClick={() => save(items.filter(i => i.id !== m.id))}><Trash2 className="h-4 w-4 text-destructive" /></Button>
-              </div>
-            </div>
+      {items.length === 0 && !form && <Card><CardContent className="py-12 text-center text-muted-foreground">Aucun membre enregistré. Cliquez sur « Importer agents de l'établissement » pour pré-remplir.</CardContent></Card>}
+
+      {/* Conflits séparation des tâches (GBCP art. 9) */}
+      {conflitsSeparation.length > 0 && (
+        <Card className="border-destructive bg-destructive/5">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2 text-destructive">
+              <AlertTriangle className="h-4 w-4" /> Conflit de séparation des tâches (GBCP art. 9)
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-xs space-y-1.5">
+            <p>Les agents suivants cumulent des tâches d'<strong>ordonnateur</strong> (engagement, liquidation, DP) et de <strong>comptable</strong> (visa, tenue, rappro) — incompatible avec le principe de séparation :</p>
+            <ul className="list-disc pl-5">
+              {conflitsSeparation.map(m => (
+                <li key={m.id}><strong>{m.nom}</strong> ({m.fonction}) — tâches : {m.taches?.join(', ')}</li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
-      ))}
+      )}
+
+      {/* Vue 1 : par fonction (Qui occupe quelle fonction) */}
+      {parFonction.length > 0 && (
+        <ModuleSection title="Qui occupe quelle fonction" description="Vue regroupée par fonction comptable" badge={`${parFonction.length} fonction(s)`}>
+          <div className="space-y-3">
+            {parFonction.map(([fonction, membres]) => (
+              <Card key={fonction}>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <Badge variant="secondary">{fonction}</Badge>
+                    <span className="text-xs text-muted-foreground font-normal">{membres.length} agent{membres.length > 1 ? 's' : ''}</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-2">
+                  {membres.map(m => (
+                    <div key={m.id} className="flex items-start gap-3 border-l-2 border-primary/30 pl-3 py-1">
+                      <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-xs shrink-0">{m.nom.charAt(0)}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm">{m.nom}</p>
+                        {(m.email || m.telephone) && (
+                          <p className="text-[11px] text-muted-foreground">{[m.telephone, m.email].filter(Boolean).join(' · ')}</p>
+                        )}
+                        <div className="flex flex-wrap gap-1 mt-1">
+                          {m.taches?.map(t => (
+                            <span
+                              key={t}
+                              className={`text-[10px] px-2 py-0.5 rounded-full font-medium border ${
+                                TACHES_ORDONNATEUR.includes(t) ? 'bg-amber-500/10 text-amber-700 border-amber-500/30' :
+                                TACHES_COMPTABLE.includes(t)   ? 'bg-blue-500/10 text-blue-700 border-blue-500/30' :
+                                'bg-primary/10 text-primary border-primary/20'
+                              }`}
+                            >
+                              {t}
+                            </span>
+                          ))}
+                          {(!m.taches || m.taches.length === 0) && <span className="text-[10px] text-muted-foreground italic">Aucune tâche assignée</span>}
+                        </div>
+                      </div>
+                      <div className="flex gap-1 shrink-0">
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setForm({ ...m })}><Pencil className="h-3.5 w-3.5" /></Button>
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => save(items.filter(i => i.id !== m.id))}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+                      </div>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </ModuleSection>
+      )}
+
+      {/* Vue 2 : matrice qui-fait-quoi (par tâche) */}
+      {items.length > 0 && (
+        <ModuleSection
+          title="Matrice « Qui fait quoi »"
+          description="Pour chaque tâche comptable Op@le, identification du ou des agents responsables. Les tâches non attribuées sont à risque."
+          badge={`${tachesNonAttribuees.length} tâche(s) non attribuée(s)`}
+        >
+          <Card>
+            <CardContent className="p-0 overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead className="bg-muted/50 text-left">
+                  <tr>
+                    <th className="px-3 py-2 font-semibold w-1/3">Tâche</th>
+                    <th className="px-3 py-2 font-semibold">Agent(s) en charge</th>
+                    <th className="px-3 py-2 font-semibold w-24 text-center">Statut</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {matriceTaches.map(({ tache, membres }) => {
+                    const orphelin = membres.length === 0;
+                    const cumul = membres.length > 1;
+                    return (
+                      <tr key={tache} className={`border-t ${orphelin ? 'bg-destructive/5' : ''}`}>
+                        <td className="px-3 py-2 font-medium">
+                          {tache}
+                          {TACHES_ORDONNATEUR.includes(tache) && <Badge variant="outline" className="ml-2 text-[9px] border-amber-500/40 text-amber-700">Ordonnateur</Badge>}
+                          {TACHES_COMPTABLE.includes(tache)   && <Badge variant="outline" className="ml-2 text-[9px] border-blue-500/40 text-blue-700">Comptable</Badge>}
+                        </td>
+                        <td className="px-3 py-2">
+                          {orphelin ? (
+                            <span className="italic text-destructive">Aucun agent — risque opérationnel</span>
+                          ) : (
+                            <div className="flex flex-wrap gap-1">
+                              {membres.map(m => (
+                                <Badge key={m.id} variant="secondary" className="text-[10px]">
+                                  <Users className="h-2.5 w-2.5 mr-1" />
+                                  {m.nom} <span className="opacity-60 ml-1">· {m.fonction}</span>
+                                </Badge>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-3 py-2 text-center">
+                          {orphelin && <Badge variant="destructive" className="text-[10px]">Non attribuée</Badge>}
+                          {!orphelin && cumul && <Badge className="text-[10px] bg-amber-600">Partagée</Badge>}
+                          {!orphelin && !cumul && <Badge variant="secondary" className="text-[10px]"><CheckCircle2 className="h-2.5 w-2.5 mr-1" />OK</Badge>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
+        </ModuleSection>
+      )}
 
       {/* Contrôles réglementaires */}
       <ModuleSection title="Contrôles réglementaires — Organisation" description="M9-6 § 1.2 — Art. 9 GBCP" badge={`${(CONTROLES_ORGANIGRAMME).filter(c => regChecks[c.id]).length}/${(CONTROLES_ORGANIGRAMME).length}`}>
