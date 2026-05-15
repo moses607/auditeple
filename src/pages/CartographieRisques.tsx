@@ -28,7 +28,8 @@ const riskLevel = (r: CartoRisque) => {
 export default function CartographieRisques() {
   const { params } = useAuditParamsContext();
   const etabId = params.selectedEtablissementId || null;
-  const { activeGroupement, activeId } = useGroupements();
+  const { groupements, activeId } = useGroupements();
+  const activeGroupement = groupements.find(g => g.id === activeId);
   const { etablissements } = useEtablissements(activeId);
   const activeEtab = etabId ? etablissements.find(e => e.id === etabId) : null;
   const [items, setItems] = useState<CartoRisque[]>(() => loadState('cartographie', []));
