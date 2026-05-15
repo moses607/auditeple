@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Pencil, Download } from 'lucide-react';
+import { Plus, Trash2, Pencil, Download, Printer } from 'lucide-react';
 import { CartoRisque, NIVEAUX_RISQUE } from '@/lib/types';
 import { CARTOPALE_PROCESSUS } from '@/lib/regulatory-data';
 import { loadState, saveState } from '@/lib/store';
@@ -12,6 +12,8 @@ import { ModulePageLayout, AnomalyAlert } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { AgentSelect } from '@/components/AgentSelect';
 import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
+import { useGroupements, useEtablissements } from '@/hooks/useGroupements';
+import { printLandscape, table, badge } from '@/lib/print-landscape';
 
 const PROCESSUS_LIST = CARTOPALE_PROCESSUS.map(p => `${p.code} — ${p.label}`);
 
