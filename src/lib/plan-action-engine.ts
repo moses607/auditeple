@@ -384,10 +384,9 @@ export function genererActions(
     });
   }
 
-  // 2) Cartographie des risques (criticité ≥ Moyenne, score ≥ 20)
+  // 2) Cartographie des risques — TOUS les risques constatés (peu importe la criticité)
   for (const r of ctx.risques) {
     const score = r.probabilite * r.impact * r.maitrise;
-    if (score < 20) continue;
     const crit = criticiteFromScore(score);
     const ref = `risque:${r.id}`;
     const existing = map.get(ref);
