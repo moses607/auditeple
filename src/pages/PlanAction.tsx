@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Plus, RefreshCw, Sparkles, AlertTriangle, Clock, CheckCircle2, ListChecks, KanbanSquare, CalendarDays, Mail } from 'lucide-react';
+import { Plus, RefreshCw, Sparkles, AlertTriangle, Clock, CheckCircle2, ListChecks, KanbanSquare, CalendarDays, Mail, Printer } from 'lucide-react';
 import { ModulePageLayout } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { CartoRisque } from '@/lib/types';
