@@ -17,7 +17,7 @@ Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
 
   try {
-    const { pv_id, email_destinataire, delai_jours, audit_libelle, etablissement_nom, ordonnateur_nom, ac_nom } = await req.json();
+    const { pv_id, email_destinataire, delai_jours, audit_libelle, etablissement_nom, ordonnateur_nom, ac_nom, constats } = await req.json();
 
     if (!pv_id || !email_destinataire) {
       return new Response(JSON.stringify({ error: 'pv_id et email_destinataire requis' }), {
