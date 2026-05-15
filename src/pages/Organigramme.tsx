@@ -47,10 +47,13 @@ export default function OrganigrammePage() {
   const [form, setForm] = useState<any>(null);
   const save = (d: EquipeMembre[]) => { setItems(d); saveState('organigramme', d); };
 
-  const { activeId } = useGroupements();
+  const { activeId, groupements } = useGroupements();
+  const activeGroupement = groupements.find(g => g.id === activeId);
   const { agents } = useAgents(activeId);
+  const { etablissements } = useEtablissements(activeId);
   const { params } = useAuditParamsContext();
   const etabId = params.selectedEtablissementId || null;
+  const activeEtab = etabId ? etablissements.find(e => e.id === etabId) : null;
 
   // Agents filtrés sur l'établissement actif (+ agents transverses du groupement)
   const agentsEtab = useMemo(
