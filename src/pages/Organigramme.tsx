@@ -211,6 +211,9 @@ export default function OrganigrammePage() {
           <Download className="h-4 w-4 mr-2" />
           Importer agents de l'établissement ({agentsEtab.length})
         </Button>
+        <Button variant="outline" onClick={handlePrint}>
+          <Printer className="h-4 w-4 mr-2" /> Imprimer (compte financier)
+        </Button>
         <Button onClick={() => setForm({ nom: '', fonction: 'Agent Comptable', telephone: '', email: '', taches: [] })}>
           <Plus className="h-4 w-4 mr-2" /> Membre
         </Button>
