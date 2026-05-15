@@ -1,17 +1,23 @@
-import { useState } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useMemo, useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Plus, Trash2, Pencil, Download } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Plus, Trash2, Pencil, Download, AlertTriangle, CheckCircle2, Users } from 'lucide-react';
 import { EquipeMembre, FONCTIONS_COMPTABLES, TACHES_COMPTABLES } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_ORGANIGRAMME } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { useAgents, useGroupements, getRoleLabel } from '@/hooks/useGroupements';
+import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 import { AgentSelect } from '@/components/AgentSelect';
 import { toast } from '@/hooks/use-toast';
+
+// Tâches « ordonnateur » (engagement) vs « comptable » (paiement) — séparation GBCP art. 9
+const TACHES_ORDONNATEUR = ['Liquidation dépenses', 'Demande de paiement', 'Émission titres', 'Commande publique', 'Engagement'];
+const TACHES_COMPTABLE   = ['Visa des dépenses', 'Tenue comptabilité', 'Rapprochement bancaire', 'Contrôle caisse'];
 
 // Mapping rôle agent → fonction comptable de l'organigramme + tâches Op@le typiques
 const ROLE_TO_FONCTION: Record<string, { fonction: string; taches: string[] }> = {
