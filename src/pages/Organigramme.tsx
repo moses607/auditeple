@@ -4,16 +4,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Pencil, Download, AlertTriangle, CheckCircle2, Users } from 'lucide-react';
+import { Plus, Trash2, Pencil, Download, AlertTriangle, CheckCircle2, Users, Printer } from 'lucide-react';
 import { EquipeMembre, FONCTIONS_COMPTABLES, TACHES_COMPTABLES } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_ORGANIGRAMME } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
-import { useAgents, useGroupements, getRoleLabel } from '@/hooks/useGroupements';
+import { useAgents, useGroupements, useEtablissements, getRoleLabel } from '@/hooks/useGroupements';
 import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 import { AgentSelect } from '@/components/AgentSelect';
 import { toast } from '@/hooks/use-toast';
+import { printLandscape, table, badge } from '@/lib/print-landscape';
 
 // Tâches « ordonnateur » (engagement) vs « comptable » (paiement) — séparation GBCP art. 9
 const TACHES_ORDONNATEUR = ['Liquidation dépenses', 'Demande de paiement', 'Émission titres', 'Commande publique', 'Engagement'];
