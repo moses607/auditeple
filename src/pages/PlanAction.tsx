@@ -27,6 +27,9 @@ import { useGroupements } from '@/hooks/useGroupements';
 import { usePlanActionsSync } from '@/hooks/usePlanActionsSync';
 import { Cloud, CloudOff } from 'lucide-react';
 import { RealtimePulse } from '@/components/RealtimePulse';
+import { printLandscape, table, badge } from '@/lib/print-landscape';
+import { useEtablissements } from '@/hooks/useGroupements';
+import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 
 export default function PlanAction() {
   const { actions, setActions: persist, synced, remoteUpdateAt } = usePlanActionsSync();
