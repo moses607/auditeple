@@ -178,7 +178,8 @@ export default function OrganigrammePage() {
                     setForm({ ...form, nom: display });
                   }
                 }}
-                placeholder="Choisir dans l'équipe…"
+                placeholder="Choisir dans l'équipe de l'établissement…"
+                etablissementId={etabId}
               />
             </div>
             <div className="space-y-1"><Label className="text-xs">Fonction</Label>
