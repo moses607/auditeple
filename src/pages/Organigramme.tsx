@@ -48,6 +48,43 @@ export default function OrganigrammePage() {
 
   const { activeId } = useGroupements();
   const { agents } = useAgents(activeId);
+  const { params } = useAuditParamsContext();
+  const etabId = params.selectedEtablissementId || null;
+
+  // Agents filtrés sur l'établissement actif (+ agents transverses du groupement)
+  const agentsEtab = useMemo(
+    () => agents.filter(a => a.actif && (!etabId || a.etablissement_id === etabId || a.etablissement_id === null)),
+    [agents, etabId],
+  );
+
+  // Matrice « qui fait quoi » : pour chaque tâche, liste des membres qui en sont chargés
+  const matriceTaches = useMemo(() => {
+    return TACHES_COMPTABLES.map(tache => ({
+      tache,
+      membres: items.filter(m => m.taches?.includes(tache)),
+    }));
+  }, [items]);
+  const tachesNonAttribuees = matriceTaches.filter(t => t.membres.length === 0);
+
+  // Vue regroupée par fonction
+  const parFonction = useMemo(() => {
+    const map = new Map<string, EquipeMembre[]>();
+    items.forEach(m => {
+      const k = m.fonction || 'Non défini';
+      if (!map.has(k)) map.set(k, []);
+      map.get(k)!.push(m);
+    });
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [items]);
+
+  // Conflits séparation des tâches : même personne sur engagement + paiement
+  const conflitsSeparation = useMemo(() => {
+    return items.filter(m => {
+      const ordo = m.taches?.some(t => TACHES_ORDONNATEUR.includes(t));
+      const compta = m.taches?.some(t => TACHES_COMPTABLE.includes(t));
+      return ordo && compta;
+    });
+  }, [items]);
 
   // Importe les agents Paramètres → organigramme (sans doublon de nom)
   const importerDepuisParametres = () => {
