@@ -137,6 +137,11 @@ export default function PVAuditDetail() {
   if (loading) return <ModulePageLayout title="PV d'audit" section="AUDIT & RESTITUTION"><p>Chargement…</p></ModulePageLayout>;
   if (!audit) return <ModulePageLayout title="PV d'audit" section="AUDIT & RESTITUTION"><p>Audit introuvable.</p></ModulePageLayout>;
 
+  const scopeDomaines = Array.from(new Set(points.map(p => p.domaine_id)))
+    .map(id => DOMAINES_AUDIT.find(d => d.id === id))
+    .filter(Boolean) as typeof DOMAINES_AUDIT;
+  const isPerimetreRestreint = scopeDomaines.length > 0 && scopeDomaines.length < DOMAINES_AUDIT.length;
+
   return (
     <ModulePageLayout
       title={`PV — ${audit.libelle}`}
@@ -144,6 +149,43 @@ export default function PVAuditDetail() {
       description={`Période ${audit.periode_debut} → ${audit.periode_fin} · ${etab?.nom ?? '—'}`}
     >
       <div className="space-y-4">
+        {/* Périmètre de l'audit — mention obligatoire au PV */}
+        <Card className={isPerimetreRestreint ? 'border-amber-500/40 bg-amber-500/5' : 'border-emerald-500/30 bg-emerald-500/5'}>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Badge variant={isPerimetreRestreint ? 'outline' : 'secondary'} className={isPerimetreRestreint ? 'border-amber-600 text-amber-700 dark:text-amber-300' : ''}>
+                {isPerimetreRestreint ? 'Périmètre restreint' : 'Audit complet'}
+              </Badge>
+              Périmètre du procès-verbal
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-xs space-y-2">
+            <p>
+              Le présent procès-verbal contradictoire porte {isPerimetreRestreint ? 'exclusivement' : ''} sur{' '}
+              <strong>{scopeDomaines.length}</strong> domaine{scopeDomaines.length > 1 ? 's' : ''} d'audit sur les 8 prévus
+              par la M9-6, soit <strong>{points.length}</strong> point{points.length > 1 ? 's' : ''} de contrôle :
+            </p>
+            <ul className="space-y-0.5 pl-4 list-disc">
+              {scopeDomaines.map(d => {
+                const nb = points.filter(p => p.domaine_id === d.id).length;
+                return (
+                  <li key={d.id}>
+                    <strong>{d.lettre} · {d.label}</strong> — {nb} point{nb > 1 ? 's' : ''} contrôlé{nb > 1 ? 's' : ''}
+                    <span className="text-muted-foreground"> ({d.reference})</span>
+                  </li>
+                );
+              })}
+            </ul>
+            {isPerimetreRestreint && (
+              <p className="italic text-muted-foreground border-t pt-2 mt-2">
+                Les autres domaines (
+                {DOMAINES_AUDIT.filter(d => !scopeDomaines.find(s => s.id === d.id)).map(d => `${d.lettre} ${d.label}`).join(', ')}
+                ) sont <strong>hors périmètre</strong> et n'ont pas fait l'objet de contrôles dans le cadre du présent PV.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+
         {/* Synthèse */}
         <Card>
           <CardHeader className="pb-3">
