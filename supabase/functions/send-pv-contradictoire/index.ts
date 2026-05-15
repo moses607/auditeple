@@ -66,7 +66,7 @@ Deno.serve(async (req) => {
           body: JSON.stringify({
             to: email_destinataire,
             subject: `[AUDIT CICF] PV contradictoire — ${etablissement_nom} — ${new Date().toLocaleDateString('fr-FR')}`,
-            html: buildEmailHtml({ link, audit_libelle, etablissement_nom, ordonnateur_nom, ac_nom, delai_jours }),
+            html: buildEmailHtml({ link, audit_libelle, etablissement_nom, ordonnateur_nom, ac_nom, delai_jours, constats }),
           }),
         });
         emailSent = emailRes.ok;
