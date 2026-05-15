@@ -11,6 +11,7 @@ import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout, AnomalyAlert } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { AgentSelect } from '@/components/AgentSelect';
+import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 
 const PROCESSUS_LIST = CARTOPALE_PROCESSUS.map(p => `${p.code} — ${p.label}`);
 
