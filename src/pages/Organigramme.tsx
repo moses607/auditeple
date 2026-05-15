@@ -127,6 +127,62 @@ export default function OrganigrammePage() {
     setForm(null);
   };
 
+  const handlePrint = () => {
+    const equipeRows = items.length === 0 ? null : items.map(m => {
+      const ordo = (m.taches || []).some(t => TACHES_ORDONNATEUR.includes(t));
+      const compta = (m.taches || []).some(t => TACHES_COMPTABLE.includes(t));
+      return [
+        m.nom || '—', m.fonction || '—', m.email || '—', m.telephone || '—',
+        (m.taches || []).join(' · ') || '—',
+        (ordo && compta) ? badge('Conflit GBCP art. 9', 'critique') : badge('Conforme', 'ok'),
+      ];
+    });
+    const matriceRows = matriceTaches.map(t => [
+      t.tache,
+      t.membres.length === 0 ? badge('Non attribuée', 'critique') : badge(`${t.membres.length} agent(s)`, 'ok'),
+      t.membres.map(m => m.nom).join(' · ') || '—',
+    ]);
+    const fonctionRows = parFonction.map(([fonction, membres]) => [
+      fonction, String(membres.length), membres.map(m => m.nom).join(' · '),
+    ]);
+    const controlesRows = CONTROLES_ORGANIGRAMME.map(c => [
+      (c as any).code || '—', c.label,
+      regChecks[c.id] ? badge('Vérifié', 'ok') : badge('À vérifier', 'majeure'),
+    ]);
+    printLandscape({
+      title: 'Organigramme fonctionnel — qui fait quoi',
+      subtitle: 'Rôles, délégations et matrice de séparation des tâches · M9-6 § 1.2 · GBCP art. 9',
+      etablissement: activeEtab?.nom || activeGroupement?.libelle,
+      identifiant: activeEtab ? `UAI ${activeEtab.uai}` : undefined,
+      reference: 'Pièce annexée au compte financier — Organigramme fonctionnel',
+      sections: [
+        { title: `Synthèse — ${items.length} agent(s)`,
+          subtitle: `${parFonction.length} fonction(s) · ${conflitsSeparation.length} conflit(s) de séparation`,
+          html: table(['Indicateur', 'Valeur'], [
+            ['Nombre d\'agents', String(items.length)],
+            ['Fonctions distinctes', String(parFonction.length)],
+            ['Tâches couvertes', `${[...new Set(items.flatMap(x => x.taches || []))].length} / ${TACHES_COMPTABLES.length}`],
+            ['Tâches non attribuées', String(tachesNonAttribuees.length)],
+            ['Conflits séparation (GBCP art. 9)', String(conflitsSeparation.length)],
+          ]) },
+        { title: 'Composition de l\'équipe',
+          subtitle: 'Détail nominatif, fonction, coordonnées et tâches assignées',
+          html: equipeRows
+            ? table(['Nom', 'Fonction', 'Email', 'Téléphone', 'Tâches', 'Séparation'], equipeRows)
+            : '<div class="note">Aucun membre enregistré dans l\'organigramme.</div>' },
+        { title: 'Matrice « qui fait quoi » — couverture par tâche',
+          html: table(['Tâche comptable', 'Couverture', 'Agent(s) en charge'], matriceRows) },
+        { title: 'Vue regroupée par fonction',
+          html: fonctionRows.length > 0
+            ? table(['Fonction', 'Effectif', 'Agents'], fonctionRows)
+            : '<div class="note">Aucune fonction renseignée.</div>' },
+        { title: 'Points de contrôle réglementaires',
+          html: table(['Réf.', 'Contrôle', 'État'], controlesRows) },
+      ],
+    });
+  };
+
+
   return (
     <ModulePageLayout
       title="Organigramme fonctionnel"
