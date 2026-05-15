@@ -24,6 +24,8 @@ const riskLevel = (r: CartoRisque) => {
 };
 
 export default function CartographieRisques() {
+  const { params } = useAuditParamsContext();
+  const etabId = params.selectedEtablissementId || null;
   const [items, setItems] = useState<CartoRisque[]>(() => loadState('cartographie', []));
   const [form, setForm] = useState<any>(null);
   const save = (d: CartoRisque[]) => { setItems(d); saveState('cartographie', d); };
