@@ -19,6 +19,9 @@ interface Props {
   value: string;
   onChange: (display: string, agent?: AgentRow) => void;
   roles?: AgentRole[];
+  /** Si fourni : ne propose que les agents rattachés à cet établissement
+   *  (ou rattachés au groupement entier — etablissement_id null, ex. agent comptable). */
+  etablissementId?: string | null;
   placeholder?: string;
   className?: string;
 }
@@ -28,15 +31,18 @@ export function formatAgentDisplay(a: AgentRow): string {
   return `${civ}${a.prenom} ${a.nom.toUpperCase()} — ${getRoleLabel(a.role)}`;
 }
 
-export function AgentSelect({ value, onChange, roles, placeholder = 'Choisir un agent…', className }: Props) {
+export function AgentSelect({ value, onChange, roles, etablissementId, placeholder = 'Choisir un agent…', className }: Props) {
   const { activeId } = useGroupements();
   const { agents, loading } = useAgents(activeId);
 
   const filtered = useMemo(() => {
     let list = agents.filter(a => a.actif);
     if (roles && roles.length > 0) list = list.filter(a => roles.includes(a.role));
+    if (etablissementId) {
+      list = list.filter(a => a.etablissement_id === etablissementId || a.etablissement_id === null);
+    }
     return list;
-  }, [agents, roles]);
+  }, [agents, roles, etablissementId]);
 
   // Regroupement par rôle
   const groups = useMemo(() => {

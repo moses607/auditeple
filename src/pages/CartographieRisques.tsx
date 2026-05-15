@@ -11,6 +11,7 @@ import { loadState, saveState } from '@/lib/store';
 import { ModulePageLayout, AnomalyAlert } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { AgentSelect } from '@/components/AgentSelect';
+import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 
 const PROCESSUS_LIST = CARTOPALE_PROCESSUS.map(p => `${p.code} — ${p.label}`);
 
@@ -23,6 +24,8 @@ const riskLevel = (r: CartoRisque) => {
 };
 
 export default function CartographieRisques() {
+  const { params } = useAuditParamsContext();
+  const etabId = params.selectedEtablissementId || null;
   const [items, setItems] = useState<CartoRisque[]>(() => loadState('cartographie', []));
   const [form, setForm] = useState<any>(null);
   const save = (d: CartoRisque[]) => { setItems(d); saveState('cartographie', d); };
@@ -172,7 +175,7 @@ export default function CartographieRisques() {
                 </select>
               </div>
               <div className="space-y-1"><Label className="text-xs">Action corrective</Label><Input value={form.action} onChange={e => setForm({ ...form, action: e.target.value })} /></div>
-              <div className="space-y-1"><Label className="text-xs">Responsable</Label><AgentSelect value={form.responsable || ''} onChange={(display) => setForm({ ...form, responsable: display })} placeholder="Choisir dans l'équipe…" /></div>
+              <div className="space-y-1"><Label className="text-xs">Responsable</Label><AgentSelect value={form.responsable || ''} etablissementId={etabId} onChange={(display) => setForm({ ...form, responsable: display })} placeholder="Choisir dans l'équipe de l'établissement…" /></div>
               <div className="space-y-1">
                 <Label className="text-xs">Échéance</Label>
                 <select className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={form.echeance} onChange={e => setForm({ ...form, echeance: e.target.value })}>
