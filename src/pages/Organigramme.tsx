@@ -88,13 +88,13 @@ export default function OrganigrammePage() {
 
   // Importe les agents Paramètres → organigramme (sans doublon de nom)
   const importerDepuisParametres = () => {
-    if (agents.length === 0) {
-      toast({ title: 'Aucun agent à importer', description: 'Ajoutez des agents dans Paramètres → Agents.', variant: 'destructive' });
+    if (agentsEtab.length === 0) {
+      toast({ title: 'Aucun agent à importer', description: 'Ajoutez des agents dans Paramètres → Agents pour cet établissement.', variant: 'destructive' });
       return;
     }
     const existingNames = new Set(items.map(i => i.nom.trim().toLowerCase()));
     const newItems: EquipeMembre[] = [];
-    agents.filter(a => a.actif).forEach(a => {
+    agentsEtab.forEach(a => {
       const fullName = `${a.civilite ? a.civilite + ' ' : ''}${a.prenom} ${a.nom.toUpperCase()}`.trim();
       if (existingNames.has(fullName.toLowerCase())) return;
       const map = ROLE_TO_FONCTION[a.role] ?? { fonction: getRoleLabel(a.role as any), taches: [] };
