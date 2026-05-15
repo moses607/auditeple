@@ -131,7 +131,7 @@ export default function PlanAction() {
     <ModulePageLayout
       title="Plan d'action — CICF"
       section="CONTRÔLE INTERNE"
-      description="Plan d'action généré automatiquement à partir de la cartographie des risques (criticité ≥ Moyenne) et des anomalies des PV d'audit. Moteur de 20 règles métier M9-6 / GBCP / Code éducation, extensible."
+      description="Plan d'action généré automatiquement à partir de TOUS les risques de la cartographie (toutes criticités) et des anomalies des PV d'audit. Moteur de 20 règles métier M9-6 / GBCP / Code éducation, extensible. Les constats sont repris dans le mail à l'ordonnateur lors de l'envoi du PV contradictoire."
       refs={[
         { code: 'M9-6 § 2.2', label: 'Cartographie & traitement des risques' },
         { code: 'GBCP art. 215', label: 'Rapport AC' },
