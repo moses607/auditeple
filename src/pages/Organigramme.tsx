@@ -139,16 +139,17 @@ export default function OrganigrammePage() {
       <DoctrineEPLE theme="organigramme" titre="Organigramme & séparation des tâches" resume="Rôles, délégations, suppléances, séparation engagement/paiement" />
 
       {/* KPI */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{items.length}</p><p className="text-xs text-muted-foreground mt-0.5">Agents</p></CardContent></Card>
         <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{[...new Set(items.map(x => x.fonction))].length}</p><p className="text-xs text-muted-foreground mt-0.5">Fonctions distinctes</p></CardContent></Card>
-        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{[...new Set(items.flatMap(x => x.taches || []))].length}</p><p className="text-xs text-muted-foreground mt-0.5">Tâches assignées</p></CardContent></Card>
+        <Card className="shadow-card"><CardContent className="p-4"><p className="text-2xl font-bold">{[...new Set(items.flatMap(x => x.taches || []))].length} / {TACHES_COMPTABLES.length}</p><p className="text-xs text-muted-foreground mt-0.5">Tâches couvertes</p></CardContent></Card>
+        <Card className={`shadow-card ${conflitsSeparation.length > 0 ? 'border-destructive/50 bg-destructive/5' : ''}`}><CardContent className="p-4"><p className={`text-2xl font-bold ${conflitsSeparation.length > 0 ? 'text-destructive' : 'text-emerald-600'}`}>{conflitsSeparation.length}</p><p className="text-xs text-muted-foreground mt-0.5">Conflits séparation des tâches</p></CardContent></Card>
       </div>
 
       <div className="flex justify-end gap-2 flex-wrap">
-        <Button variant="outline" onClick={importerDepuisParametres} disabled={agents.length === 0}>
+        <Button variant="outline" onClick={importerDepuisParametres} disabled={agentsEtab.length === 0}>
           <Download className="h-4 w-4 mr-2" />
-          Importer depuis Paramètres ({agents.filter(a => a.actif).length})
+          Importer agents de l'établissement ({agentsEtab.length})
         </Button>
         <Button onClick={() => setForm({ nom: '', fonction: 'Agent Comptable', telephone: '', email: '', taches: [] })}>
           <Plus className="h-4 w-4 mr-2" /> Membre
