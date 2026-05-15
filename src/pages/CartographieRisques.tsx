@@ -168,6 +168,13 @@ export default function CartographieRisques() {
               <Download className="h-4 w-4 mr-2" /> Export CSV
             </Button>
           )}
+          <Button
+            className="bg-white/20 hover:bg-white/30 text-white border-white/25"
+            variant="outline"
+            onClick={handlePrint}
+          >
+            <Printer className="h-4 w-4 mr-2" /> Imprimer (compte financier)
+          </Button>
         </div>
       }
     >
