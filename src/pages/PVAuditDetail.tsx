@@ -117,7 +117,7 @@ export default function PVAuditDetail() {
         .map(p => ({
           type: p.status === 'anomalie_majeure' ? 'Anomalie majeure' : 'Anomalie mineure',
           libelle: p.point_libelle,
-          domaine: DOMAINES_AUDIT.find(d => d.id === p.domaine_id)?.libelle ?? p.domaine_id,
+          domaine: DOMAINES_AUDIT.find(d => d.id === p.domaine_id)?.label ?? p.domaine_id,
           constat: p.constat ?? '',
           action: p.action_corrective ?? '',
         }));
