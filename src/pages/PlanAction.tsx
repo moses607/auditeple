@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Plus, RefreshCw, Sparkles, AlertTriangle, Clock, CheckCircle2, ListChecks, KanbanSquare, CalendarDays, Mail } from 'lucide-react';
+import { Plus, RefreshCw, Sparkles, AlertTriangle, Clock, CheckCircle2, ListChecks, KanbanSquare, CalendarDays, Mail, Printer } from 'lucide-react';
 import { ModulePageLayout } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { CartoRisque } from '@/lib/types';
@@ -27,13 +27,65 @@ import { useGroupements } from '@/hooks/useGroupements';
 import { usePlanActionsSync } from '@/hooks/usePlanActionsSync';
 import { Cloud, CloudOff } from 'lucide-react';
 import { RealtimePulse } from '@/components/RealtimePulse';
+import { printLandscape, table, badge } from '@/lib/print-landscape';
+import { useEtablissements } from '@/hooks/useGroupements';
+import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 
 export default function PlanAction() {
   const { actions, setActions: persist, synced, remoteUpdateAt } = usePlanActionsSync();
   const [editing, setEditing] = useState<ActionPlan | null>(null);
-  const { activeId } = useGroupements();
+  const { activeId, groupements } = useGroupements();
+  const activeGroupement = groupements.find(g => g.id === activeId);
+  const { etablissements } = useEtablissements(activeId);
+  const { params } = useAuditParamsContext();
+  const etabId = params.selectedEtablissementId || null;
+  const activeEtab = etabId ? etablissements.find(e => e.id === etabId) : null;
 
   const stats = useMemo(() => computeStats(actions), [actions]);
+
+  const handlePrint = () => {
+    const visibles = actions.filter(a => a.statut !== 'archive');
+    const orderCrit = { critique: 0, majeure: 1, moyenne: 2, faible: 3 } as const;
+    const sorted = [...visibles].sort((a, b) =>
+      (orderCrit[a.criticite] - orderCrit[b.criticite]) || a.echeance.localeCompare(b.echeance),
+    );
+    const rows = sorted.length === 0 ? null : sorted.map(a => [
+      CRITICITE_LABELS[a.criticite] ? badge(CRITICITE_LABELS[a.criticite], a.criticite as any) : a.criticite,
+      a.origineLabel || a.origine,
+      a.libelle,
+      a.cycle || '—',
+      a.responsable || '—',
+      a.echeance || '—',
+      badge(STATUT_LABELS[a.statut] || a.statut, a.statut === 'fait' ? 'ok' : a.statut === 'en_cours' ? 'info' : 'majeure'),
+      a.reference || '—',
+    ]);
+    printLandscape({
+      title: 'Plan d\'action — CICF',
+      subtitle: 'Issu de la cartographie des risques et des anomalies de PV d\'audit · M9-6 § 2.2 · GBCP art. 215',
+      etablissement: activeEtab?.nom || activeGroupement?.libelle,
+      identifiant: activeEtab ? `UAI ${activeEtab.uai}` : undefined,
+      reference: 'Pièce annexée au compte financier — Plan d\'action CICF',
+      sections: [
+        { title: `Synthèse — ${stats.total} action(s) active(s)`,
+          subtitle: `Avancement ${stats.tauxAvancement}% · ${stats.enRetard} en retard · ${stats.j15} à échéance J-15`,
+          html: table(['Indicateur', 'Valeur'], [
+            ['Actions actives', String(stats.total)],
+            ['En retard', String(stats.enRetard)],
+            ['À échéance J-15', String(stats.j15)],
+            ['Faites', String(stats.parStatut.fait)],
+            ['Taux d\'avancement', `${stats.tauxAvancement} %`],
+            ['Critiques', String(stats.parCriticite.critique)],
+            ['Majeures', String(stats.parCriticite.majeure)],
+            ['Moyennes', String(stats.parCriticite.moyenne)],
+            ['Faibles', String(stats.parCriticite.faible)],
+          ]) },
+        { title: 'Détail des actions (triées par criticité puis échéance)',
+          html: rows
+            ? table(['Criticité', 'Origine', 'Action corrective', 'Cycle', 'Responsable', 'Échéance', 'Statut', 'Référence'], rows)
+            : '<div class="note">Aucune action enregistrée.</div>' },
+      ],
+    });
+  };
 
   // ═══ Auto-génération depuis cartographie + PV audit ═══
   const regenerer = async () => {

@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Pencil, Download } from 'lucide-react';
+import { Plus, Trash2, Pencil, Download, Printer } from 'lucide-react';
 import { CartoRisque, NIVEAUX_RISQUE } from '@/lib/types';
 import { CARTOPALE_PROCESSUS } from '@/lib/regulatory-data';
 import { loadState, saveState } from '@/lib/store';
@@ -12,6 +12,8 @@ import { ModulePageLayout, AnomalyAlert } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
 import { AgentSelect } from '@/components/AgentSelect';
 import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
+import { useGroupements, useEtablissements } from '@/hooks/useGroupements';
+import { printLandscape, table, badge } from '@/lib/print-landscape';
 
 const PROCESSUS_LIST = CARTOPALE_PROCESSUS.map(p => `${p.code} — ${p.label}`);
 
@@ -26,9 +28,92 @@ const riskLevel = (r: CartoRisque) => {
 export default function CartographieRisques() {
   const { params } = useAuditParamsContext();
   const etabId = params.selectedEtablissementId || null;
+  const { groupements, activeId } = useGroupements();
+  const activeGroupement = groupements.find(g => g.id === activeId);
+  const { etablissements } = useEtablissements(activeId);
+  const activeEtab = etabId ? etablissements.find(e => e.id === etabId) : null;
   const [items, setItems] = useState<CartoRisque[]>(() => loadState('cartographie', []));
   const [form, setForm] = useState<any>(null);
   const save = (d: CartoRisque[]) => { setItems(d); saveState('cartographie', d); };
+
+  const handlePrint = () => {
+    const sorted = [...items].sort((a, b) => (b.probabilite * b.impact * b.maitrise) - (a.probabilite * a.impact * a.maitrise));
+    const niveauKind = (n: number): 'critique' | 'majeure' | 'moyenne' | 'faible' => {
+      if (n >= 40) return 'critique';
+      if (n >= 20) return 'majeure';
+      if (n >= 10) return 'moyenne';
+      return 'faible';
+    };
+    const niveauLabel = (n: number) => ({ critique: 'CRITIQUE', majeure: 'MAJEUR', moyenne: 'MOYEN', faible: 'FAIBLE' }[niveauKind(n)]);
+
+    const detailRows = sorted.length === 0
+      ? null
+      : sorted.map(r => {
+          const score = r.probabilite * r.impact * r.maitrise;
+          return [
+            r.processus,
+            r.risque,
+            String(r.probabilite),
+            String(r.impact),
+            String(r.maitrise),
+            String(score),
+            badge(niveauLabel(score), niveauKind(score)),
+            r.action || '—',
+            r.responsable || '—',
+            r.echeance || '—',
+            r.statut || '—',
+          ];
+        });
+
+    const couvRows = CARTOPALE_PROCESSUS.map(p => {
+      const list = items.filter(r => r.processus.startsWith(p.code));
+      const hasCrit = list.some(r => r.probabilite * r.impact * r.maitrise >= 40);
+      return [
+        p.code,
+        p.label,
+        String(list.length),
+        list.length === 0 ? badge('Non couvert', 'info') : hasCrit ? badge('Critique', 'critique') : badge('Couvert', 'ok'),
+      ];
+    });
+
+    printLandscape({
+      title: 'Cartographie des risques — CICF',
+      subtitle: 'Méthodologie Cartop@le / ODICé · Cotation P × I × M · Décret 2012-1246 art. 170',
+      etablissement: activeEtab?.nom || activeGroupement?.libelle,
+      identifiant: activeEtab ? `UAI ${activeEtab.uai}` : undefined,
+      reference: 'Pièce annexée au compte financier — Cartographie CICF',
+      sections: [
+        {
+          title: `Synthèse — ${items.length} risque${items.length > 1 ? 's' : ''} identifié${items.length > 1 ? 's' : ''}`,
+          subtitle: `${critiques.length} critique(s) · ${majeurs.length} majeur(s) · ${coveredProcessus.length}/11 processus couverts`,
+          html: table(
+            ['Indicateur', 'Valeur'],
+            [
+              ['Risques identifiés', String(items.length)],
+              ['Risques critiques (score ≥ 40)', String(critiques.length)],
+              ['Risques majeurs (score 20-39)', String(majeurs.length)],
+              ['Processus Cartop@le couverts', `${coveredProcessus.length} / 11`],
+              ['Risques en attente de traitement', String(items.filter(r => r.statut === 'À lancer').length)],
+            ],
+          ),
+        },
+        {
+          title: 'Couverture des 11 processus Cartop@le',
+          html: table(['Code', 'Processus', 'Nb risques', 'Statut couverture'], couvRows),
+        },
+        {
+          title: 'Détail des risques (triés par criticité décroissante)',
+          subtitle: 'Score = Probabilité × Impact × Maîtrise',
+          html: detailRows
+            ? table(
+                ['Processus', 'Risque', 'P', 'I', 'M', 'Score', 'Niveau', 'Action de traitement', 'Responsable', 'Échéance', 'Statut'],
+                detailRows,
+              )
+            : '<div class="note">Aucun risque enregistré dans la cartographie.</div>',
+        },
+      ],
+    });
+  };
 
   const submit = () => {
     if (!form || !form.risque) return;
@@ -83,6 +168,13 @@ export default function CartographieRisques() {
               <Download className="h-4 w-4 mr-2" /> Export CSV
             </Button>
           )}
+          <Button
+            className="bg-white/20 hover:bg-white/30 text-white border-white/25"
+            variant="outline"
+            onClick={handlePrint}
+          >
+            <Printer className="h-4 w-4 mr-2" /> Imprimer (compte financier)
+          </Button>
         </div>
       }
     >

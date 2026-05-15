@@ -4,16 +4,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Trash2, Pencil, Download, AlertTriangle, CheckCircle2, Users } from 'lucide-react';
+import { Plus, Trash2, Pencil, Download, AlertTriangle, CheckCircle2, Users, Printer } from 'lucide-react';
 import { EquipeMembre, FONCTIONS_COMPTABLES, TACHES_COMPTABLES } from '@/lib/types';
 import { loadState, saveState } from '@/lib/store';
 import { CONTROLES_ORGANIGRAMME } from '@/lib/regulatory-data';
 import { ModulePageLayout, ComplianceCheck, ModuleSection } from '@/components/ModulePageLayout';
 import { DoctrineEPLE } from '@/components/DoctrineEPLE';
-import { useAgents, useGroupements, getRoleLabel } from '@/hooks/useGroupements';
+import { useAgents, useGroupements, useEtablissements, getRoleLabel } from '@/hooks/useGroupements';
 import { useAuditParamsContext } from '@/contexts/AuditParamsContext';
 import { AgentSelect } from '@/components/AgentSelect';
 import { toast } from '@/hooks/use-toast';
+import { printLandscape, table, badge } from '@/lib/print-landscape';
 
 // Tâches « ordonnateur » (engagement) vs « comptable » (paiement) — séparation GBCP art. 9
 const TACHES_ORDONNATEUR = ['Liquidation dépenses', 'Demande de paiement', 'Émission titres', 'Commande publique', 'Engagement'];
@@ -46,10 +47,13 @@ export default function OrganigrammePage() {
   const [form, setForm] = useState<any>(null);
   const save = (d: EquipeMembre[]) => { setItems(d); saveState('organigramme', d); };
 
-  const { activeId } = useGroupements();
+  const { activeId, groupements } = useGroupements();
+  const activeGroupement = groupements.find(g => g.id === activeId);
   const { agents } = useAgents(activeId);
+  const { etablissements } = useEtablissements(activeId);
   const { params } = useAuditParamsContext();
   const etabId = params.selectedEtablissementId || null;
+  const activeEtab = etabId ? etablissements.find(e => e.id === etabId) : null;
 
   // Agents filtrés sur l'établissement actif (+ agents transverses du groupement)
   const agentsEtab = useMemo(
@@ -123,6 +127,62 @@ export default function OrganigrammePage() {
     setForm(null);
   };
 
+  const handlePrint = () => {
+    const equipeRows = items.length === 0 ? null : items.map(m => {
+      const ordo = (m.taches || []).some(t => TACHES_ORDONNATEUR.includes(t));
+      const compta = (m.taches || []).some(t => TACHES_COMPTABLE.includes(t));
+      return [
+        m.nom || '—', m.fonction || '—', m.email || '—', m.telephone || '—',
+        (m.taches || []).join(' · ') || '—',
+        (ordo && compta) ? badge('Conflit GBCP art. 9', 'critique') : badge('Conforme', 'ok'),
+      ];
+    });
+    const matriceRows = matriceTaches.map(t => [
+      t.tache,
+      t.membres.length === 0 ? badge('Non attribuée', 'critique') : badge(`${t.membres.length} agent(s)`, 'ok'),
+      t.membres.map(m => m.nom).join(' · ') || '—',
+    ]);
+    const fonctionRows = parFonction.map(([fonction, membres]) => [
+      fonction, String(membres.length), membres.map(m => m.nom).join(' · '),
+    ]);
+    const controlesRows = CONTROLES_ORGANIGRAMME.map(c => [
+      (c as any).code || '—', c.label,
+      regChecks[c.id] ? badge('Vérifié', 'ok') : badge('À vérifier', 'majeure'),
+    ]);
+    printLandscape({
+      title: 'Organigramme fonctionnel — qui fait quoi',
+      subtitle: 'Rôles, délégations et matrice de séparation des tâches · M9-6 § 1.2 · GBCP art. 9',
+      etablissement: activeEtab?.nom || activeGroupement?.libelle,
+      identifiant: activeEtab ? `UAI ${activeEtab.uai}` : undefined,
+      reference: 'Pièce annexée au compte financier — Organigramme fonctionnel',
+      sections: [
+        { title: `Synthèse — ${items.length} agent(s)`,
+          subtitle: `${parFonction.length} fonction(s) · ${conflitsSeparation.length} conflit(s) de séparation`,
+          html: table(['Indicateur', 'Valeur'], [
+            ['Nombre d\'agents', String(items.length)],
+            ['Fonctions distinctes', String(parFonction.length)],
+            ['Tâches couvertes', `${[...new Set(items.flatMap(x => x.taches || []))].length} / ${TACHES_COMPTABLES.length}`],
+            ['Tâches non attribuées', String(tachesNonAttribuees.length)],
+            ['Conflits séparation (GBCP art. 9)', String(conflitsSeparation.length)],
+          ]) },
+        { title: 'Composition de l\'équipe',
+          subtitle: 'Détail nominatif, fonction, coordonnées et tâches assignées',
+          html: equipeRows
+            ? table(['Nom', 'Fonction', 'Email', 'Téléphone', 'Tâches', 'Séparation'], equipeRows)
+            : '<div class="note">Aucun membre enregistré dans l\'organigramme.</div>' },
+        { title: 'Matrice « qui fait quoi » — couverture par tâche',
+          html: table(['Tâche comptable', 'Couverture', 'Agent(s) en charge'], matriceRows) },
+        { title: 'Vue regroupée par fonction',
+          html: fonctionRows.length > 0
+            ? table(['Fonction', 'Effectif', 'Agents'], fonctionRows)
+            : '<div class="note">Aucune fonction renseignée.</div>' },
+        { title: 'Points de contrôle réglementaires',
+          html: table(['Réf.', 'Contrôle', 'État'], controlesRows) },
+      ],
+    });
+  };
+
+
   return (
     <ModulePageLayout
       title="Organigramme fonctionnel"
@@ -150,6 +210,9 @@ export default function OrganigrammePage() {
         <Button variant="outline" onClick={importerDepuisParametres} disabled={agentsEtab.length === 0}>
           <Download className="h-4 w-4 mr-2" />
           Importer agents de l'établissement ({agentsEtab.length})
+        </Button>
+        <Button variant="outline" onClick={handlePrint}>
+          <Printer className="h-4 w-4 mr-2" /> Imprimer (compte financier)
         </Button>
         <Button onClick={() => setForm({ nom: '', fonction: 'Agent Comptable', telephone: '', email: '', taches: [] })}>
           <Plus className="h-4 w-4 mr-2" /> Membre
