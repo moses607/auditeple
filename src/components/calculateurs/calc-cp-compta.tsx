@@ -154,21 +154,22 @@ export function CalcAmortissements() {
 // ═════════════ DBM / VIREMENTS BUDGÉTAIRES ═════════════
 export function CalcDBM() {
   const meta = getCalculateur('dbm')!;
-  const [type, setType] = useState<'22' | '23' | '24' | '27'>('22');
+  const [type, setType] = useState<'21' | '23' | '32' | '34'>('21');
   const [montant, setMontant] = useState(0);
   const [budgetInitial, setBudgetInitial] = useState(0);
 
+  // Nomenclature Op@le : 1er chiffre = niveau (2 = info CA, 3 = vote CA) ; 2e chiffre = nature de l'opération.
   const TYPES = {
-    '22': { label: 'DBM 22 — Virement entre comptes du même service', auto: true, ca: false, recteur: false, detail: 'Compétence : ordonnateur. Information du CA.' },
-    '23': { label: 'DBM 23 — Ressources nouvelles spécifiques', auto: true, ca: true, recteur: false, detail: 'Vote du CA + transmission au recteur.' },
-    '24': { label: 'DBM 24 — Virement entre services', auto: false, ca: true, recteur: false, detail: 'Vote du CA obligatoire.' },
-    '27': { label: 'DBM 27 — Prélèvement sur fonds de roulement', auto: false, ca: true, recteur: true, detail: 'Vote CA + accord du recteur (FdR mobilisé).' },
+    '21': { label: 'DBM 21 — Niveau 2 — Virement entre comptes d\'un même service (info CA)', auto: true, ca: false, recteur: false, detail: 'Niveau 2 : compétence ordonnateur, simple information du CA. Pas de vote.' },
+    '23': { label: 'DBM 23 — Niveau 2 — Ressources nouvelles spécifiques affectées (info CA)', auto: true, ca: false, recteur: false, detail: 'Niveau 2 : ressources affectées (subvention fléchée, participation des familles…). Information du CA.' },
+    '34': { label: 'DBM 34 — Niveau 3 — Virement entre services (vote CA)', auto: false, ca: true, recteur: false, detail: 'Niveau 3 : vote du CA obligatoire. Modification de la répartition entre services.' },
+    '32': { label: 'DBM 32 — Niveau 3 — Prélèvement sur fonds de roulement (vote CA + accord recteur)', auto: false, ca: true, recteur: true, detail: 'Niveau 3 : mobilisation du FdR. Vote du CA puis accord exprès du recteur (autorité académique).' },
   } as const;
 
   const cur = TYPES[type];
   const impactPct = budgetInitial > 0 ? (montant / budgetInitial) * 100 : 0;
 
-  const sample = () => { setType('27'); setMontant(15000); setBudgetInitial(450000); };
+  const sample = () => { setType('32'); setMontant(15000); setBudgetInitial(450000); };
 
   return (
     <CalculateurShell meta={meta} onLoadSample={sample}>
