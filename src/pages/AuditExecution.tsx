@@ -253,6 +253,12 @@ export default function AuditExecution() {
 
   const StatusIcon = STATUS_META[current.status].icon;
 
+  // Périmètre = liste des domaines réellement présents dans audit_points_results
+  const scopeDomaines = Array.from(new Set(points.map(p => p.domaine_id)))
+    .map(id => DOMAINES_AUDIT.find(d => d.id === id))
+    .filter(Boolean) as typeof DOMAINES_AUDIT;
+  const isPerimetreRestreint = scopeDomaines.length < DOMAINES_AUDIT.length;
+
   return (
     <ModulePageLayout
       title={audit.libelle}
@@ -260,6 +266,32 @@ export default function AuditExecution() {
       description={`Période ${audit.periode_debut} → ${audit.periode_fin} · ${points.length} points à contrôler`}
     >
       <div className="space-y-4">
+        {isPerimetreRestreint && (
+          <Card className="border-amber-500/40 bg-amber-500/5">
+            <CardContent className="py-3">
+              <div className="flex items-start gap-2 flex-wrap">
+                <Badge variant="outline" className="border-amber-600 text-amber-700 dark:text-amber-300 shrink-0">
+                  Périmètre restreint
+                </Badge>
+                <div className="text-xs flex-1 min-w-[200px]">
+                  <p className="font-medium mb-1">
+                    Cet audit porte exclusivement sur {scopeDomaines.length} domaine{scopeDomaines.length > 1 ? 's' : ''} sur 8 :
+                  </p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {scopeDomaines.map(d => (
+                      <Badge key={d.id} variant="secondary" className="text-[10px]">
+                        {d.lettre} · {d.label}
+                      </Badge>
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mt-1.5 italic">
+                    Les autres domaines sont hors périmètre : ils ne pourront pas être renseignés ici ni mentionnés dans le PV.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
         <Card>
           <CardContent className="py-3 space-y-2">
             <div className="flex items-center justify-between text-sm gap-3 flex-wrap">
