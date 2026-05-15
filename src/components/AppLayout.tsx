@@ -57,65 +57,71 @@ export function AppLayout({ children }: AppLayoutProps) {
       <div className="min-h-screen flex w-full">
         <AppSidebar />
         <div className="flex-1 flex flex-col min-w-0">
-          <header className="h-14 flex items-center border-b border-border bg-card/90 backdrop-blur-md px-4 shrink-0 shadow-sm sticky top-0 z-30">
-            <SidebarTrigger className="mr-4" />
-            <div className="flex items-center gap-2 flex-1">
+          <header className="min-h-14 flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-border bg-card/90 backdrop-blur-md px-3 py-2 shrink-0 shadow-sm sticky top-0 z-30">
+            <div className="flex items-center gap-2 shrink-0">
+              <SidebarTrigger />
               <img src={logoImg} alt="CIC Expert Pro" className="h-8 w-8 rounded-md object-contain" />
-              <span className="text-sm font-semibold text-foreground tracking-tight hidden sm:inline">
+              <span className="text-sm font-semibold text-foreground tracking-tight hidden lg:inline">
                 CIC Expert Pro
               </span>
             </div>
-            {hasEtabs ? (
-              <>
-                {current && (
-                  <span className="text-xs font-medium text-foreground truncate max-w-[120px] md:hidden">
-                    {current.nom}
-                  </span>
-                )}
-                <div className="hidden md:flex items-center gap-2">
-                <Select
-                  value={current?.id ?? ''}
-                  onValueChange={(id) => update({ selectedEtablissementId: id })}
-                >
-                  <SelectTrigger className="h-8 w-auto min-w-[220px] max-w-[400px] bg-primary/5 border-primary/20 text-xs rounded-lg">
-                    <Building2 className="h-3.5 w-3.5 text-primary mr-1.5 shrink-0" />
-                    <SelectValue placeholder="Sélectionner un établissement" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {mergedEtabs.map(e => (
-                      <SelectItem key={e.id} value={e.id} className="text-xs">
-                        <span className="font-semibold">{e.nom}</span>
-                        <span className="text-muted-foreground ml-2">({e.uai})</span>
-                        {e.ville && <span className="text-muted-foreground ml-1">— {e.ville}</span>}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {current && (
-                  <div className="hidden md:flex items-center gap-1 text-xs text-muted-foreground">
-                    <MapPin className="h-3 w-3" />
-                    {current.ville}
+
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              {hasEtabs ? (
+                <>
+                  {current && (
+                    <span className="text-xs font-medium text-foreground truncate md:hidden">
+                      {current.nom}
+                    </span>
+                  )}
+                  <div className="hidden md:flex items-center gap-2 min-w-0 flex-1">
+                    <Select
+                      value={current?.id ?? ''}
+                      onValueChange={(id) => update({ selectedEtablissementId: id })}
+                    >
+                      <SelectTrigger className="h-8 min-w-0 w-full max-w-[360px] bg-primary/5 border-primary/20 text-xs rounded-lg">
+                        <Building2 className="h-3.5 w-3.5 text-primary mr-1.5 shrink-0" />
+                        <SelectValue placeholder="Sélectionner un établissement" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {mergedEtabs.map(e => (
+                          <SelectItem key={e.id} value={e.id} className="text-xs">
+                            <span className="font-semibold">{e.nom}</span>
+                            <span className="text-muted-foreground ml-2">({e.uai})</span>
+                            {e.ville && <span className="text-muted-foreground ml-1">— {e.ville}</span>}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {current?.ville && (
+                      <div className="hidden xl:flex items-center gap-1 text-xs text-muted-foreground shrink-0">
+                        <MapPin className="h-3 w-3" />
+                        {current.ville}
+                      </div>
+                    )}
+                    <NavLink to="/parametres" className="text-xs text-primary hover:underline font-medium shrink-0">
+                      Gérer
+                    </NavLink>
                   </div>
-                )}
-                <NavLink to="/parametres" className="text-xs text-primary hover:underline ml-1 font-medium">
-                  Gérer
+                </>
+              ) : (
+                <NavLink to="/parametres" className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-dashed border-muted-foreground/30 hover:border-primary/50 hover:bg-muted transition-colors">
+                  <Building2 className="h-4 w-4 text-muted-foreground" />
+                  <span className="text-xs text-muted-foreground">Aucun établissement — Saisir un UAI</span>
                 </NavLink>
-                </div>
-              </>
-            ) : (
-              <NavLink to="/parametres" className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-dashed border-muted-foreground/30 hover:border-primary/50 hover:bg-muted transition-colors">
-                <Building2 className="h-4 w-4 text-muted-foreground" />
-                <span className="text-xs text-muted-foreground">Aucun établissement — Saisir un UAI</span>
-              </NavLink>
-            )}
-            <DemoModeToggle />
-            <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="ml-2 text-muted-foreground hover:text-foreground" title="Basculer le thème">
-              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </Button>
-            <span className="text-[10px] text-green-500 font-mono ml-2 hidden sm:inline">● Session active</span>
-            <Button variant="ghost" size="icon" onClick={signOut} className="text-muted-foreground hover:text-destructive" title="Déconnexion">
-              <LogOut className="h-4 w-4" />
-            </Button>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1 shrink-0 ml-auto">
+              <DemoModeToggle />
+              <Button variant="ghost" size="icon" onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} className="text-muted-foreground hover:text-foreground" title="Basculer le thème">
+                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+              <span className="text-[10px] text-green-500 font-mono hidden xl:inline">● Session active</span>
+              <Button variant="ghost" size="icon" onClick={signOut} className="text-muted-foreground hover:text-destructive" title="Déconnexion">
+                <LogOut className="h-4 w-4" />
+              </Button>
+            </div>
           </header>
           {isDemoMode() && (
             <div className="bg-amber-500/10 border-b border-amber-500/30 text-amber-900 dark:text-amber-200 text-xs px-4 py-1.5 flex items-center justify-center gap-2 no-print">
