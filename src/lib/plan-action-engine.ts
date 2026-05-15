@@ -440,14 +440,14 @@ export function genererActions(
     });
   }
 
-  // 4) Archivage des risques disparus / criticité tombée
+  // 4) Archivage des risques disparus de la cartographie
   const refsActifs = new Set([
-    ...ctx.risques.filter(r => r.probabilite * r.impact * r.maitrise >= 20).map(r => `risque:${r.id}`),
+    ...ctx.risques.map(r => `risque:${r.id}`),
   ]);
   for (const a of map.values()) {
     if (a.origine === 'risque' && a.statut !== 'archive' && a.statut !== 'fait' && !refsActifs.has(a.origineRef)) {
       a.statut = 'archive';
-      a.commentaires = (a.commentaires ? a.commentaires + '\n' : '') + `Archivée auto le ${now.slice(0, 10)} — risque retiré ou criticité < Moyenne.`;
+      a.commentaires = (a.commentaires ? a.commentaires + '\n' : '') + `Archivée auto le ${now.slice(0, 10)} — risque retiré de la cartographie.`;
       a.updatedAt = now;
     }
   }
