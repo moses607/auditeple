@@ -8,3 +8,8 @@ Nouveautés par rapport à la version d'origine (WebGL brut) :
 - Physique réaliste : modèle bicyclette avec adhérence des pneus, transmission AWD/RWD/FWD, boîte auto 6 rapports, compte-tours, frein à main (drift), ABS, herbe glissante, collisions et dégâts.
 - 3 modes : balade libre (pièces à ramasser), auto-école (10 niveaux, étoiles, plots renversables), course (circuit de 1,1 km, 3 tours, rivaux IA de la même catégorie, records sauvegardés).
 - Compteur analogique, mini-carte, traces de pneus, fumée, son moteur synthétisé, clavier AZERTY/QWERTY, manette, commandes tactiles.
+
+## Version 2
+- Catégorie **Police & Secours** (11 véhicules) : sérigraphies Police / Gendarmerie / US / SAMU / Pompiers, rampe lumineuse clignotante, sirène (touche G, bouton SIRÈNE, LB manette). Patrouilles de police sur le circuit en balade libre.
+- Silhouettes propres aux modèles : 911, Lamborghini, Mini (toit blanc), 4x4 carrés (G63, Wrangler, Defender, Bronco… roue de secours, élargisseurs), fastbacks Mustang/Camaro, cabriolets Cobra/MX-5, DeLorean inox, Tesla, break RS6 ; phares ronds/doubles/LED, calandres typées, écopes, prises d'air.
+- Commandes : pédales progressives (clavier, tactile), volant tactile saisi n'importe où (près d'un tour, retour au centre), braquage clavier adapté à la vitesse, marche arrière après 0,4 s d'appui à l'arrêt, option AIDES (antipatinage, ESP, braquage limité au grip), voyants ABS/ESP et jauges de pédales.
