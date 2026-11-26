@@ -169,6 +169,25 @@ button{cursor:pointer;border:none;outline:none;font-family:inherit;color:inherit
   #raceBox{top:auto;bottom:8px}
   #raceBox .v{font-size:14px}
 }
+/* ---- Commandes tactiles : disposition sans chevauchement ---- */
+body.touch #touch{padding:10px max(10px,env(safe-area-inset-right,0px)) max(10px,env(safe-area-inset-bottom,0px)) max(10px,env(safe-area-inset-left,0px));gap:10px}
+body.touch #wheel{position:relative;z-index:3;flex:none}
+body.touch .tr{margin-right:0;flex:none;z-index:2}
+body.touch #dmgBox{display:none}
+body.touch #gauge{width:124px;height:124px;right:auto;left:50%;transform:translateX(-50%);bottom:10px;pointer-events:none}
+@media (orientation:portrait){
+  body.touch #wheel{width:min(130px,34vw);height:min(130px,34vw)}
+  body.touch .tr{gap:5px}
+  body.touch .pedal{width:52px;height:92px;font-size:9px}
+  body.touch #pGas{height:110px}
+  body.touch #pHand{width:44px;height:60px;font-size:8px}
+  body.touch .prnd button{width:30px;height:24px;font-size:11px}
+  body.touch #gauge{width:112px;height:112px;left:auto;right:10px;transform:none;bottom:150px}
+  body.touch #raceBox{top:auto;bottom:270px}
+}
+@media (orientation:landscape) and (max-width:700px){
+  body.touch #gauge{width:100px;height:100px}
+}
 </style>
 </head>
 <body>
@@ -1899,7 +1918,7 @@ function startDriving(){
   ensureAudio();
   S.inGarage=false; garage.remove(playerCar); scene.add(playerCar);
   $('garageUI').classList.add('hidden'); $('orbitHint').classList.add('hidden'); $('hud').classList.remove('hidden');
-  if(isTouch) $('touch').classList.remove('hidden');
+  if(isTouch) showTouch();
   S.siren=false; $('hSiren').classList.remove('act'); $('hSiren').classList.toggle('hidden',!currentSpec().livery);
   startMode(); camPos.set(P.x-Math.sin(P.yaw)*12,6,P.z-Math.cos(P.yaw)*12); camYaw=P.yaw;
   if(renderPass) renderPass.scene=scene;
@@ -1985,7 +2004,9 @@ bindPedal('pGas','gas'); bindPedal('pBrake','brake'); bindPedal('pHand','hand');
   const end=e=>{ if(e.pointerId===pid){ pid=null; touchState.wheel=false; } };
   w.addEventListener('pointerup',end); w.addEventListener('pointercancel',end);
 }
-addEventListener('touchstart',()=>{ if(!S.inGarage) $('touch').classList.remove('hidden'); },{passive:true,once:true});
+let touchUI=false;
+function showTouch(){ touchUI=true; $('touch').classList.remove('hidden'); document.body.classList.add('touch'); }
+addEventListener('touchstart',()=>{ if(!S.inGarage) showTouch(); },{passive:true});
 let padPrev=[];
 const WHEEL_MAX=300;
 const approach=(v,t,up,dn,dt)=>t>v?Math.min(t,v+up*dt):Math.max(t,v-dn*dt);
@@ -2140,7 +2161,7 @@ function loop(now){
     sun.position.set(P.x+sunDir.x*160, Math.max(20,sunDir.y*160), P.z+sunDir.z*160); sun.target.position.set(P.x,0,P.z);
     updateEngineSound(P.rpm, P.throttle, P.slip, Math.abs(P.u));
     if(++hudTick%2===0){ drawGauge(); drawMinimap(now); $('dmgTxt').textContent=Math.round(P.dmg)+'%'; $('dmgBar').style.width=P.dmg+'%';
-      if(isTouch) $('wheelSvg').style.transform=`rotate(${touchState.wheel||Math.abs(touchState.wheelDeg)>1?touchState.wheelDeg:P.steer*WHEEL_MAX/1.6}deg)`; }
+      if(touchUI) $('wheelSvg').style.transform=`rotate(${touchState.wheel||Math.abs(touchState.wheelDeg)>1?touchState.wheelDeg:P.steer*WHEEL_MAX/1.6}deg)`; }
   }
   if(bay.visible){ const k=.5+.5*Math.sin(now*.006); bayFill.opacity=.12+.12*k; }
   renderer.toneMappingExposure = S.inGarage?.95:WORLD_EXPOSURE;
