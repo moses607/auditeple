@@ -13,3 +13,11 @@ Nouveautés par rapport à la version d'origine (WebGL brut) :
 - Catégorie **Police & Secours** (11 véhicules) : sérigraphies Police / Gendarmerie / US / SAMU / Pompiers, rampe lumineuse clignotante, sirène (touche G, bouton SIRÈNE, LB manette). Patrouilles de police sur le circuit en balade libre.
 - Silhouettes propres aux modèles : 911, Lamborghini, Mini (toit blanc), 4x4 carrés (G63, Wrangler, Defender, Bronco… roue de secours, élargisseurs), fastbacks Mustang/Camaro, cabriolets Cobra/MX-5, DeLorean inox, Tesla, break RS6 ; phares ronds/doubles/LED, calandres typées, écopes, prises d'air.
 - Commandes : pédales progressives (clavier, tactile), volant tactile saisi n'importe où (près d'un tour, retour au centre), braquage clavier adapté à la vitesse, marche arrière après 0,4 s d'appui à l'arrêt, option AIDES (antipatinage, ESP, braquage limité au grip), voyants ABS/ESP et jauges de pédales.
+
+## Version 3 (maniabilité)
+- Direction au choix : volant tactile ou flèches ◀ ▶ ; sensibilité douce / normale / rapide.
+- Lignes de trajectoire à basse vitesse (vertes en avant, jaunes en marche arrière) pour les manœuvres.
+- Caméra orientable en glissant le doigt ou la souris sur l'écran (retour automatique).
+- Vibration du téléphone lors des chocs (Android).
+- Score de drift avec combo et record ; un choc fait perdre le drift en cours.
+- Commandes tactiles disposées sans chevauchement (volant toujours accessible).

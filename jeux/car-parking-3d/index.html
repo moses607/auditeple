@@ -188,6 +188,12 @@ body.touch #gauge{width:124px;height:124px;right:auto;left:50%;transform:transla
 @media (orientation:landscape) and (max-width:700px){
   body.touch #gauge{width:100px;height:100px}
 }
+#arrows{display:flex;gap:10px;pointer-events:auto}
+#arrows .arr{width:84px;height:96px;font-size:30px;background:linear-gradient(180deg,#334155,#0f172a)}
+@media (orientation:portrait){ #arrows .arr{width:64px;height:84px} }
+#drift{position:absolute;left:50%;top:22%;transform:translateX(-50%);text-align:center;pointer-events:none;text-shadow:0 3px 14px rgba(0,0,0,.6)}
+#drift b{display:block;font-size:40px;font-weight:900;color:#facc15;font-family:ui-monospace,monospace}
+#drift span{font-size:12px;font-weight:900;letter-spacing:.2em;color:#fff}
 </style>
 </head>
 <body>
@@ -216,6 +222,8 @@ try{ var t=document.createElement('canvas'); if(!(t.getContext('webgl2')||t.getC
       <button class="opt" id="optRivals">RIVAUX : 3</button>
       <button class="opt" id="optQuality">GRAPHISMES : HAUT</button>
       <button class="opt" id="optAssist">AIDES : OUI</button>
+      <button class="opt" id="optSteer">DIRECTION : VOLANT</button>
+      <button class="opt" id="optSens">SENSIBILITÉ : NORMALE</button>
       <button class="opt" id="optSound">SON : OUI</button>
       <button class="opt" id="optHelp">?</button>
       <button id="btnPlay"><svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span>JOUER</span></button>
@@ -280,9 +288,11 @@ try{ var t=document.createElement('canvas'); if(!(t.getContext('webgl2')||t.getC
   </div>
   <div id="dmgBox" class="glass">DÉGÂTS <span id="dmgTxt">0%</span><div class="b"><i id="dmgBar"></i></div></div>
   <canvas id="gauge" width="380" height="380"></canvas>
+  <div id="drift" class="hidden"><b id="driftPts">0</b><span id="driftLbl">DRIFT</span></div>
   <div id="toast" class="glass"></div>
   <div id="bigMsg"></div>
   <div id="touch" class="hidden">
+    <div id="arrows" class="hidden"><button class="pedal arr" id="tL">◀</button><button class="pedal arr" id="tR">▶</button></div>
     <div id="wheel" class="glass">
       <svg id="wheelSvg" viewBox="0 0 100 100">
         <circle cx="50" cy="50" r="42" fill="none" stroke="#1e293b" stroke-width="10"/>
@@ -483,6 +493,7 @@ const S = {
   rivals: store.get('rivals',3),
   sound: store.get('sound',true),
   assist: store.get('assist',true), siren:false,
+  steerMode: store.get('steerMode','wheel'), steerSens: store.get('steerSens',1), driftBest: store.get('driftBest',0), camDrag:0, camDragT:0,
   camMode:0, lightsOn:true, blinker:'none', gear:'D',
   levelIdx:0, levelDone:false, lastBeep:0,
   schoolStars: store.get('schoolStars',{}),
@@ -1324,7 +1335,8 @@ function stepPlayer(dt){
   const sp=Math.abs(P.u);
   // clavier : braquage progressif, plus doux à haute vitesse ; volant/manette : suivi direct
   const centering = Math.abs(steerIn)<Math.abs(P.steer) || Math.sign(steerIn)!==Math.sign(P.steer);
-  const rate = input.analog ? 14 : (centering ? 6 : 1.6+2.4/(1+sp/12));
+  const rate = input.analog ? 14 : (centering ? 7 : (1.6+2.4/(1+sp/12))*S.steerSens);
+  if(input.analog) steerIn=THREE.MathUtils.clamp(steerIn*S.steerSens,-1,1);
   P.steer += THREE.MathUtils.clamp(steerIn-P.steer,-rate*dt,rate*dt);
   let dMax = .62/(1+sp*sp/520);
   P.delta = -P.steer*dMax;   // + = gauche
@@ -1418,6 +1430,7 @@ function stepPlayer(dt){
   P.x += vx*dt; P.z += vz*dt;
   // Glissement (fumée, traces, crissement)
   const latSlip=Math.abs(P.v-b*P.r);
+  stepDrift(dt, sp, b);
   P.slip = Math.min(1.5, Math.max(0,(latSlip-1.6)/4) + wheelspin*.8 + (hand&&sp>4?.6:0));
   // --- Collisions ---
   const res = collideCar(P.x,P.z,P.yaw,spec,vx,vz,true);
@@ -1454,7 +1467,24 @@ function collideCar(x,z,yaw,spec,vx,vz,isPlayer){
   return moved?{x,z,vx,vz,hit:hitSpeed>1}:null;
 }
 let shake=0, impacts=0;
+// Score de drift (combo : glisser longtemps, vite et en travers)
+const DR={pts:0,t:0,idle:0};
+function stepDrift(dt,sp,b){
+  const ang=Math.abs(Math.atan2(P.v-b*P.r, Math.max(sp,1)));
+  const el=document.getElementById('drift');
+  if(sp>7 && ang>.18 && P.surface!=='grass' && S.mode!=='school'){
+    DR.pts+=sp*ang*dt*40*(1+DR.t*.15); DR.t+=dt; DR.idle=0;
+    el.classList.remove('hidden'); document.getElementById('driftPts').textContent=Math.round(DR.pts);
+    document.getElementById('driftLbl').textContent='DRIFT ×'+(1+DR.t*.15).toFixed(1);
+  } else if(DR.pts>0){
+    DR.idle+=dt;
+    if(DR.idle>.8){ const p=Math.round(DR.pts); DR.pts=0; DR.t=0; el.classList.add('hidden');
+      if(p>200){ toast('Drift : +'+p+' points'); if(p>S.driftBest){ S.driftBest=p; store.set('driftBest',p); toast('Record de drift : '+p+' !'); } } }
+  }
+}
 function onPlayerImpact(v){
+  if(DR.pts>0){ DR.pts=0; DR.t=0; document.getElementById('drift').classList.add('hidden'); if(v>4) toast('Drift perdu !'); }
+  try{ navigator.vibrate && navigator.vibrate(Math.min(250,Math.round(v*18))); }catch(e){}
   sfx.crash(v); shake=Math.min(1,v/15);
   P.dmg=Math.min(100,P.dmg+v*1.1); impacts++;
   if(v>6) toast('BOUM ! −'+Math.round(v*1.1)+' %');
@@ -1694,6 +1724,7 @@ let levelT=0;
 
 function placePlayer(x,z,yaw){
   Object.assign(P,{x,z,yaw,u:0,v:0,r:0,steer:0,delta:0,gearN:1,ax:0,ay:0,hint:-1});
+  DR.pts=0; DR.t=0; const de=document.getElementById('drift'); if(de) de.classList.add('hidden');
   clearSkids();
 }
 function resetRun(){ P.dmg=0; impacts=0; conesHit=0; }
@@ -1805,10 +1836,12 @@ function updateCamera(dt){
     const velYaw = sp>3 ? Math.atan2(Math.sin(P.yaw)*P.u+Math.cos(P.yaw)*P.v, Math.cos(P.yaw)*P.u-Math.sin(P.yaw)*P.v) : P.yaw;
     let target = P.u<-1 ? P.yaw : (sp>3? P.yaw+angDiff(velYaw,P.yaw)*.45 : P.yaw);
     camYaw += angDiff(target,camYaw)*Math.min(1,dt*5);
+    if(!S.camDragging){ S.camDragT-=dt; if(S.camDragT<=0) S.camDrag*=Math.exp(-dt*3); }
+    const cy=camYaw+S.camDrag;
     const dist=4.2+spec.l*.75+sp*.035, h=1.6+spec.h*.9+sp*.008;
-    const tx=P.x-Math.sin(camYaw)*dist, tz=P.z-Math.cos(camYaw)*dist;
+    const tx=P.x-Math.sin(cy)*dist, tz=P.z-Math.cos(cy)*dist;
     camPos.lerp(new THREE.Vector3(tx,h,tz), 1-Math.exp(-dt*9));
-    camLook.set(P.x+fx*3, spec.h*.7, P.z+fz*3);
+    camLook.set(P.x+fx*3*Math.cos(S.camDrag), spec.h*.7, P.z+fz*3*Math.cos(S.camDrag));
     camera.fov += ((62+Math.min(24,sp*.32))-camera.fov)*Math.min(1,dt*3);
   } else if(S.camMode===1){
     camYaw=P.yaw;
@@ -1834,6 +1867,34 @@ function updateCamera(dt){
   camera.updateProjectionMatrix();
 }
 function angDiff(a,b){ let d=a-b; while(d>Math.PI) d-=Math.PI*2; while(d<-Math.PI) d+=Math.PI*2; return d; }
+
+/* =====================================================================
+   16b. LIGNES DE TRAJECTOIRE (aide aux manœuvres)
+   ===================================================================== */
+const GUIDE_N=24;
+const guideMat=layer(new THREE.MeshBasicMaterial({color:'#22c55e',transparent:true,opacity:.75,depthWrite:false}),7);
+const guides=[0,1].map(()=>{ const g=new THREE.BufferGeometry(); g.setAttribute('position',new THREE.BufferAttribute(new Float32Array(GUIDE_N*2*3),3));
+  const idx=[]; for(let i=0;i<GUIDE_N-1;i++){ const a=i*2; idx.push(a,a+1,a+2, a+1,a+3,a+2); } g.setIndex(idx);
+  const m=new THREE.Mesh(g,guideMat); m.frustumCulled=false; m.visible=false; world.add(m); return m; });
+function updateGuides(){
+  const sp=Math.abs(P.u), show = sp<4.5 && S.mode!=='race' && !S.inGarage && S.gear!=='P';
+  guides.forEach(g=>g.visible=show); if(!show) return;
+  const spec=currentSpec(), ud=playerCar.userData, L=ud.wheelbase, dir=S.gear==='R'?-1:1;
+  const k=Math.tan(P.delta)/L;                    // courbure de la trajectoire de l'essieu arrière
+  let x=P.x+Math.sin(P.yaw)*ud.axR, z=P.z+Math.cos(P.yaw)*ud.axR, yaw=P.yaw;
+  if(dir>0){ x=P.x+Math.sin(P.yaw)*ud.axR; z=P.z+Math.cos(P.yaw)*ud.axR; }
+  const pts=[]; const ds=7/GUIDE_N;
+  for(let i=0;i<GUIDE_N;i++){ pts.push([x,z,yaw]); x+=Math.sin(yaw)*ds*dir; z+=Math.cos(yaw)*ds*dir; yaw+=k*ds*dir; }
+  const off=dir>0?L:0;   // vers l'avant : partir des roues avant
+  guides.forEach((g,si)=>{
+    const side=si?1:-1, arr=g.geometry.attributes.position.array;
+    pts.forEach((p,i)=>{ const [px,pz,py]=p, lx=Math.cos(py), lz=-Math.sin(py), fx=Math.sin(py), fz=Math.cos(py);
+      const cx=px+fx*off+lx*side*(spec.w/2+.05), cz=pz+fz*off+lz*side*(spec.w/2+.05);
+      arr.set([cx-lx*.05,.06,cz-lz*.05, cx+lx*.05,.06,cz+lz*.05], i*6); });
+    g.geometry.attributes.position.needsUpdate=true;
+  });
+  guideMat.color.set(S.gear==='R'?'#facc15':'#22c55e');
+}
 
 /* =====================================================================
    16. INTERFACE : GARAGE
@@ -1886,10 +1947,15 @@ let plateTmr; $('plate').addEventListener('input',e=>{ S.plate=e.target.value.to
 function renderModeSeg(){ $('modeSeg').querySelectorAll('button').forEach(b=>{ b.className=b.dataset.m===S.mode?('on '+S.mode):''; }); $('optRivals').classList.toggle('hidden',S.mode!=='race'); }
 $('modeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; S.mode=b.dataset.m; store.set('mode',S.mode); renderModeSeg(); });
 $('optTime').onclick=()=>{ S.tod=(S.tod+1)%3; store.set('tod',S.tod); applyTOD(); };
-$('optRivals').onclick=()=>{ S.rivals=[0,1,3,5][([0,1,3,5].indexOf(S.rivals)+1)%4]; store.set('rivals',S.rivals); $('optRivals').textContent='RIVAUX : '+S.rivals; $('optAssist').textContent='AIDES : '+(S.assist?'OUI':'NON'); };
+$('optRivals').onclick=()=>{ S.rivals=[0,1,3,5][([0,1,3,5].indexOf(S.rivals)+1)%4]; store.set('rivals',S.rivals); syncSteerOpts(); $('optRivals').textContent='RIVAUX : '+S.rivals; $('optAssist').textContent='AIDES : '+(S.assist?'OUI':'NON'); };
 $('optQuality').onclick=()=>{ S.quality=1-S.quality; store.set('quality',S.quality); setupQuality(); };
 $('optSound').onclick=()=>{ ensureAudio(); setSound(!S.sound); $('optSound').textContent='SON : '+(S.sound?'OUI':'NON'); };
 $('optHelp').onclick=()=>showHelp();
+const SENS=[[.7,'DOUCE'],[1,'NORMALE'],[1.35,'RAPIDE']];
+function syncSteerOpts(){ $('optSteer').textContent='DIRECTION : '+(S.steerMode==='wheel'?'VOLANT':'FLÈCHES'); $('optSens').textContent='SENSIBILITÉ : '+(SENS.find(x=>x[0]===S.steerSens)||SENS[1])[1];
+  $('wheel').classList.toggle('hidden',S.steerMode!=='wheel'); $('arrows').classList.toggle('hidden',S.steerMode==='wheel'); }
+$('optSteer').onclick=()=>{ S.steerMode=S.steerMode==='wheel'?'arrows':'wheel'; store.set('steerMode',S.steerMode); syncSteerOpts(); };
+$('optSens').onclick=()=>{ const i=(SENS.findIndex(x=>x[0]===S.steerSens)+1)%SENS.length; S.steerSens=SENS[i][0]; store.set('steerSens',S.steerSens); syncSteerOpts(); };
 $('optAssist').onclick=()=>{ S.assist=!S.assist; store.set('assist',S.assist); $('optAssist').textContent='AIDES : '+(S.assist?'OUI':'NON'); };
 $('btnPlay').onclick=()=>startDriving();
 
@@ -1924,6 +1990,7 @@ function startDriving(){
   if(renderPass) renderPass.scene=scene;
 }
 function openGarage(){
+  guides.forEach(g=>g.visible=false);
   S.siren=false;
   S.inGarage=true; scene.remove(playerCar); garage.add(playerCar); playerCar.position.set(0,.12,0); playerCar.rotation.set(0,0,0);
   clearRivals(); race.running=false; hideModal();
@@ -1955,6 +2022,9 @@ function showHelp(){
   Les pédales sont progressives : garde la touche appuyée pour accélérer ou freiner plus fort. À l'arrêt, garde <kbd>↓</kbd> pour passer en marche arrière.<br>
   <b>Aides (OUI)</b> : antipatinage, ESP et braquage limité au grip, pour éviter les tête-à-queue. Mets NON pour drifter librement.<br>
   Manette : <b>RT</b> gaz, <b>LT</b> frein, stick gauche direction, <b>A</b> frein à main, <b>Y</b> caméra, <b>LB</b> sirène.<br>
+  Glisse le doigt (ou la souris) sur l'écran pour regarder autour de la voiture. Lignes de trajectoire à basse vitesse (vertes en avant, jaunes en marche arrière).<br>
+  Drift : glisse en travers pour marquer des points (combo), un choc fait tout perdre.<br>
+  Réglages du garage : DIRECTION volant ou flèches, SENSIBILITÉ douce / normale / rapide.<br>
   Tactile : attrape le volant n'importe où et tourne-le (jusqu'à presque un tour), il revient seul au centre. Pédales et boîte P-R-N-D à droite.<br><br>
   <b>Auto-école</b> : gare-toi dans la zone jaune, vitesse 0, levier sur <b>P</b>. 3 étoiles = sans plot renversé, sans choc, en moins de 75 s.<br>
   <b>Course</b> : 3 tours contre des rivaux de la même catégorie. L'herbe ralentit, les vibreurs aussi un peu.<br>
@@ -1993,7 +2063,7 @@ function bindPedal(id,key){
   const upf=e=>{ e.preventDefault(); touchState[key]=false; el.classList.remove('down'); };
   el.addEventListener('pointerdown',dn); el.addEventListener('pointerup',upf); el.addEventListener('pointerleave',upf); el.addEventListener('pointercancel',upf);
 }
-bindPedal('pGas','gas'); bindPedal('pBrake','brake'); bindPedal('pHand','hand');
+bindPedal('pGas','gas'); bindPedal('pBrake','brake'); bindPedal('pHand','hand'); bindPedal('tL','left'); bindPedal('tR','right');
 {
   // Volant tactile : on le saisit où l'on veut et on le tourne (jusqu'à ±1 tour), il revient seul au centre
   const w=$('wheel'); let pid=null, lastA=0;
@@ -2013,7 +2083,7 @@ const approach=(v,t,up,dn,dt)=>t>v?Math.min(t,v+up*dt):Math.max(t,v-dn*dt);
 function readInput(dt=1/60){
   // Clavier et pédales tactiles : pression progressive (comme une vraie pédale)
   let up=(keys.ArrowUp||keys.KeyW||touchState.gas)?1:0, down=(keys.ArrowDown||keys.KeyS||touchState.brake)?1:0;
-  let steer=((keys.ArrowRight||keys.KeyD)?1:0)-((keys.ArrowLeft||keys.KeyA)?1:0);
+  let steer=((keys.ArrowRight||keys.KeyD||touchState.right)?1:0)-((keys.ArrowLeft||keys.KeyA||touchState.left)?1:0);
   let hand=!!keys.Space||touchState.hand, analog=false, padUp=0, padDown=0;
   if(!touchState.wheel) touchState.wheelDeg*=Math.exp(-dt*7);            // retour au centre
   if(touchState.wheel||Math.abs(touchState.wheelDeg)>1){ steer=touchState.wheelDeg/WHEEL_MAX*1.6; analog=true; }
@@ -2032,7 +2102,9 @@ function readInput(dt=1/60){
   input.steer=THREE.MathUtils.clamp(steer,-1,1); input.hand=hand; input.analog=analog;
 }
 // Orbite garage (souris / tactile)
-canvas.addEventListener('pointerdown',e=>{ if(!S.inGarage) return; S.orbitDrag=true; S.px=e.clientX; S.py=e.clientY; });
+canvas.addEventListener('pointerdown',e=>{ if(!S.inGarage){ S.camDragging=true; S.px=e.clientX; return; } S.orbitDrag=true; S.px=e.clientX; S.py=e.clientY; });
+addEventListener('pointermove',e=>{ if(!S.camDragging) return; S.camDrag=THREE.MathUtils.clamp(S.camDrag-(e.clientX-S.px)*.01,-Math.PI,Math.PI); S.px=e.clientX; });
+addEventListener('pointerup',()=>{ if(S.camDragging){ S.camDragging=false; S.camDragT=1.5; } });
 addEventListener('pointermove',e=>{ if(!S.orbitDrag) return; S.orbitYaw-=(e.clientX-S.px)*.008; S.orbitPitch=THREE.MathUtils.clamp(S.orbitPitch+(e.clientY-S.py)*.005,.04,1.1); S.px=e.clientX; S.py=e.clientY; });
 addEventListener('pointerup',()=>{ S.orbitDrag=false; });
 canvas.addEventListener('wheel',e=>{ if(!S.inGarage) return; S.orbitDist=THREE.MathUtils.clamp(S.orbitDist+e.deltaY*.01,5,16); },{passive:true});
@@ -2155,7 +2227,7 @@ function loop(now){
     if(S.mode==='race'){ stepRace(dt); stepRivals(dt); }
     if(S.mode==='free') stepRivals(dt);
     if(S.mode==='school') stepSchool(dt,now);
-    updatePlayerVisuals(dt,now);
+    updatePlayerVisuals(dt,now); updateGuides();
     updateCamera(dt);
     // ombres qui suivent le joueur
     sun.position.set(P.x+sunDir.x*160, Math.max(20,sunDir.y*160), P.z+sunDir.z*160); sun.target.position.set(P.x,0,P.z);
@@ -2193,7 +2265,7 @@ rebuildPlayer();
 syncLightsBtn();
 requestAnimationFrame(t=>{ last=t; requestAnimationFrame(loop); });
 $('loading').classList.add('hidden');
-window.__game={S,P,VEHICLES,startDriving,openGarage,input,keys,race,rivals:()=>rivals,TRACK,world,stepPlayer,stepRivals,stepRace,stepSchool,readInput,rebuildPlayer,setGear,loadLevel,placePlayer,currentSpec,startMode};
+window.__game={S,P,VEHICLES,startDriving,openGarage,input,keys,race,rivals:()=>rivals,TRACK,world,stepPlayer,stepRivals,stepRace,stepSchool,readInput,rebuildPlayer,touchState,DR,updateGuides,setGear,loadLevel,placePlayer,currentSpec,startMode};
 </script>
 </body>
 </html>
