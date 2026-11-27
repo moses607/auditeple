@@ -21,3 +21,6 @@ Nouveautés par rapport à la version d'origine (WebGL brut) :
 - Vibration du téléphone lors des chocs (Android).
 - Score de drift avec combo et record ; un choc fait perdre le drift en cours.
 - Commandes tactiles disposées sans chevauchement (volant toujours accessible).
+
+## Version 3.1
+- Circuit élargi en 2 × 3 voies (23 m) : voies de 3,5 m, terre-plein central hachuré, lignes de rive ; rivaux et patrouilles placés sur les voies.

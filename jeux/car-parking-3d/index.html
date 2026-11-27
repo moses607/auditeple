@@ -1042,7 +1042,7 @@ ORIG_BUILDINGS.forEach((b,i)=>addBuilding(b[0],b[1],b[2],b[3],b[4],i));
 // --- Circuit (spline fermée autour de la ville) ---
 const TRACK_PTS=[[80,0],[92,-55],[72,-100],[20,-118],[-30,-102],[-72,-124],[-118,-100],[-96,-52],[-86,0],[-102,52],[-146,82],[-126,132],[-62,116],[-10,128],[42,150],[104,128],[124,72],[94,36]];
 const trackCurve = new THREE.CatmullRomCurve3(chaikin(TRACK_PTS.map(p=>[p[0]*1.18,p[1]*1.18]),1,true).map(p=>new THREE.Vector3(p[0],0,p[1])), true, 'centripetal');
-const TRACK_W = 15, TRACK_N = 900;
+const TRACK_W = 23, TRACK_N = 900;   // 2 × 3 voies de 3,5 m + terre-plein central + bandes
 const TRACK = { pts:[], tan:[], nor:[], s:[], curv:[], len:0 };
 {
   const P=trackCurve.getSpacedPoints(TRACK_N);
@@ -1081,11 +1081,22 @@ function ribbon(halfIn, halfOut, y, mat, vRepeatPerM=0.1){
   const nn=g.attributes.normal; for(let i=0;i<nn.count;i++) nn.setXYZ(i,0,1,0);
   const m=new THREE.Mesh(g,mat); m.receiveShadow=true; world.add(m); return m;
 }
-const roadTex = canvasTex(256,512,(g,w,h)=>{
-  noiseFill(g,w,h,'#35383f',55,30000,2);
-  g.fillStyle='rgba(255,255,255,.92)'; g.fillRect(10,0,7,h); g.fillRect(w-17,0,7,h);
-  g.fillStyle='rgba(255,255,255,.85)'; g.fillRect(w/2-4,0,8,h*.5);
-  g.fillStyle='rgba(0,0,0,.12)'; g.fillRect(w*.22,0,w*.12,h); g.fillRect(w*.66,0,w*.12,h);
+const roadTex = canvasTex(512,512,(g,w,h)=>{
+  // Profil en travers (m) : bande 0,5 | 3 voies de 3,5 | terre-plein 1,0 | 3 voies de 3,5 | bande 0,5
+  noiseFill(g,w,h,'#35383f',55,60000,2);
+  const px=m=>(m+TRACK_W/2)/TRACK_W*w;
+  const line=(m,wd,col,dash)=>{ g.fillStyle=col; const x=px(m)-wd*w/TRACK_W/2, ww=wd*w/TRACK_W;
+    if(!dash) g.fillRect(x,0,ww,h); else for(let y=0;y<h;y+=h/4) g.fillRect(x,y,ww,h/4*.45); };
+  // terre-plein central hachuré
+  g.fillStyle='rgba(255,255,255,.08)'; g.fillRect(px(-.5),0,px(.5)-px(-.5),h);
+  g.strokeStyle='rgba(255,255,255,.5)'; g.lineWidth=3; for(let y=-40;y<h;y+=40){ g.beginPath(); g.moveTo(px(-.5),y); g.lineTo(px(.5),y+30); g.stroke(); }
+  for(const sd of [-1,1]){
+    line(sd*.55,.15,'rgba(255,255,255,.95)');                 // ligne continue du terre-plein
+    line(sd*4.0,.15,'rgba(255,255,255,.9)',true);            // séparation voies 1-2
+    line(sd*7.5,.15,'rgba(255,255,255,.9)',true);            // séparation voies 2-3
+    line(sd*11.05,.2,'rgba(255,255,255,.95)');                // rive
+    g.fillStyle='rgba(0,0,0,.10)'; for(const c of [2.25,5.75,9.25]) g.fillRect(px(sd*c)-px(.6)+px(0),0,px(1.2)-px(0),h); // usure des roues
+  }
 });
 roadTex.wrapT=THREE.RepeatWrapping;
 ribbon(-TRACK_W/2, TRACK_W/2, .02, layer(new THREE.MeshStandardMaterial({map:roadTex, roughness:.82}),2), 1/20);
@@ -1631,7 +1642,7 @@ function spawnRivals(n){
 }
 function gridSlot(k){ // k=0 joueur
   const row=Math.floor(k/2), side=k%2?1:-1;
-  return {s:-10-row*9-(k%2)*3, lat:side*3.4};
+  return {s:-10-row*9-(k%2)*3, lat:side*5.75};
 }
 function stepRivals(dt){
   const pSpec=currentSpec();
@@ -1655,8 +1666,8 @@ function stepRivals(dt){
     const p=trackPointAt(R.s);
     const dxp=P.x-p.x, dzp=P.z-p.z, ahead=dxp*p.t.x+dzp*p.t.y, latP=dxp*p.n.x+dzp*p.n.y;
     if(ahead>0 && ahead<14 && Math.abs(latP-R.lat)<2.6){ R.latT = latP>0? latP-3.2 : latP+3.2; }
-    else if(Math.random()<.004) R.latT=(Math.random()-.5)*8;
-    R.latT=THREE.MathUtils.clamp(R.latT,-5,5);
+    else if(Math.random()<.004) R.latT=R.patrol?R.lane:[-9.25,-5.75,-2.25,2.25,5.75,9.25][Math.floor(Math.random()*6)];
+    R.latT=THREE.MathUtils.clamp(R.latT,-9.2,9.2);
     R.lat += THREE.MathUtils.clamp(R.latT-R.lat,-2.5*dt,2.5*dt);
     const sOld=R.s; R.s+=R.v*dt;
     if(R.s>=TRACK.len){ R.s-=TRACK.len; R.lap++; if(!R.patrol && R.lap>=race.laps && !R.finished){ R.finished=true; R.time=race.t; race.order.push(R); } }
@@ -1698,7 +1709,7 @@ function spawnPatrols(){
   [0,2].forEach((k,i)=>{
     const rs=cops[k]; const mesh=buildCar(rs,{paint:rs.color,rim:1,plate:'POLICE'});
     mesh.traverse(o=>{ if(o.isMesh && o.material!==MAT.shadow) o.castShadow=true; }); world.add(mesh);
-    const R={spec:rs,mesh,s:TRACK.len*(.3+i*.45),lat:3.4,latT:3.4,v:12,lap:0,skill:1,finished:false,time:0,yaw:0,x:0,z:0,spin:0,patrol:true,cruise:15+i*3};
+    const R={spec:rs,mesh,s:TRACK.len*(.3+i*.45),lat:5.75,latT:5.75,lane:5.75,v:12,lap:0,skill:1,finished:false,time:0,yaw:0,x:0,z:0,spin:0,patrol:true,cruise:15+i*3};
     rivals.push(R); placeRival(R);
   });
 }
