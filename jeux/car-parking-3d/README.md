@@ -24,3 +24,10 @@ Nouveautés par rapport à la version d'origine (WebGL brut) :
 
 ## Version 3.1
 - Circuit élargi en 2 × 3 voies (23 m) : voies de 3,5 m, terre-plein central hachuré, lignes de rive ; rivaux et patrouilles placés sur les voies.
+
+## Version 4 (réalisme)
+- Trafic dans les deux sens en balade libre (voitures civiles + police), distances de sécurité, changements de voie avec clignotants.
+- Vue INTÉRIEUR : tableau de bord, compteurs, volant qui tourne, plafond, montants, rétroviseur intérieur en temps réel.
+- Vibreurs et herbe : secousses de caisse et grondement sonore.
+- Clignotants qui s arrêtent seuls après le virage.
+- Panneaux de limitation (30 km/h parking, 90 km/h circuit) ; auto-école : excès de vitesse comptés et pénalisés.
